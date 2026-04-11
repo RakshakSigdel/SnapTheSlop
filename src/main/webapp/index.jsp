@@ -8,6 +8,5 @@
 <body>
 
 <h1 class="font-bold">This is a test for tailwind</h1>
-
 </body>
 </html>
