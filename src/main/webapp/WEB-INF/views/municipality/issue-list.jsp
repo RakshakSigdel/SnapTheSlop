@@ -11,17 +11,48 @@
   <div class="flex-1" style="margin-left:220px; background:#f8fafc; min-height:100vh;">
 
     <div style="padding:18px 32px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #e2e8f0; background:#fff;">
-      <h1 style="font-family:'Outfit',sans-serif; font-size:18px; font-weight:700; color:#0f172a;">Issue Management</h1>
+      <div>
+        <h1 style="font-family:'Outfit',sans-serif; font-size:18px; font-weight:700; color:#0f172a; margin:0;">Manage Issues</h1>
+        <p style="font-size:13px; color:#64748b; margin:2px 0 0;">Browse and act on reports by ward, category, status, and priority.</p>
+      </div>
       <div style="display:flex; gap:8px;">
-        <button style="padding:8px 14px; border-radius:6px; font-size:12px; font-weight:600; border:1px solid #e2e8f0; background:#fff; color:#64748b; cursor:pointer; font-family:'Inter',sans-serif; display:inline-flex; align-items:center; gap:4px;">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
-          Filter
-        </button>
+        <button style="padding:8px 14px; border-radius:6px; font-size:12px; font-weight:600; border:1px solid #bbf7d0; background:#ecfdf5; color:#065f46; cursor:pointer; font-family:'Inter',sans-serif;">Apply Filters</button>
         <button style="padding:8px 14px; border-radius:6px; font-size:12px; font-weight:600; border:1px solid #e2e8f0; background:#fff; color:#64748b; cursor:pointer; font-family:'Inter',sans-serif;">Export CSV</button>
       </div>
     </div>
 
     <div style="padding:28px 32px;">
+
+      <div style="display:grid; grid-template-columns:2fr 1fr 1fr 1fr 1fr; gap:10px; margin-bottom:14px;">
+        <input type="text" placeholder="Search by issue title, issue id, or citizen" style="height:40px; border:1px solid #d1d5db; border-radius:8px; padding:0 12px; font-size:13px; color:#111827; background:#fff; font-family:'Inter',sans-serif;"/>
+        <select style="height:40px; border:1px solid #d1d5db; border-radius:8px; padding:0 10px; font-size:13px; color:#111827; background:#fff; font-family:'Inter',sans-serif;">
+          <option>Ward: All</option>
+          <option>Ward 02</option>
+          <option>Ward 04</option>
+          <option>Ward 09</option>
+          <option>Ward 15</option>
+        </select>
+        <select style="height:40px; border:1px solid #d1d5db; border-radius:8px; padding:0 10px; font-size:13px; color:#111827; background:#fff; font-family:'Inter',sans-serif;">
+          <option>Category: All</option>
+          <option>Road</option>
+          <option>Sanitation</option>
+          <option>Water Supply</option>
+          <option>Electrical</option>
+        </select>
+        <select style="height:40px; border:1px solid #d1d5db; border-radius:8px; padding:0 10px; font-size:13px; color:#111827; background:#fff; font-family:'Inter',sans-serif;">
+          <option>Status: All</option>
+          <option>Open</option>
+          <option>Pending</option>
+          <option>In Progress</option>
+          <option>Resolved</option>
+        </select>
+        <select style="height:40px; border:1px solid #d1d5db; border-radius:8px; padding:0 10px; font-size:13px; color:#111827; background:#fff; font-family:'Inter',sans-serif;">
+          <option>Sort: Reported Date</option>
+          <option>Sort: Upvotes</option>
+          <option>Sort: Oldest First</option>
+          <option>Sort: Ward</option>
+        </select>
+      </div>
 
       <!-- Quick stats -->
       <div style="display:flex; gap:24px; margin-bottom:24px;">
@@ -44,6 +75,7 @@
               <th style="text-align:left; padding:12px 18px; font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:1px;">Citizen</th>
               <th style="text-align:left; padding:12px 18px; font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:1px;">Ward</th>
               <th style="text-align:left; padding:12px 18px; font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:1px;">Status</th>
+              <th style="text-align:left; padding:12px 18px; font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:1px;">Upvotes</th>
               <th style="text-align:left; padding:12px 18px; font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:1px;">Date</th>
               <th style="text-align:right; padding:12px 18px;"></th>
             </tr>
@@ -55,17 +87,19 @@
               <td style="padding:14px 18px; font-size:13px; color:#64748b;">Ramesh S.</td>
               <td style="padding:14px 18px; font-size:13px; color:#64748b;">04</td>
               <td style="padding:14px 18px;"><span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:#fee2e2; color:#991b1b;">Open</span></td>
+              <td style="padding:14px 18px; font-size:12px; color:#0f172a; font-weight:700;">34</td>
               <td style="padding:14px 18px; font-size:12px; color:#94a3b8;">Today</td>
-              <td style="padding:14px 18px; text-align:right;"><button style="background:#7c3aed; color:#fff; border:none; padding:5px 14px; border-radius:6px; font-size:11px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif;">Review</button></td>
+              <td style="padding:14px 18px; text-align:right;"><a href="<%= request.getContextPath() %>/municipality/manage-issue?id=NW-29402" style="background:#059669; color:#fff; border:none; padding:5px 14px; border-radius:6px; font-size:11px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif; text-decoration:none; display:inline-block;">Manage</a></td>
             </tr>
             <tr style="border-bottom:1px solid #f8fafc;" onmouseover="this.style.background='#fafbfc'" onmouseout="this.style.background='transparent'">
               <td style="padding:14px 18px; font-size:13px; font-weight:500; color:#94a3b8;">#NW-29391</td>
               <td style="padding:14px 18px;"><p style="font-size:13px; font-weight:600; color:#1e293b;">Streetlight outage — Thamel</p><p style="font-size:11px; color:#94a3b8;">Electrical</p></td>
               <td style="padding:14px 18px; font-size:13px; color:#64748b;">Priya A.</td>
               <td style="padding:14px 18px; font-size:13px; color:#64748b;">09</td>
-              <td style="padding:14px 18px;"><span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:#dbeafe; color:#1e40af;">In Progress</span></td>
+              <td style="padding:14px 18px;"><span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:#d1fae5; color:#065f46;">In Progress</span></td>
+              <td style="padding:14px 18px; font-size:12px; color:#0f172a; font-weight:700;">29</td>
               <td style="padding:14px 18px; font-size:12px; color:#94a3b8;">Yesterday</td>
-              <td style="padding:14px 18px; text-align:right;"><button style="background:#f1f5f9; color:#64748b; border:1px solid #e2e8f0; padding:5px 14px; border-radius:6px; font-size:11px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif;">View</button></td>
+              <td style="padding:14px 18px; text-align:right;"><a href="<%= request.getContextPath() %>/municipality/manage-issue?id=NW-29391" style="background:#f1f5f9; color:#64748b; border:1px solid #e2e8f0; padding:5px 14px; border-radius:6px; font-size:11px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif; text-decoration:none; display:inline-block;">Manage</a></td>
             </tr>
             <tr style="border-bottom:1px solid #f8fafc;" onmouseover="this.style.background='#fafbfc'" onmouseout="this.style.background='transparent'">
               <td style="padding:14px 18px; font-size:13px; font-weight:500; color:#94a3b8;">#NW-29385</td>
@@ -73,8 +107,9 @@
               <td style="padding:14px 18px; font-size:13px; color:#64748b;">Anita D.</td>
               <td style="padding:14px 18px; font-size:13px; color:#64748b;">15</td>
               <td style="padding:14px 18px;"><span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:#d1fae5; color:#065f46;">Resolved</span></td>
+              <td style="padding:14px 18px; font-size:12px; color:#0f172a; font-weight:700;">18</td>
               <td style="padding:14px 18px; font-size:12px; color:#94a3b8;">Oct 14</td>
-              <td style="padding:14px 18px; text-align:right;"><button style="background:#f1f5f9; color:#64748b; border:1px solid #e2e8f0; padding:5px 14px; border-radius:6px; font-size:11px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif;">View</button></td>
+              <td style="padding:14px 18px; text-align:right;"><a href="<%= request.getContextPath() %>/municipality/manage-issue?id=NW-29385" style="background:#f1f5f9; color:#64748b; border:1px solid #e2e8f0; padding:5px 14px; border-radius:6px; font-size:11px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif; text-decoration:none; display:inline-block;">Manage</a></td>
             </tr>
             <tr onmouseover="this.style.background='#fafbfc'" onmouseout="this.style.background='transparent'">
               <td style="padding:14px 18px; font-size:13px; font-weight:500; color:#94a3b8;">#NW-29377</td>
@@ -82,8 +117,9 @@
               <td style="padding:14px 18px; font-size:13px; color:#64748b;">Vikram S.</td>
               <td style="padding:14px 18px; font-size:13px; color:#64748b;">09</td>
               <td style="padding:14px 18px;"><span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:#fef3c7; color:#92400e;">Pending</span></td>
+              <td style="padding:14px 18px; font-size:12px; color:#0f172a; font-weight:700;">52</td>
               <td style="padding:14px 18px; font-size:12px; color:#94a3b8;">Oct 12</td>
-              <td style="padding:14px 18px; text-align:right;"><button style="background:#7c3aed; color:#fff; border:none; padding:5px 14px; border-radius:6px; font-size:11px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif;">Review</button></td>
+              <td style="padding:14px 18px; text-align:right;"><a href="<%= request.getContextPath() %>/municipality/manage-issue?id=NW-29377" style="background:#059669; color:#fff; border:none; padding:5px 14px; border-radius:6px; font-size:11px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif; text-decoration:none; display:inline-block;">Manage</a></td>
             </tr>
           </tbody>
         </table>
