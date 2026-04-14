@@ -5,11 +5,11 @@
 
     <div style="padding:20px 20px 16px; border-bottom:1px solid #1e293b;">
         <div style="display:flex; align-items:center; gap:10px;">
-            <div style="width:30px; height:30px; border-radius:8px; background:#dc2626; display:flex; align-items:center; justify-content:center;">
+            <div style="width:30px; height:30px; border-radius:8px; background:#059669; display:flex; align-items:center; justify-content:center;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M12 3L3 7v2h18V7l-9-4zm-7 8v6H3v2h18v-2h-2v-6h-2v6h-2v-6h-2v6h-2v-6H9v6H7v-6H5z"/></svg>
             </div>
             <div>
-                <div style="font-family:'Outfit',sans-serif; font-weight:700; font-size:15px; color:#f1f5f9;">NagarSewa</div>
+                <div style="font-family:'Outfit',sans-serif; font-weight:700; font-size:15px; color:#f1f5f9;">SnapTheSlop</div>
                 <div style="font-size:10px; font-weight:600; color:#475569; text-transform:uppercase; letter-spacing:1.5px;">Admin</div>
             </div>
         </div>
@@ -20,28 +20,30 @@
 
         <a href="<%= request.getContextPath() %>/admin/dashboard"
            style="display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:8px; margin-bottom:2px; text-decoration:none; font-size:13px; font-weight:600;
-           <%= "dashboard".equals(activePage) ? "background:#1e293b; color:#f1f5f9;" : "color:#64748b;" %>">
+           <%= "dashboard".equals(activePage) ? "background:#15342a; color:#34d399;" : "color:#64748b;" %>">
             <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
             Dashboard
         </a>
 
-        <a href="<%= request.getContextPath() %>/admin/user-management"
+        <a href="<%= request.getContextPath() %>/admin/users"
            style="display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:8px; margin-bottom:2px; text-decoration:none; font-size:13px; font-weight:600;
-           <%= "user-management".equals(activePage) ? "background:#1e293b; color:#f1f5f9;" : "color:#64748b;" %>">
+              <%= ("citizens".equals(activePage) || "user-management".equals(activePage)) ? "background:#15342a; color:#34d399;" : "color:#64748b;" %>">
             <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg>
-            Users
+            Citizens
         </a>
 
-        <a href="<%= request.getContextPath() %>/admin/issue-management"
+        <a href="<%= request.getContextPath() %>/admin/municipalities"
            style="display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:8px; margin-bottom:2px; text-decoration:none; font-size:13px; font-weight:600;
-           <%= "issue-management".equals(activePage) ? "background:#1e293b; color:#f1f5f9;" : "color:#64748b;" %>">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-            Issues
+           <%= "municipalities".equals(activePage) ? "background:#15342a; color:#34d399;" : "color:#64748b;" %>">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 21h18M5 21V7l7-4 7 4v14M9 9h.01M15 9h.01M9 13h.01M15 13h.01"/></svg>
+            Municipalities
         </a>
 
-        <a href="#" style="display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:8px; margin-bottom:2px; text-decoration:none; font-size:13px; font-weight:600; color:#64748b;">
-            <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/></svg>
-            Settings
+        <a href="<%= request.getContextPath() %>/admin/manage-issues"
+           style="display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:8px; margin-bottom:2px; text-decoration:none; font-size:13px; font-weight:600;
+           <%= "issue-management".equals(activePage) ? "background:#15342a; color:#34d399;" : "color:#64748b;" %>">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            Manage Issues
         </a>
     </nav>
 

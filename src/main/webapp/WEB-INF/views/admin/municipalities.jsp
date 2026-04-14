@@ -1,0 +1,80 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<% request.setAttribute("activePage", "municipalities"); %>
+<jsp:include page="../common/header.jsp"/>
+
+<div class="flex min-h-screen">
+	<jsp:include page="../common/admin-sidebar.jsp"/>
+
+	<div class="flex-1" style="margin-left:220px; background:#f8fafc; min-height:100vh;">
+		<div style="padding:18px 32px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #e2e8f0; background:#fff;">
+			<div>
+				<h1 style="font-family:'Outfit',sans-serif; font-size:18px; font-weight:700; color:#0f172a; margin:0;">Municipalities</h1>
+				<p style="font-size:13px; color:#64748b; margin:2px 0 0;">Register and manage municipalities and municipality admins.</p>
+			</div>
+			<a href="<%= request.getContextPath() %>/admin/dashboard" style="padding:8px 14px; border-radius:7px; font-size:12px; font-weight:600; border:1px solid #e2e8f0; background:#fff; color:#64748b; text-decoration:none;">Back to Dashboard</a>
+		</div>
+
+		<div style="padding:28px 32px; display:grid; grid-template-columns:1.7fr 1fr; gap:16px;">
+			<div>
+				<div style="display:grid; grid-template-columns:2fr 1fr 1fr; gap:10px; margin-bottom:14px;">
+					<input type="text" placeholder="Search municipality or admin" style="height:40px; border:1px solid #d1d5db; border-radius:8px; padding:0 12px; font-size:13px; font-family:'Inter',sans-serif;"/>
+					<select style="height:40px; border:1px solid #d1d5db; border-radius:8px; padding:0 10px; font-size:13px; font-family:'Inter',sans-serif;"><option>Status: All</option><option>Active</option><option>Pending</option></select>
+					<select style="height:40px; border:1px solid #d1d5db; border-radius:8px; padding:0 10px; font-size:13px; font-family:'Inter',sans-serif;"><option>Sort: Name</option><option>Sort: Newest</option></select>
+				</div>
+
+				<div style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; overflow:hidden;">
+					<table style="width:100%; border-collapse:collapse;">
+						<thead>
+						<tr style="border-bottom:1px solid #f1f5f9;">
+							<th style="text-align:left; padding:12px 18px; font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:1px;">Municipality</th>
+							<th style="text-align:left; padding:12px 18px; font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:1px;">Admin</th>
+							<th style="text-align:left; padding:12px 18px; font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:1px;">Wards</th>
+							<th style="text-align:left; padding:12px 18px; font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:1px;">Status</th>
+							<th style="text-align:right; padding:12px 18px;"></th>
+						</tr>
+						</thead>
+						<tbody>
+						<tr style="border-bottom:1px solid #f8fafc;" onmouseover="this.style.background='#fafbfc'" onmouseout="this.style.background='transparent'">
+							<td style="padding:14px 18px;"><p style="font-size:13px; font-weight:600; color:#1e293b; margin:0;">Kathmandu Metropolitan City</p><p style="font-size:11px; color:#94a3b8; margin:2px 0 0;">KMC-01</p></td>
+							<td style="padding:14px 18px; font-size:13px; color:#64748b;">s.karki@kmc.gov.np</td>
+							<td style="padding:14px 18px; font-size:13px; color:#64748b;">32</td>
+							<td style="padding:14px 18px;"><span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:#d1fae5; color:#065f46;">Active</span></td>
+							<td style="padding:14px 18px; text-align:right;"><a href="<%= request.getContextPath() %>/admin/manage-municipality?id=KMC-01" style="background:#059669; color:#fff; border:none; padding:5px 14px; border-radius:6px; font-size:11px; font-weight:600; text-decoration:none; display:inline-block;">Manage</a></td>
+						</tr>
+						<tr style="border-bottom:1px solid #f8fafc;" onmouseover="this.style.background='#fafbfc'" onmouseout="this.style.background='transparent'">
+							<td style="padding:14px 18px;"><p style="font-size:13px; font-weight:600; color:#1e293b; margin:0;">Lalitpur Metropolitan City</p><p style="font-size:11px; color:#94a3b8; margin:2px 0 0;">LMC-02</p></td>
+							<td style="padding:14px 18px; font-size:13px; color:#64748b;">a.gurung@lmc.gov.np</td>
+							<td style="padding:14px 18px; font-size:13px; color:#64748b;">29</td>
+							<td style="padding:14px 18px;"><span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:#d1fae5; color:#065f46;">Active</span></td>
+							<td style="padding:14px 18px; text-align:right;"><a href="<%= request.getContextPath() %>/admin/manage-municipality?id=LMC-02" style="background:#f1f5f9; color:#64748b; border:1px solid #e2e8f0; padding:5px 14px; border-radius:6px; font-size:11px; font-weight:600; text-decoration:none; display:inline-block;">Manage</a></td>
+						</tr>
+						<tr onmouseover="this.style.background='#fafbfc'" onmouseout="this.style.background='transparent'">
+							<td style="padding:14px 18px;"><p style="font-size:13px; font-weight:600; color:#1e293b; margin:0;">Bhaktapur Municipality</p><p style="font-size:11px; color:#94a3b8; margin:2px 0 0;">BMC-03</p></td>
+							<td style="padding:14px 18px; font-size:13px; color:#64748b;">pending setup</td>
+							<td style="padding:14px 18px; font-size:13px; color:#64748b;">10</td>
+							<td style="padding:14px 18px;"><span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:#fef3c7; color:#92400e;">Pending</span></td>
+							<td style="padding:14px 18px; text-align:right;"><a href="<%= request.getContextPath() %>/admin/manage-municipality?id=BMC-03" style="background:#f1f5f9; color:#64748b; border:1px solid #e2e8f0; padding:5px 14px; border-radius:6px; font-size:11px; font-weight:600; text-decoration:none; display:inline-block;">Manage</a></td>
+						</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+			<div style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:18px;">
+				<h2 style="font-size:14px; font-weight:700; color:#0f172a; margin:0 0 12px;">Add Municipality</h2>
+				<input placeholder="Municipality Name" style="width:100%; height:38px; border:1px solid #d1d5db; border-radius:7px; padding:0 10px; font-size:13px; margin-bottom:10px; font-family:'Inter',sans-serif;"/>
+				<input placeholder="Municipality Code" style="width:100%; height:38px; border:1px solid #d1d5db; border-radius:7px; padding:0 10px; font-size:13px; margin-bottom:10px; font-family:'Inter',sans-serif;"/>
+				<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+					<input placeholder="Admin First Name" style="width:100%; height:38px; border:1px solid #d1d5db; border-radius:7px; padding:0 10px; font-size:13px; font-family:'Inter',sans-serif;"/>
+					<input placeholder="Admin Last Name" style="width:100%; height:38px; border:1px solid #d1d5db; border-radius:7px; padding:0 10px; font-size:13px; font-family:'Inter',sans-serif;"/>
+				</div>
+				<input placeholder="Admin Email Address" style="width:100%; height:38px; border:1px solid #d1d5db; border-radius:7px; padding:0 10px; font-size:13px; margin-bottom:10px; font-family:'Inter',sans-serif;"/>
+				<input placeholder="Admin Phone Number" style="width:100%; height:38px; border:1px solid #d1d5db; border-radius:7px; padding:0 10px; font-size:13px; margin-bottom:10px; font-family:'Inter',sans-serif;"/>
+				<input placeholder="Admin Password (Permanent)" style="width:100%; height:38px; border:1px solid #d1d5db; border-radius:7px; padding:0 10px; font-size:13px; margin-bottom:12px; font-family:'Inter',sans-serif;"/>
+				<button style="width:100%; background:#059669; color:#fff; border:none; height:38px; border-radius:7px; font-size:12px; font-weight:700; font-family:'Inter',sans-serif;">Register Municipality</button>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>

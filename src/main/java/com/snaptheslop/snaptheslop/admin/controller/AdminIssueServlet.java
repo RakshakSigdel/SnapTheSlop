@@ -6,10 +6,10 @@ import jakarta.servlet.http.*;
 
 import java.io.IOException;
 
-@WebServlet(name="adminIssueServlet",value="/admin/issue-management")
+@WebServlet(name = "adminIssueServlet", urlPatterns = {"/admin/issue-management", "/admin/manage-issues"})
 public class AdminIssueServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         request.setAttribute("activePage", "issue-management");
-        request.getRequestDispatcher("/WEB-INF/views/admin/issue-management.jsp").forward(request,response);
+        request.getRequestDispatcher("/WEB-INF/views/admin/issue-management.jsp").forward(request, response);
     }
 }
