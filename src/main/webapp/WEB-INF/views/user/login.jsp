@@ -1,344 +1,175 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>NagarSewa - Sign In</title>
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Sign In — SnapTheSlop</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
     <style>
-      :root {
-        --page-bg: #efefef;
-        --card-bg: #f6f6f6;
-        --panel-bg: #ffffff;
-        --text-main: #2c3338;
-        --text-muted: #7b8188;
-        --border-soft: #e4e7eb;
-        --primary: #1f63de;
-        --primary-dark: #1553c4;
-      }
-
-      * {
-        box-sizing: border-box;
-      }
-
-      body {
-        margin: 0;
-        min-height: 100vh;
-        font-family: "Segoe UI", Arial, sans-serif;
-        background: var(--page-bg);
-        color: var(--text-main);
-        display: flex;
-        justify-content: center;
-      }
-
-      .auth-shell {
-        width: 100%;
-        max-width: 720px;
-        min-height: 100vh;
-        padding: 52px 20px 28px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-      }
-
-      .brand-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 8px;
-        background: var(--primary);
-        display: grid;
-        place-items: center;
-        box-shadow: 0 10px 22px rgba(31, 99, 222, 0.26);
-        margin-bottom: 12px;
-      }
-
-      .brand-icon svg {
-        width: 22px;
-        height: 22px;
-        fill: #ffffff;
-      }
-
-      .brand-title {
-        margin: 0;
-        font-size: 52px;
-        font-weight: 700;
-        letter-spacing: -0.8px;
-      }
-
-      .brand-subtitle {
-        margin: 7px 0 28px;
-        color: #80858c;
-        font-size: 16px;
-        letter-spacing: 2.1px;
-        font-weight: 600;
-        text-transform: uppercase;
-      }
-
-      .login-card {
-        width: 100%;
-        max-width: 480px;
-        border-radius: 12px;
-        background: var(--card-bg);
-        padding: 34px 34px 30px;
-        box-shadow: 0 18px 42px rgba(30, 45, 78, 0.08);
-      }
-
-      .card-title {
-        margin: 0;
-        font-size: 30px;
-        font-weight: 700;
-      }
-
-      .card-subtitle {
-        margin: 6px 0 24px;
-        color: var(--text-muted);
-        font-size: 20px;
-        line-height: 1.45;
-      }
-
-      .form-row {
-        margin-bottom: 16px;
-      }
-
-      .label {
-        display: block;
-        margin-bottom: 8px;
-        color: #7d8288;
-        font-size: 12px;
-        font-weight: 700;
-        letter-spacing: 0.8px;
-        text-transform: uppercase;
-      }
-
-      .field-wrap {
-        position: relative;
-      }
-
-      .field-icon {
-        position: absolute;
-        top: 50%;
-        left: 12px;
-        transform: translateY(-50%);
-        color: #9098a2;
-        font-size: 14px;
-        line-height: 1;
-      }
-
-      .field-input {
-        width: 100%;
-        height: 50px;
-        border: 1px solid var(--border-soft);
-        border-radius: 9px;
-        background: #eceef1;
-        padding: 0 12px 0 34px;
-        font-size: 15px;
-        color: #2f353a;
-        outline: none;
-      }
-
-      .field-input:focus {
-        border-color: #b8c8e8;
-        box-shadow: 0 0 0 3px rgba(31, 99, 222, 0.12);
-        background: #f5f8ff;
-      }
-
-      .password-head {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 8px;
-      }
-
-      .forgot-link {
-        color: var(--primary);
-        font-size: 13px;
-        font-weight: 600;
-        text-decoration: none;
-      }
-
-      .remember {
-        margin: 2px 0 18px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        color: #7d8288;
-        font-size: 14px;
-      }
-
-      .remember input {
-        width: 14px;
-        height: 14px;
-        margin: 0;
-        accent-color: var(--primary);
-      }
-
-      .signin-btn {
-        width: 100%;
-        height: 50px;
-        border: 0;
-        border-radius: 9px;
-        background: var(--primary);
-        color: #ffffff;
-        font-size: 24px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background 0.2s ease;
-      }
-
-      .signin-btn:hover {
-        background: var(--primary-dark);
-      }
-
-      .card-divider {
-        margin: 24px 0 18px;
-        border: 0;
-        border-top: 1px solid #dddfe3;
-      }
-
-      .register-row {
-        margin: 0;
-        text-align: center;
-        color: #666d76;
-        font-size: 20px;
-      }
-
-      .register-row a {
-        margin-left: 6px;
-        color: var(--primary);
-        font-weight: 600;
-        text-decoration: none;
-      }
-
-      .footer-links {
-        margin-top: auto;
-        display: flex;
-        gap: 22px;
-        flex-wrap: wrap;
-        justify-content: center;
-        color: #8c929a;
-        font-size: 12px;
-        text-transform: uppercase;
-        font-weight: 600;
-        letter-spacing: 0.3px;
-        padding-top: 26px;
-      }
-
-      .footer-links a {
-        color: inherit;
-        text-decoration: none;
-      }
-
-      @media (max-width: 620px) {
-        .auth-shell {
-          padding-top: 28px;
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; }
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
         }
 
-        .brand-title {
-          font-size: 42px;
+        .left-panel {
+            background: #0c1222;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            padding: 60px; position: relative; overflow: hidden;
+        }
+        .left-panel::before {
+            content: ''; position: absolute; top: -20%; right: -30%;
+            width: 500px; height: 500px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(5,150,105,0.12) 0%, transparent 65%);
+        }
+        .left-panel::after {
+            content: ''; position: absolute; bottom: -15%; left: -20%;
+            width: 400px; height: 400px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(16,185,129,0.08) 0%, transparent 65%);
         }
 
-        .brand-subtitle {
-          font-size: 13px;
-          letter-spacing: 1.4px;
-          margin-bottom: 20px;
+        .right-panel {
+            background: #f8fafc;
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            padding: 60px 80px;
         }
 
-        .login-card {
-          padding: 24px 20px;
+        .right-panel-inner {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .card-title {
-          font-size: 24px;
+        .field-group { margin-bottom: 20px; }
+        .field-label { display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px; }
+        .field-input {
+            width: 100%; height: 46px; border: 1.5px solid #e5e7eb; border-radius: 8px;
+            padding: 0 14px; font-size: 14px; color: #111827; background: #fff;
+            outline: none; transition: border-color 0.2s, box-shadow 0.2s; font-family: 'Inter', sans-serif;
+        }
+        .field-input:focus { border-color: #059669; box-shadow: 0 0 0 3px rgba(5,150,105,0.08); }
+        .field-input::placeholder { color: #9ca3af; }
+
+        .btn-primary {
+            width: 100%; height: 46px; border: none; border-radius: 8px;
+            background: #059669; color: #fff; font-size: 14px; font-weight: 600;
+            cursor: pointer; transition: background 0.2s; font-family: 'Inter', sans-serif;
+        }
+        .btn-primary:hover { background: #047857; }
+
+        .stat-pill {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 16px; border-radius: 8px;
+            background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
+            color: #94a3b8; font-size: 12px; font-weight: 500;
         }
 
-        .card-subtitle {
-          font-size: 17px;
-          margin-bottom: 18px;
+        @media (max-width: 900px) {
+            body { grid-template-columns: 1fr; }
+            .left-panel { display: none; }
+            .right-panel {
+                min-height: 100vh;
+                min-height: 100dvh;
+                padding: 40px 24px;
+            }
         }
-
-        .signin-btn,
-        .register-row {
-          font-size: 20px;
-        }
-      }
     </style>
-  </head>
-  <body>
-    <main class="auth-shell">
-      <div class="brand-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path
-            d="M12 3L3 7v2h18V7l-9-4zm-7 8v6H3v2h18v-2h-2v-6h-2v6h-2v-6h-2v6h-2v-6H9v6H7v-6H5z"
-          ></path>
-        </svg>
-      </div>
+</head>
+<body>
 
-      <h1 class="brand-title">NagarSewa</h1>
-      <p class="brand-subtitle">Municipal Governance Portal</p>
+    <!-- Left: Brand Panel -->
+    <div class="left-panel">
+        <div style="position:relative; z-index:1; max-width:380px;">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:40px;">
+                <div style="width:36px; height:36px; border-radius:8px; background:#059669; display:flex; align-items:center; justify-content:center;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12 3L3 7v2h18V7l-9-4zm-7 8v6H3v2h18v-2h-2v-6h-2v6h-2v-6h-2v6h-2v-6H9v6H7v-6H5z"/></svg>
+                </div>
+                <span style="font-family:'Outfit',sans-serif; font-weight:700; font-size:18px; color:#f1f5f9;">SnapTheSlop</span>
+            </div>
 
-      <section class="login-card">
-        <h2 class="card-title">Welcome back</h2>
-        <p class="card-subtitle">Access your municipal dashboard</p>
+            <h2 style="font-family:'Outfit',sans-serif; font-size:32px; font-weight:800; color:#f1f5f9; line-height:1.2; margin-bottom:14px; letter-spacing:-0.5px;">
+                Your city,<br>your voice.
+            </h2>
+            <p style="font-size:15px; color:#64748b; line-height:1.7; margin-bottom:36px;">
+                Report infrastructure problems, track municipal responses, and help build a better neighborhood — one issue at a time.
+            </p>
 
-        <% if (request.getAttribute("error") != null) { %>
-        <div style="background: #fff1f1; color: #b3261e; padding: 10px 12px; border-radius: 8px; margin-bottom: 16px; font-size: 13px; border: 1px solid #ffd4d1;">
-          <%= request.getAttribute("error") %>
+            <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                <div class="stat-pill">
+                    <span style="color:#34d399; font-weight:700;">2,847</span> registered citizens
+                </div>
+                <div class="stat-pill">
+                    <span style="color:#34d399; font-weight:700;">89%</span> issues resolved
+                </div>
+                <div class="stat-pill">
+                    <span style="color:#fbbf24; font-weight:700;">15</span> wards covered
+                </div>
+            </div>
+
+            <div style="margin-top:48px; padding-top:24px; border-top:1px solid rgba(148,163,184,0.08);">
+                <p style="font-size:12px; color:#475569; font-style:italic; line-height:1.6;">
+                    "NagarSewa helped us get the broken pipeline on our street fixed in 3 days. Finally a system that actually works."
+                </p>
+                <p style="font-size:12px; color:#64748b; margin-top:8px;">— Sita Devi, Ward 7 Resident</p>
+            </div>
         </div>
-        <% } %>
+    </div>
 
-        <form action="<%= request.getContextPath() %>/login" method="post" novalidate>
-          <div class="form-row">
-            <label class="label" for="email">Email Address</label>
-            <div class="field-wrap">
-              <span class="field-icon" aria-hidden="true">@</span>
-              <input
-                class="field-input"
-                id="email"
-                name="email"
-                type="email"
-                placeholder="name@municipality.gov"
-              />
+    <!-- Right: Login Form -->
+    <div class="right-panel">
+        <div class="right-panel-inner">
+        <div style="max-width:380px; width:100%;">
+            <h1 style="font-family:'Outfit',sans-serif; font-size:26px; font-weight:800; color:#111827; margin-bottom:4px;">Welcome back</h1>
+            <p style="font-size:14px; color:#6b7280; margin-bottom:28px;">Enter your credentials to access your dashboard.</p>
+
+            <% if (request.getAttribute("error") != null) { %>
+            <div style="background:#fef2f2; color:#dc2626; padding:12px 14px; border-radius:8px; margin-bottom:20px; font-size:13px; border:1px solid #fecaca;">
+                <%= request.getAttribute("error") %>
             </div>
-          </div>
+            <% } %>
 
-          <div class="form-row">
-            <div class="password-head">
-              <label class="label" for="password">Password</label>
-              <a class="forgot-link" href="#">Forgot?</a>
+            <form action="<%= request.getContextPath() %>/login" method="post" novalidate>
+                <div class="field-group">
+                    <label class="field-label" for="email">Email</label>
+                    <input class="field-input" id="email" name="email" type="email" placeholder="you@example.com" required/>
+                </div>
+
+                <div class="field-group">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                        <label class="field-label" for="password" style="margin:0;">Password</label>
+                        <a href="#" style="font-size:12px; color:#059669; text-decoration:none; font-weight:500;">Forgot password?</a>
+                    </div>
+                    <input class="field-input" id="password" name="password" type="password" placeholder="Enter your password" required/>
+                </div>
+
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:24px;">
+                    <input id="remember" type="checkbox" style="width:15px; height:15px; accent-color:#059669; cursor:pointer;"/>
+                    <label for="remember" style="font-size:13px; color:#6b7280; cursor:pointer;">Keep me signed in</label>
+                </div>
+
+                <button type="submit" class="btn-primary">Sign in</button>
+            </form>
+
+            <p style="text-align:center; color:#6b7280; font-size:14px; margin-top:24px;">
+                New here? <a href="<%= request.getContextPath() %>/register" style="color:#059669; font-weight:600; text-decoration:none;">Create an account</a>
+            </p>
+
+            <div style="margin-top:40px; padding-top:20px; border-top:1px solid #e5e7eb;">
+                <p style="font-size:11px; color:#9ca3af; text-align:center;">
+                    By signing in you agree to our <a href="#" style="color:#6b7280; text-decoration:underline;">Terms</a> and <a href="#" style="color:#6b7280; text-decoration:underline;">Privacy Policy</a>
+                </p>
             </div>
-            <div class="field-wrap">
-              <span class="field-icon" aria-hidden="true">*</span>
-              <input
-                class="field-input"
-                id="password"
-                name="password"
-                type="password"
-                placeholder="........"
-              />
-            </div>
-          </div>
-
-          <label class="remember" for="remember-device">
-            <input id="remember-device" type="checkbox" />
-            Remember this device
-          </label>
-
-          <button class="signin-btn" type="submit">Sign in</button>
-        </form>
-
-        <hr class="card-divider" />
-        <p class="register-row">
-          Citizen?<a href="<%= request.getContextPath() %>/register"
-            >Register here</a
-          >
-        </p>
-      </section>
-
-      <footer class="footer-links">
-        <a href="#">Privacy Policy</a>
-        <a href="#">Terms of Service</a>
-        <a href="#">Help Center</a>
-      </footer>
-    </main>
-  </body>
+        </div>
+        </div>
+    </div>
+</body>
 </html>

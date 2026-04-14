@@ -43,8 +43,8 @@ public class LoginServlet extends HttpServlet {
                 session.setAttribute("rememberDevice", true);
             }
 
-            // Redirect to profile
-            response.sendRedirect(request.getContextPath() + "/profile");
+            // Redirect to citizen profile
+            response.sendRedirect(request.getContextPath() + "/citizen/profile");
         } else {
             // Login failed
             request.setAttribute("error", "Invalid email or password.");

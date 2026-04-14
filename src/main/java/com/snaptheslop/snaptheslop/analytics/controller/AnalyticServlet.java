@@ -20,7 +20,7 @@ public class AnalyticServlet extends HttpServlet {
             if ("/sidebar".equals(path)) {
 
                 request.setAttribute("activePage", "sidebar");
-                request.getRequestDispatcher("/WEB-INF/views/common/sidebar.jsp")
+                request.getRequestDispatcher("/WEB-INF/views/common/admin-sidebar.jsp")
                         .forward(request, response);
 
             } else if ("/footer".equals(path)) {

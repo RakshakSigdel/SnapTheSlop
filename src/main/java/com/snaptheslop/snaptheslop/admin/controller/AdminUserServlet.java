@@ -11,7 +11,6 @@ import java.io.IOException;
 @WebServlet(name = "adminUserServlet", value = "/admin/user-management")
 public class AdminUserServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.setAttribute("activePage", "user-management");
-        request.getRequestDispatcher("/WEB-INF/views/admin/user-management.jsp").forward(request, response);
+        response.sendRedirect(request.getContextPath() + "/admin/users");
     }
 }

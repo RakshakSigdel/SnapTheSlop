@@ -11,10 +11,10 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebServlet(name = "profileServlet", value = "/profile")
+@WebServlet(name = "profileServlet", urlPatterns = {"/citizen/profile", "/profile"})
 public class ProfileServlet extends HttpServlet {
 
-    private static final String PROFILE_VIEW = "/WEB-INF/views/user/profile.jsp";
+    private static final String PROFILE_VIEW = "/WEB-INF/views/citizen/profile.jsp";
     private UserDAO userDAO = new UserDAO();
 
     @Override
@@ -38,6 +38,7 @@ public class ProfileServlet extends HttpServlet {
 
         request.setAttribute("profileUser", profileUser);
         request.setAttribute("profileInitials", buildInitials(profileUser.getFirstName(), profileUser.getLastName()));
+        request.setAttribute("activePage", "profile");
         request.getRequestDispatcher(PROFILE_VIEW).forward(request, response);
     }
 
@@ -68,6 +69,7 @@ public class ProfileServlet extends HttpServlet {
 
         request.setAttribute("profileUser", profileUser);
         request.setAttribute("profileInitials", buildInitials(profileUser.getFirstName(), profileUser.getLastName()));
+        request.setAttribute("activePage", "profile");
         request.getRequestDispatcher(PROFILE_VIEW).forward(request, response);
     }
 
