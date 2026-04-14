@@ -1,386 +1,183 @@
-<%@ page import="java.util.List" %>
-<%@ page import="java.util.ArrayList" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%
-	String fullName = request.getParameter("fullName") != null ? request.getParameter("fullName") : "";
-	String email = request.getParameter("email") != null ? request.getParameter("email") : "";
-	String phone = request.getParameter("phone") != null ? request.getParameter("phone") : "";
-	String wardNumber = request.getParameter("wardNumber") != null ? request.getParameter("wardNumber") : "";
-	String municipality = request.getParameter("municipality") != null ? request.getParameter("municipality") : "";
-
-	String formError = (String) request.getAttribute("error");
-	String formSuccess = (String) request.getAttribute("success");
-
-	List<String> municipalityOptions = (List<String>) request.getAttribute("municipalityOptions");
-	if (municipalityOptions == null || municipalityOptions.isEmpty()) {
-		municipalityOptions = new ArrayList<>();
-		municipalityOptions.add("Kathmandu Metropolitan City");
-		municipalityOptions.add("Lalitpur Metropolitan City");
-		municipalityOptions.add("Bhaktapur Municipality");
-		municipalityOptions.add("Kirtipur Municipality");
-	}
-%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>NagarSewa - Create Account</title>
-	<style>
-		:root {
-			--bg: #ececec;
-			--card: #ffffff;
-			--text-primary: #2d2f33;
-			--text-muted: #7d828a;
-			--border: #e6e8ec;
-			--brand: #0f5edb;
-			--brand-hover: #0b50be;
-			--shadow: 0 10px 26px rgba(15, 32, 62, 0.08);
-			--danger-bg: #fff1f1;
-			--danger-text: #b3261e;
-			--success-bg: #edf9f0;
-			--success-text: #1b7a38;
-		}
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Create Account — SnapTheSlop</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; }
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+        }
 
-		* {
-			box-sizing: border-box;
-		}
+        .left-panel {
+            background: #0c1222;
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            padding: 60px; position: relative; overflow: hidden;
+        }
+        .left-panel::before {
+            content: ''; position: absolute; top: -10%; right: -25%;
+            width: 450px; height: 450px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(16,185,129,0.1) 0%, transparent 65%);
+        }
 
-		body {
-			margin: 0;
-			font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-			background:
-				radial-gradient(circle at top left, rgba(255, 255, 255, 0.9) 0%, rgba(236, 236, 236, 0) 45%),
-				radial-gradient(circle at bottom right, rgba(215, 223, 236, 0.45) 0%, rgba(236, 236, 236, 0) 52%),
-				var(--bg);
-			color: var(--text-primary);
-			min-height: 100vh;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			padding: 22px;
-		}
+        .right-panel {
+            background: #f8fafc;
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            padding: 48px 64px;
+            overflow-y: auto;
+        }
 
-		.page-wrap {
-			width: 100%;
-			max-width: 430px;
-			text-align: center;
-		}
+        .left-panel-inner,
+        .right-panel-inner {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-		.brand {
-			margin-bottom: 18px;
-		}
+        .field-label { display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 5px; }
+        .field-input {
+            width: 100%; height: 44px; border: 1.5px solid #e5e7eb; border-radius: 8px;
+            padding: 0 12px; font-size: 14px; color: #111827; background: #fff;
+            outline: none; transition: border-color 0.2s, box-shadow 0.2s; font-family: 'Inter', sans-serif;
+        }
+        .field-input:focus { border-color: #059669; box-shadow: 0 0 0 3px rgba(5,150,105,0.08); }
+        .field-input::placeholder { color: #9ca3af; }
 
-		.brand-badge {
-			width: 30px;
-			height: 30px;
-			margin: 0 auto 8px;
-			border-radius: 7px;
-			background: var(--brand);
-			display: grid;
-			place-items: center;
-			color: #fff;
-			font-weight: 700;
-			box-shadow: var(--shadow);
-			font-size: 13px;
-		}
+        .btn-primary {
+            width: 100%; height: 46px; border: none; border-radius: 8px;
+            background: #059669; color: #fff; font-size: 14px; font-weight: 600;
+            cursor: pointer; transition: background 0.2s; font-family: 'Inter', sans-serif;
+        }
+        .btn-primary:hover { background: #047857; }
 
-		.brand h1 {
-			margin: 0;
-			font-size: 32px;
-			font-weight: 700;
-			letter-spacing: -0.6px;
-		}
-
-		.brand p {
-			margin: 5px 0 0;
-			color: var(--text-muted);
-			font-size: 13px;
-		}
-
-		.card {
-			margin-top: 12px;
-			background: var(--card);
-			border-radius: 8px;
-			box-shadow: var(--shadow);
-			padding: 22px;
-			text-align: left;
-		}
-
-		.card h2 {
-			margin: 0;
-			font-size: 30px;
-			line-height: 1.2;
-			letter-spacing: -0.3px;
-		}
-
-		.card .sub {
-			margin: 7px 0 18px;
-			font-size: 13px;
-			color: var(--text-muted);
-			font-weight: 600;
-		}
-
-		.alert {
-			border-radius: 8px;
-			padding: 10px 12px;
-			font-size: 13px;
-			margin-bottom: 14px;
-		}
-
-		.alert.error {
-			background: var(--danger-bg);
-			color: var(--danger-text);
-			border: 1px solid #ffd4d1;
-		}
-
-		.alert.success {
-			background: var(--success-bg);
-			color: var(--success-text);
-			border: 1px solid #c8e8d2;
-		}
-
-		.grid {
-			display: grid;
-			grid-template-columns: 1fr 1fr;
-			gap: 13px;
-		}
-
-		.field {
-			margin-bottom: 2px;
-		}
-
-		label {
-			display: block;
-			font-size: 10px;
-			letter-spacing: 0.6px;
-			color: #737882;
-			text-transform: uppercase;
-			margin-bottom: 6px;
-			font-weight: 700;
-		}
-
-		input,
-		select {
-			width: 100%;
-			border: 1px solid var(--border);
-			border-radius: 6px;
-			height: 40px;
-			padding: 0 12px;
-			font-size: 13px;
-			color: var(--text-primary);
-			background: #f8f9fb;
-			outline: none;
-			transition: border-color 0.2s ease, box-shadow 0.2s ease;
-		}
-
-		input:focus,
-		select:focus {
-			border-color: #9ab8f0;
-			box-shadow: 0 0 0 3px rgba(15, 94, 219, 0.12);
-			background: #fff;
-		}
-
-		.divider {
-			border: 0;
-			border-top: 1px solid var(--border);
-			margin: 14px 0;
-		}
-
-		.tos {
-			margin-top: 2px;
-			margin-bottom: 16px;
-			display: grid;
-			grid-template-columns: 16px 1fr;
-			gap: 9px;
-			align-items: start;
-			font-size: 12px;
-			color: #7a8088;
-			line-height: 1.4;
-		}
-
-		.tos input {
-			width: 14px;
-			height: 14px;
-			margin-top: 2px;
-			accent-color: var(--brand);
-		}
-
-		.tos a,
-		.signin a {
-			color: var(--brand);
-			text-decoration: none;
-			font-weight: 600;
-		}
-
-		.btn {
-			width: 100%;
-			border: 0;
-			border-radius: 7px;
-			height: 43px;
-			background: linear-gradient(180deg, #1465e4 0%, #0f5edb 100%);
-			color: #fff;
-			font-size: 15px;
-			font-weight: 700;
-			letter-spacing: 0.2px;
-			cursor: pointer;
-			transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
-			box-shadow: 0 8px 14px rgba(15, 94, 219, 0.28);
-		}
-
-		.btn:hover {
-			background: linear-gradient(180deg, #115cd1 0%, #0b50be 100%);
-			transform: translateY(-1px);
-		}
-
-		.btn:active {
-			transform: translateY(0);
-		}
-
-		.signin {
-			margin-top: 13px;
-			text-align: center;
-			color: #7a8088;
-			font-size: 13px;
-		}
-
-		.footer-links {
-			text-align: center;
-			margin-top: 16px;
-			color: #8f959e;
-			letter-spacing: 1px;
-			font-size: 10px;
-			text-transform: uppercase;
-		}
-
-		.footer-links span {
-			padding: 0 9px;
-			opacity: 0.5;
-		}
-
-		@media (max-width: 680px) {
-			.brand h1,
-			.card h2 {
-				font-size: 28px;
-			}
-
-			.card {
-				padding: 18px;
-			}
-
-			.grid {
-				grid-template-columns: 1fr;
-				gap: 12px;
-			}
-
-			.footer-links {
-				letter-spacing: 0.6px;
-				font-size: 9px;
-			}
-		}
-	</style>
+        @media (max-width: 900px) {
+            body { grid-template-columns: 1fr; }
+            .left-panel { display: none; }
+            .right-panel {
+                min-height: 100vh;
+                min-height: 100dvh;
+                padding: 32px 20px;
+            }
+        }
+    </style>
 </head>
 <body>
-<main class="page-wrap">
-	<section class="brand" aria-label="NagarSewa brand">
-		<div class="brand-badge">N</div>
-		<h1>NagarSewa</h1>
-		<p>Join your local municipal digital network</p>
-	</section>
 
-	<section class="card" aria-label="Registration form container">
-		<h2>Create Citizen Account</h2>
-		<p class="sub">Provide your details to register as a verified resident.</p>
+    <!-- Left: Brand -->
+    <div class="left-panel">
+        <div class="left-panel-inner">
+        <div style="position:relative; z-index:1; max-width:360px; width:100%;">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:40px;">
+                <div style="width:36px; height:36px; border-radius:8px; background:#059669; display:flex; align-items:center; justify-content:center;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12 3L3 7v2h18V7l-9-4zm-7 8v6H3v2h18v-2h-2v-6h-2v6h-2v-6h-2v6h-2v-6H9v6H7v-6H5z"/></svg>
+                </div>
+                <span style="font-family:'Outfit',sans-serif; font-weight:700; font-size:18px; color:#f1f5f9;">SnapTheSlop</span>
+            </div>
 
-		<% if (formError != null && !formError.trim().isEmpty()) { %>
-		<div class="alert error" role="alert"><%= formError %></div>
-		<% } %>
+            <h2 style="font-family:'Outfit',sans-serif; font-size:30px; font-weight:800; color:#f1f5f9; line-height:1.25; margin-bottom:14px;">
+                Be the change in<br>your municipality.
+            </h2>
+            <p style="font-size:15px; color:#64748b; line-height:1.7; margin-bottom:32px;">
+                Join thousands of active citizens who are making their wards cleaner, safer, and more responsive by snapping the slop.
+            </p>
 
-		<% if (formSuccess != null && !formSuccess.trim().isEmpty()) { %>
-		<div class="alert success" role="status"><%= formSuccess %></div>
-		<% } %>
+            <div style="display:flex; flex-direction:column; gap:16px;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div style="width:32px; height:32px; border-radius:6px; background:rgba(16,185,129,0.1); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                        <svg width="16" height="16" fill="#34d399" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                    </div>
+                    <span style="font-size:14px; color:#94a3b8;">Report issues with photo evidence</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div style="width:32px; height:32px; border-radius:6px; background:rgba(16,185,129,0.1); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                        <svg width="16" height="16" fill="#34d399" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                    </div>
+                    <span style="font-size:14px; color:#94a3b8;">Track real-time resolution status</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div style="width:32px; height:32px; border-radius:6px; background:rgba(16,185,129,0.1); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                        <svg width="16" height="16" fill="#34d399" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                    </div>
+                    <span style="font-size:14px; color:#94a3b8;">Get instant notifications on updates</span>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
 
-		<form method="post" action="<%= request.getContextPath() %>/register" novalidate>
-			<div class="grid">
-				<div class="field">
-					<label for="fullName">Full Name</label>
-					<input id="fullName" name="fullName" type="text" maxlength="100" placeholder="John Doe" value="<%= fullName %>" required />
-				</div>
+    <!-- Right: Registration Form -->
+    <div class="right-panel">
+        <div class="right-panel-inner">
+        <div style="max-width:440px; width:100%;">
+            <h1 style="font-family:'Outfit',sans-serif; font-size:24px; font-weight:800; color:#111827; margin-bottom:4px;">Create your account</h1>
+            <p style="font-size:14px; color:#6b7280; margin-bottom:24px;">Takes less than 2 minutes. No paperwork needed.</p>
 
-				<div class="field">
-					<label for="email">Email</label>
-					<input id="email" name="email" type="email" maxlength="120" placeholder="john@example.com" value="<%= email %>" required />
-				</div>
+            <% if (request.getAttribute("error") != null) { %>
+            <div style="background:#fef2f2; color:#dc2626; padding:12px 14px; border-radius:8px; margin-bottom:16px; font-size:13px; border:1px solid #fecaca;">
+                <%= request.getAttribute("error") %>
+            </div>
+            <% } %>
 
-				<div class="field">
-					<label for="phone">Phone Number</label>
-					<input id="phone" name="phone" type="tel" maxlength="18" placeholder="+1 (555) 000-0000" value="<%= phone %>" />
-				</div>
+            <form action="<%= request.getContextPath() %>/register" method="post" id="regForm">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;">
+                    <div>
+                        <label class="field-label" for="firstName">First name</label>
+                        <input class="field-input" id="firstName" name="firstName" type="text" required placeholder="Hari"/>
+                    </div>
+                    <div>
+                        <label class="field-label" for="lastName">Last name</label>
+                        <input class="field-input" id="lastName" name="lastName" type="text" required placeholder="Bahadur"/>
+                    </div>
+                </div>
 
-				<div class="field">
-					<label for="municipality">Municipality</label>
-					<select id="municipality" name="municipality" required>
-						<option value="">Select Municipality</option>
-						<% for (String option : municipalityOptions) {
-							String selected = option.equals(municipality) ? "selected" : "";
-						%>
-							<option value="<%= option %>" <%= selected %>><%= option %></option>
-						<% } %>
-					</select>
-				</div>
+                <div style="margin-bottom:14px;">
+                    <label class="field-label" for="email">Email address</label>
+                    <input class="field-input" id="email" name="email" type="email" required placeholder="hari@example.com"/>
+                </div>
 
-				<div class="field">
-					<label for="wardNumber">Ward Number</label>
-					<input id="wardNumber" name="wardNumber" type="text" maxlength="2" placeholder="e.g. 05" value="<%= wardNumber %>" />
-				</div>
-			</div>
+                <div style="margin-bottom:14px;">
+                    <label class="field-label" for="phone">Phone number</label>
+                    <input class="field-input" id="phone" name="phone" type="tel" required placeholder="98XXXXXXXX"/>
+                </div>
 
-			<hr class="divider" />
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;">
+                    <div>
+                        <label class="field-label" for="password">Password</label>
+                        <input class="field-input" id="password" name="password" type="password" required placeholder="Min 8 characters"/>
+                    </div>
+                    <div>
+                        <label class="field-label" for="confirmPassword">Confirm</label>
+                        <input class="field-input" id="confirmPassword" name="confirmPassword" type="password" required placeholder="Re-enter"/>
+                    </div>
+                </div>
 
-			<div class="grid">
-				<div class="field">
-					<label for="password">Password</label>
-					<input id="password" name="password" type="password" minlength="8" placeholder="********" required />
-				</div>
+                <div style="display:flex; align-items:flex-start; gap:8px; margin-bottom:22px;">
+                    <input type="checkbox" required style="width:15px; height:15px; accent-color:#059669; margin-top:2px; cursor:pointer;"/>
+                    <span style="font-size:13px; color:#6b7280; line-height:1.5;">I agree to the <a href="#" style="color:#059669; text-decoration:underline;">Terms of Service</a> and <a href="#" style="color:#059669; text-decoration:underline;">Privacy Policy</a></span>
+                </div>
 
-				<div class="field">
-					<label for="confirmPassword">Confirm Password</label>
-					<input id="confirmPassword" name="confirmPassword" type="password" minlength="8" placeholder="********" required />
-				</div>
-			</div>
+                <button type="submit" class="btn-primary">Create account</button>
+            </form>
 
-			<label class="tos" for="agreeToTerms">
-				<input type="checkbox" id="agreeToTerms" name="agreeToTerms" required />
-				<span>By creating an account, I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a> of NagarSewa.</span>
-			</label>
-
-			<button type="submit" class="btn">Create Account &rarr;</button>
-		</form>
-
-		<p class="signin">Already have an account? <a href="<%= request.getContextPath() %>/login">Sign in</a></p>
-	</section>
-
-	<div class="footer-links">Help Center <span>*</span> Accessibility <span>*</span> Safety</div>
-</main>
-
-<script>
-	(function () {
-		var wardInput = document.getElementById("wardNumber");
-		var phoneInput = document.getElementById("phone");
-
-		if (wardInput) {
-			wardInput.addEventListener("input", function () {
-				var digits = this.value.replace(/\D/g, "").slice(0, 2);
-				this.value = digits;
-			});
-		}
-
-		if (phoneInput) {
-			phoneInput.addEventListener("input", function () {
-				this.value = this.value.replace(/[^0-9+()\-\s]/g, "").slice(0, 18);
-			});
-		}
-	})();
-</script>
+            <p style="text-align:center; color:#6b7280; font-size:14px; margin-top:20px;">
+                Already have an account? <a href="<%= request.getContextPath() %>/login" style="color:#059669; font-weight:600; text-decoration:none;">Sign in</a>
+            </p>
+        </div>
+        </div>
+    </div>
 </body>
 </html>

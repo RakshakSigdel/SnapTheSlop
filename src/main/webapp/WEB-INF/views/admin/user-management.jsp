@@ -1,265 +1,143 @@
 <%--
-  Created by IntelliJ IDEA.
-  User: raksh
-  Date: 4/6/2026
-  Time: 3:20 PM
-  To change this template use File | Settings | File Templates.
+  Admin User Management — NagarSewa
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<% request.setAttribute("activePage", "user-management"); %>
 <jsp:include page="../common/header.jsp"/>
-<div class="flex min-h-screen bg-gray-100">
+
+<div class="flex min-h-screen">
   <jsp:include page="../common/sidebar.jsp"/>
-  <div class="flex-1 ml-0 md:ml-64 p-4 md:p-8 overflow-x-hidden">
-    <div class="max-w-[1200px] mx-auto">
-      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div class="flex items-center gap-6 border-b border-gray-200">
-          <button id="tab-municipal" type="button" class="tab-btn py-3 text-sm font-semibold border-b-2 border-blue-600 text-blue-600" data-target="municipal-section">Municipal Heads</button>
-          <button id="tab-citizen" type="button" class="tab-btn py-3 text-sm font-semibold border-b-2 border-transparent text-gray-500 hover:text-gray-700" data-target="citizen-section">Citizens</button>
-        </div>
-        <button id="open-municipal-form" type="button" class="inline-flex items-center justify-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-xl font-semibold hover:bg-blue-700">
-          <span class="text-lg leading-none">+</span>
-          Add Municipal Head
-        </button>
-      </div>
 
-      <section id="municipal-section" class="tab-section mt-6">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-5">
-            <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">Total Heads</p>
-            <p class="mt-2 text-4xl font-bold text-gray-800">42</p>
-          </div>
-          <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-5">
-            <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">Active</p>
-            <p class="mt-2 text-4xl font-bold text-gray-800">38</p>
-          </div>
-          <div class="bg-blue-50 rounded-2xl shadow-sm border border-blue-200 p-5 flex items-center justify-between">
-            <div>
-              <p class="text-xs font-semibold uppercase tracking-wide text-blue-600">System Status</p>
-              <p class="mt-2 font-semibold text-gray-700">All municipalities reporting</p>
-            </div>
-            <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">✓</div>
-          </div>
-        </div>
+  <div class="flex-1" style="margin-left:220px; background:#f8fafc; min-height:100vh;">
 
-        <div class="mt-5 bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-          <div class="overflow-x-auto">
-            <table class="w-full text-left">
-              <thead class="bg-gray-50 border-b border-gray-200">
-              <tr class="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                <th class="px-6 py-4">Name & Role</th>
-                <th class="px-6 py-4">Email</th>
-                <th class="px-6 py-4">Municipality</th>
-                <th class="px-6 py-4">Status</th>
-                <th class="px-6 py-4 text-center">Actions</th>
-              </tr>
-              </thead>
-              <tbody class="text-sm text-gray-700">
-              <tr class="border-b border-gray-100">
-                <td class="px-6 py-4">
-                  <p class="font-semibold text-gray-800">Arjun Sharma</p>
-                  <p class="text-xs text-gray-500 uppercase">Commissioner</p>
-                </td>
-                <td class="px-6 py-4 break-all">arjun.s@nagarsewa.gov</td>
-                <td class="px-6 py-4">Kathmandu Metro</td>
-                <td class="px-6 py-4"><span class="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">Active</span></td>
-                <td class="px-6 py-4 text-center text-gray-400">•••</td>
-              </tr>
-              <tr class="border-b border-gray-100">
-                <td class="px-6 py-4">
-                  <p class="font-semibold text-gray-800">Sunita Rajbhandari</p>
-                  <p class="text-xs text-gray-500 uppercase">Lead Architect</p>
-                </td>
-                <td class="px-6 py-4 break-all">sunita.r@nagarsewa.gov</td>
-                <td class="px-6 py-4">Lalitpur Sub-Metro</td>
-                <td class="px-6 py-4"><span class="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">Active</span></td>
-                <td class="px-6 py-4 text-center text-gray-400">•••</td>
-              </tr>
-              <tr>
-                <td class="px-6 py-4">
-                  <p class="font-semibold text-gray-800">Binod Pradhan</p>
-                  <p class="text-xs text-gray-500 uppercase">Urban Planner</p>
-                </td>
-                <td class="px-6 py-4 break-all">binod.p@nagarsewa.gov</td>
-                <td class="px-6 py-4">Pokhara City</td>
-                <td class="px-6 py-4"><span class="px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-600">Suspended</span></td>
-                <td class="px-6 py-4 text-center text-gray-400">•••</td>
-              </tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="px-6 py-4 border-t border-gray-100 text-xs text-gray-500">Showing 3 of 42 municipal heads</div>
-        </div>
-      </section>
-
-      <section id="citizen-section" class="tab-section mt-6 hidden">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-5">
-            <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">Total Citizens</p>
-            <p class="mt-2 text-4xl font-bold text-gray-800">12,884</p>
-          </div>
-          <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-5">
-            <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">Verified Accounts</p>
-            <p class="mt-2 text-4xl font-bold text-gray-800">11,109</p>
-          </div>
-          <div class="bg-emerald-50 rounded-2xl shadow-sm border border-emerald-200 p-5">
-            <p class="text-xs font-semibold uppercase tracking-wide text-emerald-700">Self Registration</p>
-            <p class="mt-2 font-semibold text-gray-700">Citizens onboard themselves through the public portal</p>
-          </div>
-        </div>
-
-        <div class="mt-5 bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-          <div class="overflow-x-auto">
-            <table class="w-full text-left">
-              <thead class="bg-gray-50 border-b border-gray-200">
-              <tr class="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                <th class="px-6 py-4">Citizen</th>
-                <th class="px-6 py-4">Email</th>
-                <th class="px-6 py-4">Municipality</th>
-                <th class="px-6 py-4">Issues Reported</th>
-                <th class="px-6 py-4">Status</th>
-              </tr>
-              </thead>
-              <tbody class="text-sm text-gray-700">
-              <tr class="border-b border-gray-100">
-                <td class="px-6 py-4 font-semibold text-gray-800">Nisha Karki</td>
-                <td class="px-6 py-4 break-all">nisha.karki@mail.com</td>
-                <td class="px-6 py-4">Kathmandu Metro</td>
-                <td class="px-6 py-4">13</td>
-                <td class="px-6 py-4"><span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">Verified</span></td>
-              </tr>
-              <tr class="border-b border-gray-100">
-                <td class="px-6 py-4 font-semibold text-gray-800">Pratik KC</td>
-                <td class="px-6 py-4 break-all">pratik.kc@mail.com</td>
-                <td class="px-6 py-4">Bhaktapur</td>
-                <td class="px-6 py-4">6</td>
-                <td class="px-6 py-4"><span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">Verified</span></td>
-              </tr>
-              <tr>
-                <td class="px-6 py-4 font-semibold text-gray-800">Mina Gautam</td>
-                <td class="px-6 py-4 break-all">mina.gautam@mail.com</td>
-                <td class="px-6 py-4">Lalitpur</td>
-                <td class="px-6 py-4">1</td>
-                <td class="px-6 py-4"><span class="px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">Pending Verification</span></td>
-              </tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="px-6 py-4 border-t border-gray-100 text-xs text-gray-500">Citizen profiles are system-generated from self registration. No manual add option available.</div>
-        </div>
-      </section>
+    <div style="padding:18px 32px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #e2e8f0; background:#fff;">
+      <h1 style="font-family:'Outfit',sans-serif; font-size:18px; font-weight:700; color:#0f172a;">User Management</h1>
+      <button style="display:inline-flex; align-items:center; gap:6px; background:#0f172a; color:#fff; padding:9px 18px; border-radius:8px; font-size:13px; font-weight:600; border:none; cursor:pointer; font-family:'Inter',sans-serif;">
+        <span style="font-size:16px;">+</span> Add User
+      </button>
     </div>
 
-    <div id="form-overlay" class="fixed inset-0 bg-black/30 z-30 hidden"></div>
+    <div style="padding:28px 32px;">
 
-    <aside id="municipal-form-panel" class="fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-2xl border-l border-gray-200 z-40 translate-x-full transition-transform duration-300 ease-out overflow-y-auto">
-      <div class="p-6 border-b border-gray-200 flex items-center justify-between">
-        <h2 class="text-2xl font-bold text-gray-800">Add Municipal Head</h2>
-        <button id="close-municipal-form" type="button" class="w-9 h-9 rounded-lg text-gray-500 hover:bg-gray-100">✕</button>
+      <p style="font-size:14px; color:#64748b; margin-bottom:20px;">2,847 registered accounts across all municipalities.</p>
+
+      <!-- Search bar -->
+      <div style="margin-bottom:20px;">
+        <input type="text" placeholder="Search by name, email, or ID..." style="width:320px; height:40px; border:1.5px solid #e2e8f0; border-radius:8px; padding:0 14px; font-size:13px; color:#111827; background:#fff; outline:none; font-family:'Inter',sans-serif;"/>
       </div>
-      <form class="p-6 space-y-4">
-        <div>
-          <label class="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">Full Name</label>
-          <input type="text" placeholder="e.g. Rajesh Hamal" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-        </div>
-        <div>
-          <label class="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">Email Address</label>
-          <input type="email" placeholder="name@nagarsewa.gov" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-        </div>
-        <div>
-          <label class="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">Password</label>
-          <input type="password" placeholder="Set initial password" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-        </div>
-        <div>
-          <label class="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">Municipality Name</label>
-          <select class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option>Choose Municipality</option>
-            <option>Kathmandu Metro</option>
-            <option>Lalitpur Sub-Metro</option>
-            <option>Pokhara City</option>
-            <option>Bhaktapur Municipality</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">Role</label>
-          <select class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option>Select Role</option>
-            <option>Commissioner</option>
-            <option>Lead Architect</option>
-            <option>Urban Planner</option>
-            <option>Operations Lead</option>
-          </select>
-        </div>
 
-        <button type="submit" class="w-full mt-3 bg-blue-600 text-white rounded-xl py-3 font-semibold hover:bg-blue-700">Create Municipal Head</button>
-        <p class="text-xs text-gray-500">An activation email will be sent immediately to the added municipal head.</p>
-      </form>
-    </aside>
+      <!-- Table -->
+      <div style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; overflow:hidden;">
+        <table style="width:100%; border-collapse:collapse;">
+          <thead>
+            <tr style="border-bottom:1px solid #f1f5f9;">
+              <th style="text-align:left; padding:12px 20px; font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:1px;">User</th>
+              <th style="text-align:left; padding:12px 16px; font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:1px;">Email</th>
+              <th style="text-align:left; padding:12px 16px; font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:1px;">Role</th>
+              <th style="text-align:left; padding:12px 16px; font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:1px;">Status</th>
+              <th style="text-align:left; padding:12px 16px; font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:1px;">Joined</th>
+              <th style="text-align:right; padding:12px 20px;"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:1px solid #f8fafc;" onmouseover="this.style.background='#fafbfc'" onmouseout="this.style.background='transparent'">
+              <td style="padding:14px 20px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <div style="width:32px; height:32px; border-radius:50%; background:#e0e7ff; display:flex; align-items:center; justify-content:center; color:#4338ca; font-size:11px; font-weight:700;">RS</div>
+                  <div>
+                    <p style="font-size:13px; font-weight:600; color:#1e293b;">Ramesh Sharma</p>
+                    <p style="font-size:11px; color:#94a3b8;">NS-001</p>
+                  </div>
+                </div>
+              </td>
+              <td style="padding:14px 16px; font-size:13px; color:#64748b;">ramesh.s@gmail.com</td>
+              <td style="padding:14px 16px;"><span style="font-size:12px; color:#4f46e5; font-weight:600;">Citizen</span></td>
+              <td style="padding:14px 16px;"><span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:#d1fae5; color:#065f46;">Active</span></td>
+              <td style="padding:14px 16px; font-size:12px; color:#94a3b8;">Oct 2023</td>
+              <td style="padding:14px 20px; text-align:right;">
+                <div style="display:flex; gap:6px; justify-content:flex-end;">
+                  <button style="background:none; border:none; cursor:pointer; color:#64748b; padding:4px;" title="Edit"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>
+                  <button style="background:none; border:none; cursor:pointer; color:#dc2626; padding:4px;" title="Delete"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+                </div>
+              </td>
+            </tr>
+            <tr style="border-bottom:1px solid #f8fafc;" onmouseover="this.style.background='#fafbfc'" onmouseout="this.style.background='transparent'">
+              <td style="padding:14px 20px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <div style="width:32px; height:32px; border-radius:50%; background:#ede9fe; display:flex; align-items:center; justify-content:center; color:#6d28d9; font-size:11px; font-weight:700;">SK</div>
+                  <div>
+                    <p style="font-size:13px; font-weight:600; color:#1e293b;">Sushila Karki</p>
+                    <p style="font-size:11px; color:#94a3b8;">NS-002</p>
+                  </div>
+                </div>
+              </td>
+              <td style="padding:14px 16px; font-size:13px; color:#64748b;">sushila.k@kmc.gov.np</td>
+              <td style="padding:14px 16px;"><span style="font-size:12px; color:#7c3aed; font-weight:600;">Municipal Head</span></td>
+              <td style="padding:14px 16px;"><span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:#d1fae5; color:#065f46;">Active</span></td>
+              <td style="padding:14px 16px; font-size:12px; color:#94a3b8;">Sep 2023</td>
+              <td style="padding:14px 20px; text-align:right;">
+                <div style="display:flex; gap:6px; justify-content:flex-end;">
+                  <button style="background:none; border:none; cursor:pointer; color:#64748b; padding:4px;" title="Edit"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>
+                  <button style="background:none; border:none; cursor:pointer; color:#dc2626; padding:4px;" title="Delete"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+                </div>
+              </td>
+            </tr>
+            <tr style="border-bottom:1px solid #f8fafc;" onmouseover="this.style.background='#fafbfc'" onmouseout="this.style.background='transparent'">
+              <td style="padding:14px 20px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <div style="width:32px; height:32px; border-radius:50%; background:#fef3c7; display:flex; align-items:center; justify-content:center; color:#92400e; font-size:11px; font-weight:700;">VS</div>
+                  <div>
+                    <p style="font-size:13px; font-weight:600; color:#1e293b;">Vikram Shrestha</p>
+                    <p style="font-size:11px; color:#94a3b8;">NS-003</p>
+                  </div>
+                </div>
+              </td>
+              <td style="padding:14px 16px; font-size:13px; color:#64748b;">vikram.sh@yahoo.com</td>
+              <td style="padding:14px 16px;"><span style="font-size:12px; color:#4f46e5; font-weight:600;">Citizen</span></td>
+              <td style="padding:14px 16px;"><span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:#fef3c7; color:#92400e;">Pending</span></td>
+              <td style="padding:14px 16px; font-size:12px; color:#94a3b8;">Oct 2023</td>
+              <td style="padding:14px 20px; text-align:right;">
+                <div style="display:flex; gap:6px; justify-content:flex-end;">
+                  <button style="background:none; border:none; cursor:pointer; color:#64748b; padding:4px;" title="Edit"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>
+                  <button style="background:none; border:none; cursor:pointer; color:#dc2626; padding:4px;" title="Delete"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+                </div>
+              </td>
+            </tr>
+            <tr onmouseover="this.style.background='#fafbfc'" onmouseout="this.style.background='transparent'">
+              <td style="padding:14px 20px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <div style="width:32px; height:32px; border-radius:50%; background:#fee2e2; display:flex; align-items:center; justify-content:center; color:#991b1b; font-size:11px; font-weight:700;">BP</div>
+                  <div>
+                    <p style="font-size:13px; font-weight:600; color:#1e293b;">Binod Poudel</p>
+                    <p style="font-size:11px; color:#94a3b8;">NS-004</p>
+                  </div>
+                </div>
+              </td>
+              <td style="padding:14px 16px; font-size:13px; color:#64748b;">binod.p@mail.com</td>
+              <td style="padding:14px 16px;"><span style="font-size:12px; color:#4f46e5; font-weight:600;">Citizen</span></td>
+              <td style="padding:14px 16px;"><span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:#fee2e2; color:#991b1b;">Suspended</span></td>
+              <td style="padding:14px 16px; font-size:12px; color:#94a3b8;">Aug 2023</td>
+              <td style="padding:14px 20px; text-align:right;">
+                <div style="display:flex; gap:6px; justify-content:flex-end;">
+                  <button style="background:none; border:none; cursor:pointer; color:#64748b; padding:4px;" title="Edit"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>
+                  <button style="background:none; border:none; cursor:pointer; color:#dc2626; padding:4px;" title="Delete"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div style="padding:12px 20px; border-top:1px solid #f1f5f9; display:flex; align-items:center; justify-content:space-between;">
+          <span style="font-size:12px; color:#94a3b8;">Showing 4 of 2,847</span>
+          <div style="display:flex; gap:4px;">
+            <button style="width:28px; height:28px; border-radius:6px; border:1px solid #e2e8f0; background:#fff; color:#94a3b8; cursor:pointer; font-size:11px;">&lsaquo;</button>
+            <button style="width:28px; height:28px; border-radius:6px; border:none; background:#0f172a; color:#fff; font-size:12px; font-weight:700; cursor:pointer;">1</button>
+            <button style="width:28px; height:28px; border-radius:6px; border:1px solid #e2e8f0; background:#fff; color:#64748b; font-size:12px; cursor:pointer;">2</button>
+            <button style="width:28px; height:28px; border-radius:6px; border:1px solid #e2e8f0; background:#fff; color:#94a3b8; cursor:pointer; font-size:11px;">&rsaquo;</button>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
-
-<script>
-  (function () {
-    var tabButtons = document.querySelectorAll('.tab-btn');
-    var tabSections = document.querySelectorAll('.tab-section');
-    var municipalButton = document.getElementById('open-municipal-form');
-
-    function setActiveTab(targetId) {
-      tabSections.forEach(function (section) {
-        section.classList.toggle('hidden', section.id !== targetId);
-      });
-
-      tabButtons.forEach(function (button) {
-        var active = button.getAttribute('data-target') === targetId;
-        button.classList.toggle('text-blue-600', active);
-        button.classList.toggle('border-blue-600', active);
-        button.classList.toggle('text-gray-500', !active);
-        button.classList.toggle('border-transparent', !active);
-      });
-
-      if (municipalButton) {
-        municipalButton.classList.toggle('hidden', targetId !== 'municipal-section');
-      }
-    }
-
-    tabButtons.forEach(function (button) {
-      button.addEventListener('click', function () {
-        setActiveTab(button.getAttribute('data-target'));
-      });
-    });
-
-    var formPanel = document.getElementById('municipal-form-panel');
-    var formOverlay = document.getElementById('form-overlay');
-    var closeFormButton = document.getElementById('close-municipal-form');
-    var openFormButton = document.getElementById('open-municipal-form');
-
-    function openForm() {
-      if (!formPanel || !formOverlay) {
-        return;
-      }
-      formPanel.classList.remove('translate-x-full');
-      formOverlay.classList.remove('hidden');
-      document.body.classList.add('overflow-hidden');
-    }
-
-    function closeForm() {
-      if (!formPanel || !formOverlay) {
-        return;
-      }
-      formPanel.classList.add('translate-x-full');
-      formOverlay.classList.add('hidden');
-      document.body.classList.remove('overflow-hidden');
-    }
-
-    if (openFormButton) {
-      openFormButton.addEventListener('click', openForm);
-    }
-    if (closeFormButton) {
-      closeFormButton.addEventListener('click', closeForm);
-    }
-    if (formOverlay) {
-      formOverlay.addEventListener('click', closeForm);
-    }
-
-    setActiveTab('municipal-section');
-  })();
-</script>
+</body>
+</html>

@@ -1,225 +1,98 @@
+<%--
+  Admin Dashboard — NagarSewa
+--%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<% request.setAttribute("activePage", "dashboard"); %>
 <jsp:include page="../common/header.jsp"/>
 
-<body class="bg-gray-50">
-<div class="flex">
-    <jsp:include page="../common/sidebar.jsp"/>
-    <div class="flex-1 container mx-auto px-4 py-8 ml-64">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <!-- Total Issues -->
-            <div class="bg-white p-6 rounded-2xl shadow">
-                <div class="text-sm text-gray-500">Total Issues</div>
-                <div class="text-3xl font-bold mt-2">12,482 <span class="text-green-500 text-base font-semibold">+12%</span></div>
-                <div class="text-xs text-gray-400 mt-3 flex items-center">
-                    <svg class="w-4 h-4 mr-1 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
-                    Increased from last month
-                </div>
-            </div>
-            <!-- Total Municipalities -->
-            <div class="bg-white p-6 rounded-2xl shadow">
-                <div class="text-sm text-gray-500">Total Municipalities</div>
-                <div class="text-3xl font-bold mt-2">284</div>
-                <div class="text-xs text-gray-400 mt-3 flex items-center">
-                    <svg class="w-4 h-4 mr-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h6m-6 4h6m-6 4h6"></path></svg>
-                    Active governing bodies
-                </div>
-            </div>
-            <!-- Total Citizens -->
-            <div class="bg-white p-6 rounded-2xl shadow">
-                <div class="text-sm text-gray-500">Total Citizen</div>
-                <div class="text-3xl font-bold mt-2">1.2M</div>
-                <div class="text-xs text-gray-400 mt-3 flex items-center">
-                    <svg class="w-4 h-4 mr-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.653-.184-1.268-.5-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.653.184-1.268.5-1.857m0 0a5.002 5.002 0 019 0m-4.5-5a3 3 0 100-6 3 3 0 000 6z"></path></svg>
-                    Registered portal users
-                </div>
-            </div>
-            <!-- Resolved Rate -->
-            <div class="bg-white p-6 rounded-2xl shadow">
-                <div class="text-sm text-gray-500">Resolved Rate (%)</div>
-                <div class="text-3xl font-bold mt-2">84.2%</div>
-                <div class="text-xs text-gray-400 mt-3 flex items-center">
-                    <svg class="w-4 h-4 mr-1 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    Efficiency benchmark
-                </div>
-            </div>
-        </div>
+<div class="flex min-h-screen">
+  <jsp:include page="../common/sidebar.jsp"/>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
-            <!-- Recent Issue Reports -->
-            <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow">
-                <div class="flex justify-between items-center mb-4">
-                    <div>
-                        <h2 class="text-lg font-bold">Recent Issue Reports</h2>
-                        <p class="text-sm text-gray-500">LIVE STREAM OF CITY UPDATES</p>
-                    </div>
-                    <a href="#" class="text-sm font-semibold text-blue-600">VIEW ALL REPORTS</a>
-                </div>
-                <table class="w-full text-left">
-                    <thead>
-                    <tr class="text-xs text-gray-500 border-b">
-                        <th class="py-3">ISSUE TITLE</th>
-                        <th class="py-3">MUNICIPALITY</th>
-                        <th class="py-3">CATEGORY</th>
-                        <th class="py-3">STATUS</th>
-                        <th class="py-3">DATE</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr class="border-b">
-                        <td class="py-4">
-                            <p class="font-semibold">Broken Water Main</p>
-                            <p class="text-xs text-gray-400">#ISS-9042</p>
-                        </td>
-                        <td class="py-4">Kathmandu Metro</td>
-                        <td class="py-4">Infrastructure</td>
-                        <td class="py-4"><span class="bg-yellow-200 text-yellow-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">PENDING</span></td>
-                        <td class="py-4 text-sm">Oct 24, 2023</td>
-                    </tr>
-                    <tr class="border-b">
-                        <td class="py-4">
-                            <p class="font-semibold">Street Light Fault</p>
-                            <p class="text-xs text-gray-400">#ISS-8812</p>
-                        </td>
-                        <td class="py-4">Lalitpur Sub-Metro</td>
-                        <td class="py-4">Utilities</td>
-                        <td class="py-4"><span class="bg-blue-200 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">ONGOING</span></td>
-                        <td class="py-4 text-sm">Oct 23, 2023</td>
-                    </tr>
-                    <tr class="border-b">
-                        <td class="py-4">
-                            <p class="font-semibold">Illegal Dumping Site</p>
-                            <p class="text-xs text-gray-400">#ISS-7721</p>
-                        </td>
-                        <td class="py-4">Pokhara City</td>
-                        <td class="py-4">Environment</td>
-                        <td class="py-4"><span class="bg-green-200 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">FINISHED</span></td>
-                        <td class="py-4 text-sm">Oct 22, 2023</td>
-                    </tr>
-                    <tr class="border-b">
-                        <td class="py-4">
-                            <p class="font-semibold">Pothole Repair</p>
-                            <p class="text-xs text-gray-400">#ISS-9102</p>
-                        </td>
-                        <td class="py-4">Bharatpur</td>
-                        <td class="py-4">Roads</td>
-                        <td class="py-4"><span class="bg-yellow-200 text-yellow-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">PENDING</span></td>
-                        <td class="py-4 text-sm">Oct 22, 2023</td>
-                    </tr>
-                    <tr>
-                        <td class="py-4">
-                            <p class="font-semibold">Sewage Leak</p>
-                            <p class="text-xs text-gray-400">#ISS-9128</p>
-                        </td>
-                        <td class="py-4">Biratnagar</td>
-                        <td class="py-4">Sanitation</td>
-                        <td class="py-4"><span class="bg-blue-200 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">ONGOING</span></td>
-                        <td class="py-4 text-sm">Oct 21, 2023</td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
+  <div class="flex-1" style="margin-left:220px; background:#f8fafc; min-height:100vh;">
 
-            <!-- By Category & System Audit -->
-            <div class="space-y-6">
-                <div class="bg-white p-6 rounded-2xl shadow">
-                    <div class="flex justify-between items-center mb-4">
-                        <div>
-                            <h2 class="text-lg font-bold">By Category</h2>
-                            <p class="text-sm text-gray-500">DISTRIBUTION ANALYSIS</p>
-                        </div>
-                        <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path></svg>
-                    </div>
-                    <div class="space-y-4">
-                        <div>
-                            <div class="flex justify-between text-sm mb-1">
-                                <span>INFRASTRUCTURE</span>
-                                <span>42%</span>
-                            </div>
-                            <div class="w-full bg-gray-200 rounded-full h-2">
-                                <div class="bg-blue-600 h-2 rounded-full" style="width: 42%"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="flex justify-between text-sm mb-1">
-                                <span>UTILITIES</span>
-                                <span>28%</span>
-                            </div>
-                            <div class="w-full bg-gray-200 rounded-full h-2">
-                                <div class="bg-blue-600 h-2 rounded-full" style="width: 28%"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="flex justify-between text-sm mb-1">
-                                <span>SANITATION</span>
-                                <span>15%</span>
-                            </div>
-                            <div class="w-full bg-gray-200 rounded-full h-2">
-                                <div class="bg-blue-600 h-2 rounded-full" style="width: 15%"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="flex justify-between text-sm mb-1">
-                                <span>ENVIRONMENT</span>
-                                <span>10%</span>
-                            </div>
-                            <div class="w-full bg-gray-200 rounded-full h-2">
-                                <div class="bg-blue-600 h-2 rounded-full" style="width: 10%"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="flex justify-between text-sm mb-1">
-                                <span>OTHER</span>
-                                <span>5%</span>
-                            </div>
-                            <div class="w-full bg-gray-200 rounded-full h-2">
-                                <div class="bg-gray-300 h-2 rounded-full" style="width: 5%"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-blue-600 text-white p-6 rounded-2xl shadow-lg">
-                    <h2 class="text-lg font-bold">System Audit</h2>
-                    <p class="text-sm mt-2">Review all municipal activity logs and performance benchmarks for the current fiscal quarter.</p>
-                    <button class="mt-4 bg-white text-blue-600 font-semibold py-2 px-4 rounded-lg">GENERATE REPORT</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Global System Events -->
-        <div class="mt-8 bg-white p-6 rounded-2xl shadow">
-            <h2 class="text-lg font-bold">Global System Events</h2>
-            <p class="text-sm text-gray-500">REAL-TIME INFRASTRUCTURE ACTIVITY</p>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-                <!-- System Sync -->
-                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-blue-500">
-                    <div class="flex justify-between items-center">
-                        <span class="text-sm font-semibold text-blue-500">SYSTEM SYNC</span>
-                        <span class="text-xs text-gray-400">2 min ago</span>
-                    </div>
-                    <h3 class="font-bold mt-2">Data Integrity Check Complete</h3>
-                    <p class="text-sm text-gray-600 mt-1">All municipal databases successfully synchronized with the central repository.</p>
-                </div>
-                <!-- Alert -->
-                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-yellow-500">
-                    <div class="flex justify-between items-center">
-                        <span class="text-sm font-semibold text-yellow-500">ALERT</span>
-                        <span class="text-xs text-gray-400">14 min ago</span>
-                    </div>
-                    <h3 class="font-bold mt-2">Service Outage Detected</h3>
-                    <p class="text-sm text-gray-600 mt-1">Minor disruption reported in Bharatpur payment gateway. Maintenance team notified.</p>
-                </div>
-                <!-- New Unit -->
-                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-green-500">
-                    <div class="flex justify-between items-center">
-                        <span class="text-sm font-semibold text-green-500">NEW UNIT</span>
-                        <span class="text-xs text-gray-400">1 hour ago</span>
-                    </div>
-                    <h3 class="font-bold mt-2">Dharan Municipality Onboarded</h3>
-                    <p class="text-sm text-gray-600 mt-1">Successfully integrated Dharan Sub-Metro into the NagarSewa governance network.</p>
-                </div>
-            </div>
-        </div>
+    <div style="padding:18px 32px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #e2e8f0; background:#fff;">
+      <div>
+        <h1 style="font-family:'Outfit',sans-serif; font-size:20px; font-weight:700; color:#0f172a;">System Admin</h1>
+        <p style="font-size:13px; color:#64748b;">Platform-wide oversight</p>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <p style="font-size:12px; font-weight:600; color:#0f172a;">Admin</p>
+        <div style="width:34px; height:34px; border-radius:50%; background:#dc2626; display:flex; align-items:center; justify-content:center; color:#fff; font-size:12px; font-weight:700;">SA</div>
+      </div>
     </div>
+
+    <div style="padding:28px 32px;">
+
+      <!-- Stats -->
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:14px; margin-bottom:28px;">
+        <div style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:18px 20px;">
+          <p style="font-size:12px; font-weight:600; color:#94a3b8; margin-bottom:8px;">Registered Users</p>
+          <span style="font-family:'Outfit',sans-serif; font-size:28px; font-weight:800; color:#0f172a;">2,847</span>
+          <span style="font-size:12px; color:#059669; font-weight:600; margin-left:6px;">+156</span>
+        </div>
+        <div style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:18px 20px;">
+          <p style="font-size:12px; font-weight:600; color:#94a3b8; margin-bottom:8px;">Total Issues</p>
+          <span style="font-family:'Outfit',sans-serif; font-size:28px; font-weight:800; color:#0f172a;">1,429</span>
+        </div>
+        <div style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:18px 20px;">
+          <p style="font-size:12px; font-weight:600; color:#94a3b8; margin-bottom:8px;">Resolution Rate</p>
+          <span style="font-family:'Outfit',sans-serif; font-size:28px; font-weight:800; color:#059669;">89%</span>
+        </div>
+        <div style="background:#fff; border:1px solid #fee2e2; border-radius:10px; padding:18px 20px;">
+          <p style="font-size:12px; font-weight:600; color:#94a3b8; margin-bottom:8px;">Critical Issues</p>
+          <span style="font-family:'Outfit',sans-serif; font-size:28px; font-weight:800; color:#dc2626;">12</span>
+          <span style="font-size:12px; color:#dc2626; font-weight:600; margin-left:4px;">needs attention</span>
+        </div>
+      </div>
+
+      <!-- Actions + Activity -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px;">
+        <a href="<%= request.getContextPath() %>/admin/user-management" style="text-decoration:none; display:flex; align-items:center; gap:14px; background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:20px; transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.04)'" onmouseout="this.style.boxShadow='none'">
+          <div style="width:40px; height:40px; border-radius:8px; background:#e0e7ff; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <svg width="18" height="18" fill="#4f46e5" viewBox="0 0 20 20"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg>
+          </div>
+          <div>
+            <p style="font-size:14px; font-weight:700; color:#0f172a;">Manage Users</p>
+            <p style="font-size:12px; color:#64748b;">View, edit, suspend accounts</p>
+          </div>
+        </a>
+        <a href="<%= request.getContextPath() %>/admin/issue-management" style="text-decoration:none; display:flex; align-items:center; gap:14px; background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:20px; transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.04)'" onmouseout="this.style.boxShadow='none'">
+          <div style="width:40px; height:40px; border-radius:8px; background:#fef3c7; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <svg width="18" height="18" fill="#d97706" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg>
+          </div>
+          <div>
+            <p style="font-size:14px; font-weight:700; color:#0f172a;">Issue Oversight</p>
+            <p style="font-size:12px; color:#64748b;">Monitor all civic reports</p>
+          </div>
+        </a>
+      </div>
+
+      <!-- Activity Log -->
+      <div style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; overflow:hidden;">
+        <div style="padding:16px 20px; border-bottom:1px solid #f1f5f9;"><h2 style="font-size:15px; font-weight:700; color:#0f172a;">Recent Activity</h2></div>
+        <div style="padding:12px 20px; border-bottom:1px solid #f8fafc; display:flex; align-items:center; gap:10px;">
+          <div style="width:6px; height:6px; border-radius:50%; background:#059669;"></div>
+          <p style="font-size:13px; color:#1e293b; flex:1;"><strong>Priya Adhikari</strong> registered as a citizen</p>
+          <span style="font-size:11px; color:#94a3b8;">2 min ago</span>
+        </div>
+        <div style="padding:12px 20px; border-bottom:1px solid #f8fafc; display:flex; align-items:center; gap:10px;">
+          <div style="width:6px; height:6px; border-radius:50%; background:#dc2626;"></div>
+          <p style="font-size:13px; color:#1e293b; flex:1;">Issue <strong>#NS-8921</strong> escalated to critical</p>
+          <span style="font-size:11px; color:#94a3b8;">15 min ago</span>
+        </div>
+        <div style="padding:12px 20px; border-bottom:1px solid #f8fafc; display:flex; align-items:center; gap:10px;">
+          <div style="width:6px; height:6px; border-radius:50%; background:#2563eb;"></div>
+          <p style="font-size:13px; color:#1e293b; flex:1;">Ward 04 monthly report auto-generated</p>
+          <span style="font-size:11px; color:#94a3b8;">1 hr ago</span>
+        </div>
+        <div style="padding:12px 20px; display:flex; align-items:center; gap:10px;">
+          <div style="width:6px; height:6px; border-radius:50%; background:#059669;"></div>
+          <p style="font-size:13px; color:#1e293b; flex:1;"><strong>Sushila Karki</strong> resolved issue #NS-8790</p>
+          <span style="font-size:11px; color:#94a3b8;">3 hrs ago</span>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 </body>
 </html>
