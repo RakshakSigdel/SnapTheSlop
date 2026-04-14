@@ -2,7 +2,6 @@
   My Issues — NagarSewa
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<% request.setAttribute("activePage", "issue-reports"); %>
 <jsp:include page="../common/header.jsp"/>
 
 <div class="flex min-h-screen">
@@ -13,7 +12,7 @@
     <!-- Topbar -->
     <div style="padding:18px 32px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #e2e8f0; background:#fff;">
       <h1 style="font-family:'Outfit',sans-serif; font-size:18px; font-weight:700; color:#0f172a;">My Issue Reports</h1>
-      <a href="<%= request.getContextPath() %>/citizen/report-issue" style="display:inline-flex; align-items:center; gap:6px; background:#4f46e5; color:#fff; padding:9px 18px; border-radius:8px; font-size:13px; font-weight:600; text-decoration:none;">
+      <a href="<%= request.getContextPath() %>/citizen/report-issue" style="display:inline-flex; align-items:center; gap:6px; background:#059669; color:#fff; padding:9px 18px; border-radius:8px; font-size:13px; font-weight:600; text-decoration:none;">
         <span style="font-size:16px; line-height:1;">+</span> New Report
       </a>
     </div>
@@ -51,7 +50,7 @@
               <td style="padding:14px 16px;"><span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:#fef3c7; color:#92400e;">Pending</span></td>
               <td style="padding:14px 16px; font-size:12px; color:#94a3b8;">Oct 11</td>
               <td style="padding:14px 16px; font-size:13px; font-weight:600; color:#64748b;">24</td>
-              <td style="padding:14px 20px; text-align:right;"><a href="<%= request.getContextPath() %>/citizen/issue-detail?id=1" style="font-size:12px; color:#4f46e5; font-weight:600; text-decoration:none;">View →</a></td>
+              <td style="padding:14px 20px; text-align:right;"><a href="<%= request.getContextPath() %>/citizen/issue-detail?id=1" style="font-size:12px; color:#059669; font-weight:600; text-decoration:none;">View →</a></td>
             </tr>
             <tr style="border-bottom:1px solid #f8fafc; transition:background 0.15s;" onmouseover="this.style.background='#fafbfc'" onmouseout="this.style.background='transparent'">
               <td style="padding:14px 20px;">
@@ -59,10 +58,10 @@
                 <p style="font-size:12px; color:#94a3b8;">#NS-8815 · Ward 04</p>
               </td>
               <td style="padding:14px 16px;"><span style="font-size:12px; color:#64748b;">Electrical</span></td>
-              <td style="padding:14px 16px;"><span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:#dbeafe; color:#1e40af;">In Progress</span></td>
+              <td style="padding:14px 16px;"><span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:#d1fae5; color:#065f46;">In Progress</span></td>
               <td style="padding:14px 16px; font-size:12px; color:#94a3b8;">Oct 8</td>
               <td style="padding:14px 16px; font-size:13px; font-weight:600; color:#64748b;">18</td>
-              <td style="padding:14px 20px; text-align:right;"><a href="<%= request.getContextPath() %>/citizen/issue-detail?id=2" style="font-size:12px; color:#4f46e5; font-weight:600; text-decoration:none;">View →</a></td>
+              <td style="padding:14px 20px; text-align:right;"><a href="<%= request.getContextPath() %>/citizen/issue-detail?id=2" style="font-size:12px; color:#059669; font-weight:600; text-decoration:none;">View →</a></td>
             </tr>
             <tr style="border-bottom:1px solid #f8fafc; transition:background 0.15s;" onmouseover="this.style.background='#fafbfc'" onmouseout="this.style.background='transparent'">
               <td style="padding:14px 20px;">
@@ -73,7 +72,7 @@
               <td style="padding:14px 16px;"><span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:#d1fae5; color:#065f46;">Resolved</span></td>
               <td style="padding:14px 16px; font-size:12px; color:#94a3b8;">Oct 5</td>
               <td style="padding:14px 16px; font-size:13px; font-weight:600; color:#64748b;">31</td>
-              <td style="padding:14px 20px; text-align:right;"><a href="<%= request.getContextPath() %>/citizen/issue-detail?id=3" style="font-size:12px; color:#4f46e5; font-weight:600; text-decoration:none;">View →</a></td>
+              <td style="padding:14px 20px; text-align:right;"><a href="<%= request.getContextPath() %>/citizen/issue-detail?id=3" style="font-size:12px; color:#059669; font-weight:600; text-decoration:none;">View →</a></td>
             </tr>
             <tr style="border-bottom:1px solid #f8fafc; transition:background 0.15s;" onmouseover="this.style.background='#fafbfc'" onmouseout="this.style.background='transparent'">
               <td style="padding:14px 20px;">
@@ -84,7 +83,7 @@
               <td style="padding:14px 16px;"><span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:#d1fae5; color:#065f46;">Resolved</span></td>
               <td style="padding:14px 16px; font-size:12px; color:#94a3b8;">Sep 28</td>
               <td style="padding:14px 16px; font-size:13px; font-weight:600; color:#64748b;">42</td>
-              <td style="padding:14px 20px; text-align:right;"><a href="<%= request.getContextPath() %>/citizen/issue-detail?id=4" style="font-size:12px; color:#4f46e5; font-weight:600; text-decoration:none;">View →</a></td>
+              <td style="padding:14px 20px; text-align:right;"><a href="<%= request.getContextPath() %>/citizen/issue-detail?id=4" style="font-size:12px; color:#059669; font-weight:600; text-decoration:none;">View →</a></td>
             </tr>
             <tr style="transition:background 0.15s;" onmouseover="this.style.background='#fafbfc'" onmouseout="this.style.background='transparent'">
               <td style="padding:14px 20px;">
@@ -95,7 +94,7 @@
               <td style="padding:14px 16px;"><span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:#fef3c7; color:#92400e;">Pending</span></td>
               <td style="padding:14px 16px; font-size:12px; color:#94a3b8;">Sep 22</td>
               <td style="padding:14px 16px; font-size:13px; font-weight:600; color:#64748b;">15</td>
-              <td style="padding:14px 20px; text-align:right;"><a href="<%= request.getContextPath() %>/citizen/issue-detail?id=5" style="font-size:12px; color:#4f46e5; font-weight:600; text-decoration:none;">View →</a></td>
+              <td style="padding:14px 20px; text-align:right;"><a href="<%= request.getContextPath() %>/citizen/issue-detail?id=5" style="font-size:12px; color:#059669; font-weight:600; text-decoration:none;">View →</a></td>
             </tr>
           </tbody>
         </table>

@@ -2,7 +2,6 @@
   Report Issue — NagarSewa
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<% request.setAttribute("activePage", "issue-reports"); %>
 <jsp:include page="../common/header.jsp"/>
 
 <div class="flex min-h-screen">
@@ -20,7 +19,7 @@
       </nav>
     </div>
 
-    <div style="padding:32px; max-width:680px;">
+    <div style="padding:32px; max-width:760px; margin:0 auto; width:100%;">
 
       <h1 style="font-family:'Outfit',sans-serif; font-size:24px; font-weight:800; color:#0f172a; margin-bottom:6px;">Report an Issue</h1>
       <p style="font-size:14px; color:#64748b; margin-bottom:28px;">Tell us what needs fixing. Be as specific as you can — it helps us respond faster.</p>
@@ -31,7 +30,7 @@
       </div>
       <% } %>
 
-      <form action="<%= request.getContextPath() %>/issue/create" method="post" enctype="multipart/form-data" id="reportForm">
+      <form action="<%= request.getContextPath() %>/citizen/report-issue" method="post" enctype="multipart/form-data" id="reportForm">
 
         <!-- Title -->
         <div style="margin-bottom:20px;">
@@ -40,7 +39,7 @@
                  style="width:100%; height:44px; border:1.5px solid #e5e7eb; border-radius:8px; padding:0 14px; font-size:14px; color:#111827; background:#fff; outline:none; font-family:'Inter',sans-serif;"/>
         </div>
 
-        <!-- Category + Ward -->
+        <!-- Category + Municipality -->
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:20px;">
           <div>
             <label style="display:block; font-size:13px; font-weight:600; color:#374151; margin-bottom:6px;">Category <span style="color:#dc2626;">*</span></label>
@@ -59,25 +58,25 @@
             </select>
           </div>
           <div>
+            <label style="display:block; font-size:13px; font-weight:600; color:#374151; margin-bottom:6px;">Municipality <span style="color:#dc2626;">*</span></label>
+            <select name="municipality" id="municipality" required
+                    style="width:100%; height:44px; border:1.5px solid #e5e7eb; border-radius:8px; padding:0 12px; font-size:14px; color:#111827; background:#fff; outline:none; appearance:none; cursor:pointer; font-family:'Inter',sans-serif;">
+              <option value="" disabled selected>Select municipality</option>
+              <option value="Kathmandu Metropolitan City">Kathmandu Metropolitan City</option>
+              <option value="Lalitpur Metropolitan City">Lalitpur Metropolitan City</option>
+              <option value="Bhaktapur Municipality">Bhaktapur Municipality</option>
+              <option value="Kirtipur Municipality">Kirtipur Municipality</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Ward -->
+        <div style="margin-bottom:20px;">
+          <div>
             <label style="display:block; font-size:13px; font-weight:600; color:#374151; margin-bottom:6px;">Ward <span style="color:#dc2626;">*</span></label>
             <select name="ward" id="ward" required
                     style="width:100%; height:44px; border:1.5px solid #e5e7eb; border-radius:8px; padding:0 12px; font-size:14px; color:#111827; background:#fff; outline:none; appearance:none; cursor:pointer; font-family:'Inter',sans-serif;">
-              <option value="" disabled selected>Select</option>
-              <option value="Ward 01">Ward 01</option>
-              <option value="Ward 02">Ward 02</option>
-              <option value="Ward 03">Ward 03</option>
-              <option value="Ward 04">Ward 04</option>
-              <option value="Ward 05">Ward 05</option>
-              <option value="Ward 06">Ward 06</option>
-              <option value="Ward 07">Ward 07</option>
-              <option value="Ward 08">Ward 08</option>
-              <option value="Ward 09">Ward 09</option>
-              <option value="Ward 10">Ward 10</option>
-              <option value="Ward 11">Ward 11</option>
-              <option value="Ward 12">Ward 12</option>
-              <option value="Ward 13">Ward 13</option>
-              <option value="Ward 14">Ward 14</option>
-              <option value="Ward 15">Ward 15</option>
+              <option value="" disabled selected>Select municipality first</option>
             </select>
           </div>
         </div>
@@ -113,7 +112,7 @@
 
         <!-- Buttons -->
         <div style="display:flex; align-items:center; gap:12px;">
-          <button type="submit" style="background:#4f46e5; color:#fff; border:none; font-weight:600; font-size:14px; padding:11px 24px; border-radius:8px; cursor:pointer; font-family:'Inter',sans-serif;">
+          <button type="submit" style="background:#059669; color:#fff; border:none; font-weight:600; font-size:14px; padding:11px 24px; border-radius:8px; cursor:pointer; font-family:'Inter',sans-serif;">
             Submit Report
           </button>
           <a href="<%= request.getContextPath() %>/citizen/dashboard" style="font-size:14px; font-weight:500; color:#64748b; text-decoration:none;">Cancel</a>
@@ -127,7 +126,40 @@
   var dropZone = document.getElementById('dropZone');
   var imageInput = document.getElementById('imageInput');
   dropZone.addEventListener('click', function() { imageInput.click(); });
-  dropZone.addEventListener('dragover', function(e) { e.preventDefault(); dropZone.style.borderColor='#4f46e5'; });
+  var municipality = document.getElementById('municipality');
+  var ward = document.getElementById('ward');
+  var wardMap = {
+    'Kathmandu Metropolitan City': ['Ward 01', 'Ward 02', 'Ward 03', 'Ward 04', 'Ward 05'],
+    'Lalitpur Metropolitan City': ['Ward 06', 'Ward 07', 'Ward 08', 'Ward 09', 'Ward 10'],
+    'Bhaktapur Municipality': ['Ward 11', 'Ward 12', 'Ward 13'],
+    'Kirtipur Municipality': ['Ward 14', 'Ward 15']
+  };
+
+  function populateWards() {
+    var selectedMunicipality = municipality.value;
+    ward.innerHTML = '';
+    var defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.disabled = true;
+    defaultOption.selected = true;
+    defaultOption.textContent = selectedMunicipality ? 'Select ward' : 'Select municipality first';
+    ward.appendChild(defaultOption);
+
+    if (!selectedMunicipality || !wardMap[selectedMunicipality]) {
+      return;
+    }
+
+    wardMap[selectedMunicipality].forEach(function(wardName) {
+      var option = document.createElement('option');
+      option.value = wardName;
+      option.textContent = wardName;
+      ward.appendChild(option);
+    });
+  }
+
+  municipality.addEventListener('change', populateWards);
+
+  dropZone.addEventListener('dragover', function(e) { e.preventDefault(); dropZone.style.borderColor='#059669'; });
   dropZone.addEventListener('dragleave', function() { dropZone.style.borderColor='#d1d5db'; });
   dropZone.addEventListener('drop', function(e) { e.preventDefault(); dropZone.style.borderColor='#d1d5db'; if(e.dataTransfer.files[0]) showPreview(e.dataTransfer.files[0]); });
   imageInput.addEventListener('change', function() { if(imageInput.files[0]) showPreview(imageInput.files[0]); });

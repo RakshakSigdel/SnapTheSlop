@@ -98,7 +98,7 @@
                 <p style="font-size:15px; font-weight:700; color:#0f172a; margin-bottom:4px;">Register</p>
                 <p style="font-size:13px; color:#64748b;">Create a new account</p>
             </a>
-            <a href="<%= request.getContextPath() %>/profile" class="card-link">
+            <a href="<%= request.getContextPath() %>/citizen/profile" class="card-link">
                 <p style="font-size:15px; font-weight:700; color:#0f172a; margin-bottom:4px;">Profile</p>
                 <p style="font-size:13px; color:#64748b;">View & edit your details</p>
             </a>

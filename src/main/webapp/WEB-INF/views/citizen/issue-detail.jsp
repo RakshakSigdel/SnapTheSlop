@@ -2,8 +2,16 @@
   Issue Detail — NagarSewa
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<% request.setAttribute("activePage", "issue-reports"); %>
 <jsp:include page="../common/header.jsp"/>
+
+<%
+String issueId = String.valueOf(request.getAttribute("issueId") == null ? "1" : request.getAttribute("issueId"));
+String issueTitle = String.valueOf(request.getAttribute("issueTitle") == null ? "Pothole near Ratna Park" : request.getAttribute("issueTitle"));
+String issueCategory = String.valueOf(request.getAttribute("issueCategory") == null ? "Roads & Potholes" : request.getAttribute("issueCategory"));
+String issueStatus = String.valueOf(request.getAttribute("issueStatus") == null ? "Pending" : request.getAttribute("issueStatus"));
+String issuePriority = String.valueOf(request.getAttribute("issuePriority") == null ? "High Priority" : request.getAttribute("issuePriority"));
+String issueLocation = String.valueOf(request.getAttribute("issueLocation") == null ? "Near Ratna Park bus stop, Ward 04" : request.getAttribute("issueLocation"));
+%>
 
 <div class="flex min-h-screen">
   <jsp:include page="../common/citizen-sidebar.jsp"/>
@@ -16,7 +24,7 @@
         <span>/</span>
         <a href="<%= request.getContextPath() %>/citizen/my-issues" style="color:#64748b; text-decoration:none;">My Issues</a>
         <span>/</span>
-        <span style="color:#0f172a; font-weight:600;">#NS-8821</span>
+        <span style="color:#0f172a; font-weight:600;">#NS-<%= issueId %></span>
       </nav>
     </div>
 
@@ -25,11 +33,11 @@
       <!-- Header -->
       <div style="margin-bottom:24px;">
         <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
-          <span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:#fef3c7; color:#92400e;">Pending</span>
-          <span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:#fee2e2; color:#991b1b;">High Priority</span>
+          <span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:#fef3c7; color:#92400e;"><%= issueStatus %></span>
+          <span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:#fee2e2; color:#991b1b;"><%= issuePriority %></span>
         </div>
-        <h1 style="font-family:'Outfit',sans-serif; font-size:26px; font-weight:800; color:#0f172a; margin-bottom:4px; letter-spacing:-0.5px;">Pothole near Ratna Park</h1>
-        <p style="font-size:13px; color:#94a3b8;">Filed Oct 11, 2023 · Roads & Potholes · Ward 04</p>
+        <h1 style="font-family:'Outfit',sans-serif; font-size:26px; font-weight:800; color:#0f172a; margin-bottom:4px; letter-spacing:-0.5px;"><%= issueTitle %></h1>
+        <p style="font-size:13px; color:#94a3b8;">Filed Oct 11, 2023 · <%= issueCategory %> · <%= issueLocation %></p>
       </div>
 
       <div style="display:grid; grid-template-columns:5fr 3fr; gap:20px;">
@@ -66,7 +74,7 @@
             <h2 style="font-size:14px; font-weight:700; color:#0f172a; margin-bottom:16px;">Comments (2)</h2>
 
             <div style="display:flex; gap:10px; margin-bottom:16px; padding-bottom:16px; border-bottom:1px solid #f1f5f9;">
-              <div style="width:30px; height:30px; border-radius:50%; background:#e0e7ff; display:flex; align-items:center; justify-content:center; color:#4338ca; font-size:11px; font-weight:700; flex-shrink:0;">AS</div>
+              <div style="width:30px; height:30px; border-radius:50%; background:#dcfce7; display:flex; align-items:center; justify-content:center; color:#166534; font-size:11px; font-weight:700; flex-shrink:0;">AS</div>
               <div>
                 <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
                   <span style="font-size:13px; font-weight:600; color:#1e293b;">Arjun Sharma</span>
@@ -77,11 +85,11 @@
             </div>
 
             <div style="display:flex; gap:10px; margin-bottom:16px; padding-bottom:16px; border-bottom:1px solid #f1f5f9;">
-              <div style="width:30px; height:30px; border-radius:50%; background:#dbeafe; display:flex; align-items:center; justify-content:center; color:#1e40af; font-size:11px; font-weight:700; flex-shrink:0;">WO</div>
+              <div style="width:30px; height:30px; border-radius:50%; background:#d1fae5; display:flex; align-items:center; justify-content:center; color:#065f46; font-size:11px; font-weight:700; flex-shrink:0;">WO</div>
               <div>
                 <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
                   <span style="font-size:13px; font-weight:600; color:#1e293b;">Ward Office</span>
-                  <span style="padding:1px 6px; border-radius:4px; font-size:10px; font-weight:600; background:#dbeafe; color:#1e40af;">Official</span>
+                  <span style="padding:1px 6px; border-radius:4px; font-size:10px; font-weight:600; background:#dcfce7; color:#166534;">Official</span>
                   <span style="font-size:11px; color:#94a3b8;">Oct 12</span>
                 </div>
                 <p style="font-size:13px; color:#475569; line-height:1.6;">This has been forwarded to the roads department. A crew is scheduled for inspection this Friday.</p>
@@ -104,9 +112,9 @@
           <div style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:20px;">
             <h3 style="font-size:12px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:1px; margin-bottom:14px;">Details</h3>
             <div style="display:flex; flex-direction:column; gap:12px;">
-              <div><p style="font-size:12px; color:#94a3b8;">ID</p><p style="font-size:14px; font-weight:600; color:#0f172a;">#NS-8821</p></div>
-              <div><p style="font-size:12px; color:#94a3b8;">Category</p><p style="font-size:14px; color:#1e293b;">Roads & Potholes</p></div>
-              <div><p style="font-size:12px; color:#94a3b8;">Location</p><p style="font-size:14px; color:#1e293b;">Near Ratna Park bus stop</p></div>
+              <div><p style="font-size:12px; color:#94a3b8;">ID</p><p style="font-size:14px; font-weight:600; color:#0f172a;">#NS-<%= issueId %></p></div>
+              <div><p style="font-size:12px; color:#94a3b8;">Category</p><p style="font-size:14px; color:#1e293b;"><%= issueCategory %></p></div>
+              <div><p style="font-size:12px; color:#94a3b8;">Location</p><p style="font-size:14px; color:#1e293b;"><%= issueLocation %></p></div>
               <div><p style="font-size:12px; color:#94a3b8;">Ward</p><p style="font-size:14px; color:#1e293b;">Ward 04</p></div>
               <div><p style="font-size:12px; color:#94a3b8;">Filed by</p><p style="font-size:14px; color:#1e293b;">Arjun Sharma</p></div>
             </div>
