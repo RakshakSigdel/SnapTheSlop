@@ -48,6 +48,19 @@
     </nav>
 
     <div style="padding:10px; border-top:1px solid #1e293b;">
+        <% String userName = (String) session.getAttribute("userName"); %>
+        <% String userInitials = (String) session.getAttribute("userInitials"); %>
+        <% if (userName != null) { %>
+        <div style="padding:12px; margin-bottom:12px; background:#15342a; border-radius:8px; display:flex; align-items:center; gap:10px;">
+            <div style="width:36px; height:36px; border-radius:50%; background:#059669; display:flex; align-items:center; justify-content:center; color:#fff; font-size:13px; font-weight:700; flex-shrink:0;">
+                <%= userInitials %>
+            </div>
+            <div style="flex:1; min-width:0;">
+                <p style="font-size:12px; font-weight:600; color:#f1f5f9; margin:0; word-break:break-word; white-space:normal;"><%= userName %></p>
+                <p style="font-size:10px; color:#94a3b8; margin:2px 0 0; text-transform:uppercase; letter-spacing:0.5px;">Municipality</p>
+            </div>
+        </div>
+        <% } %>
         <a href="<%= request.getContextPath() %>/municipality/profile"
            style="display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:8px; margin-bottom:2px; text-decoration:none; font-size:13px; font-weight:600;
            <%= "profile".equals(activePage) ? "background:#15342a; color:#34d399;" : "color:#64748b;" %>">

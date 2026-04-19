@@ -3,117 +3,123 @@ package com.snaptheslop.snaptheslop.user.controller;
 import com.snaptheslop.snaptheslop.user.model.UserDTO;
 import com.snaptheslop.snaptheslop.user.model.dao.UserDAO;
 import com.snaptheslop.snaptheslop.util.ValidationUtil;
-
-import java.io.IOException;
-import java.util.UUID;
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.io.IOException;
+import java.util.UUID;
 
 @WebServlet(name = "registerServlet", value = "/register")
 public class RegisterServlet extends HttpServlet {
 
-    private static final String REGISTER_VIEW = "/WEB-INF/views/user/register.jsp";
-    private UserDAO userDAO = new UserDAO();
+  private static final String REGISTER_VIEW =
+    "/WEB-INF/views/user/register.jsp";
+  private UserDAO userDAO = new UserDAO();
 
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.getRequestDispatcher(REGISTER_VIEW).forward(request, response);
+  @Override
+  protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    throws ServletException, IOException {
+    request.getRequestDispatcher(REGISTER_VIEW).forward(request, response);
+  }
+
+  @Override
+  protected void doPost(
+    HttpServletRequest request,
+    HttpServletResponse response
+  ) throws ServletException, IOException {
+    String firstName = request.getParameter("firstName");
+    String lastName = request.getParameter("lastName");
+    String email = request.getParameter("email");
+    String phone = request.getParameter("phone");
+    String password = request.getParameter("password");
+    String confirmPassword = request.getParameter("confirmPassword");
+
+    // Validation
+    StringBuilder errors = new StringBuilder();
+
+    if (firstName == null || firstName.trim().isEmpty()) {
+      errors.append("First name is required. ");
     }
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String fullName = request.getParameter("fullName");
-        String email = request.getParameter("email");
-        String phone = request.getParameter("phone");
-        String wardNumber = request.getParameter("wardNumber");
-        String municipality = request.getParameter("municipality");
-        String password = request.getParameter("password");
-        String confirmPassword = request.getParameter("confirmPassword");
-        String agreeToTerms = request.getParameter("agreeToTerms");
-
-        // Validation
-        StringBuilder errors = new StringBuilder();
-
-        if (!ValidationUtil.isValidEmail(email)) {
-            errors.append("Invalid email address. ");
-        }
-
-        if (email != null && userDAO.findUserByEmail(email) != null) {
-            errors.append("Email already registered. ");
-        }
-
-        if (fullName == null || fullName.trim().isEmpty()) {
-            errors.append("Full name is required. ");
-        }
-
-        if (password == null || password.length() < 8) {
-            errors.append("Password must be at least 8 characters. ");
-        }
-
-        if (!password.equals(confirmPassword)) {
-            errors.append("Passwords do not match. ");
-        }
-
-        if (municipality == null || municipality.trim().isEmpty()) {
-            errors.append("Municipality is required. ");
-        }
-
-        if (!"on".equals(agreeToTerms)) {
-            errors.append("You must agree to the terms and conditions. ");
-        }
-
-        if (errors.length() > 0) {
-            request.setAttribute("error", errors.toString().trim());
-            request.setAttribute("fullName", fullName);
-            request.setAttribute("email", email);
-            request.setAttribute("phone", phone);
-            request.setAttribute("wardNumber", wardNumber);
-            request.setAttribute("municipality", municipality);
-            request.getRequestDispatcher(REGISTER_VIEW).forward(request, response);
-            return;
-        }
-
-        // Parse full name into first and last name
-        String[] nameParts = fullName.trim().split("\\s+");
-        String firstName = nameParts[0];
-        String lastName = nameParts.length > 1 ? String.join(" ", java.util.Arrays.copyOfRange(nameParts, 1, nameParts.length)) : "";
-
-        // Create UserDTO
-        UserDTO newUser = new UserDTO();
-        newUser.setUserId("NS-" + System.currentTimeMillis() + "-" + UUID.randomUUID().toString().substring(0, 5).toUpperCase());
-        newUser.setFirstName(firstName);
-        newUser.setLastName(lastName);
-        newUser.setEmail(email);
-        newUser.setPhoneNumber(phone);
-        newUser.setMunicipality(municipality);
-        newUser.setWardNo("Ward No. " + wardNumber);
-        newUser.setProvince("Madhesh Province"); // Default province
-        newUser.setRole("Registered Citizen");
-        newUser.setAccountStatus("Verified Account");
-        newUser.setMemberSince(java.time.LocalDate.now().toString());
-
-        // Register user in database
-        if (userDAO.registerUser(newUser, password)) {
-            // Store user in session
-            HttpSession session = request.getSession();
-            session.setAttribute("loggedInUser", newUser);
-
-            // Show success message
-            request.setAttribute("success", "Account created successfully! You are now logged in.");
-            request.getRequestDispatcher(REGISTER_VIEW).forward(request, response);
-        } else {
-            request.setAttribute("error", "Registration failed. Please try again.");
-            request.setAttribute("fullName", fullName);
-            request.setAttribute("email", email);
-            request.setAttribute("phone", phone);
-            request.setAttribute("wardNumber", wardNumber);
-            request.setAttribute("municipality", municipality);
-            request.getRequestDispatcher(REGISTER_VIEW).forward(request, response);
-        }
+    if (lastName == null || lastName.trim().isEmpty()) {
+      errors.append("Last name is required. ");
     }
+
+    if (!ValidationUtil.isValidEmail(email)) {
+      errors.append("Invalid email address. ");
+    }
+
+    if (email != null && userDAO.findUserByEmail(email) != null) {
+      errors.append("Email already registered. ");
+    }
+
+    if (password == null || password.length() < 8) {
+      errors.append("Password must be at least 8 characters. ");
+    }
+
+    if (!password.equals(confirmPassword)) {
+      errors.append("Passwords do not match. ");
+    }
+
+    if (errors.length() > 0) {
+      request.setAttribute("error", errors.toString().trim());
+      request.setAttribute("firstName", firstName);
+      request.setAttribute("lastName", lastName);
+      request.setAttribute("email", email);
+      request.setAttribute("phone", phone);
+      request.getRequestDispatcher(REGISTER_VIEW).forward(request, response);
+      return;
+    }
+
+    // Create UserDTO
+    UserDTO newUser = new UserDTO();
+    newUser.setUserId(
+      "NS-" +
+        System.currentTimeMillis() +
+        "-" +
+        UUID.randomUUID().toString().substring(0, 5).toUpperCase()
+    );
+    newUser.setFirstName(firstName.trim());
+    newUser.setLastName(lastName.trim());
+    newUser.setEmail(email.trim());
+    newUser.setPhoneNumber(phone);
+    newUser.setMunicipality("Itahari Sub-metropolitan City");
+    newUser.setWardNo("Ward No. 1");
+    newUser.setProvince("Madhesh Province");
+    newUser.setRole("Registered Citizen");
+    newUser.setAccountStatus("Verified Account");
+    newUser.setMemberSince(java.time.LocalDate.now().toString());
+
+    // Register user in database
+    if (userDAO.registerUser(newUser, password)) {
+      // Store user in session
+      HttpSession session = request.getSession();
+      session.setAttribute("loggedInUser", newUser);
+      session.setAttribute(
+        "userName",
+        firstName.trim() + " " + lastName.trim()
+      );
+      session.setAttribute(
+        "userInitials",
+        (
+          firstName.trim().charAt(0) +
+          "" +
+          lastName.trim().charAt(0)
+        ).toUpperCase()
+      );
+
+      // Redirect to citizen dashboard
+      response.sendRedirect(request.getContextPath() + "/citizen/dashboard");
+    } else {
+      request.setAttribute("error", "Registration failed. Please try again.");
+      request.setAttribute("firstName", firstName);
+      request.setAttribute("lastName", lastName);
+      request.setAttribute("email", email);
+      request.setAttribute("phone", phone);
+      request.getRequestDispatcher(REGISTER_VIEW).forward(request, response);
+    }
+  }
 }

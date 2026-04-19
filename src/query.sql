@@ -1,131 +1,117 @@
 -- ============================================================
 -- Drop & Create Database
 -- ============================================================
-DROP
-DATABASE IF EXISTS snaptheslop;
-CREATE
-DATABASE snaptheslop;
-USE
-snaptheslop;
+DROP DATABASE IF EXISTS snaptheslop;
+CREATE DATABASE snaptheslop;
+USE snaptheslop;
 
 -- ============================================================
--- Municipalities
+-- Municipalities Table
 -- ============================================================
-CREATE TABLE municipalities
-(
-    id             INT AUTO_INCREMENT PRIMARY KEY,
-    name           VARCHAR(100) NOT NULL,
-    district       VARCHAR(100) NOT NULL,
-    province       VARCHAR(100) NOT NULL,
+CREATE TABLE municipalities (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    district VARCHAR(100),
+    province VARCHAR(100),
     contact_number VARCHAR(20),
-    email          VARCHAR(100),
+    email VARCHAR(100),
     office_address TEXT
 );
 
 -- ============================================================
--- Wards
+-- Wards Table
 -- ============================================================
-CREATE TABLE wards
-(
-    id              INT AUTO_INCREMENT PRIMARY KEY,
-    ward_number     INT         NOT NULL,
-    ward_head       VARCHAR(100),
-    contact_number  VARCHAR(20),
-    status          VARCHAR(20) NOT NULL DEFAULT 'active',
-    municipality_id INT         NOT NULL,
-
-    CONSTRAINT fk_ward_municipality
-        FOREIGN KEY (municipality_id) REFERENCES municipalities (id)
-            ON DELETE CASCADE
+CREATE TABLE wards (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    ward_number INT NOT NULL,
+    ward_head VARCHAR(100),
+    contact_number VARCHAR(20),
+    status VARCHAR(20) NOT NULL DEFAULT 'active',
+    municipality_id INT NOT NULL,
+    CONSTRAINT fk_ward_municipality FOREIGN KEY (municipality_id) REFERENCES municipalities (id) ON DELETE CASCADE
 );
 
 -- ============================================================
--- Users
+-- Users Table
 -- ============================================================
-CREATE TABLE users
-(
-    id              INT AUTO_INCREMENT PRIMARY KEY,
-    full_name       VARCHAR(100) NOT NULL,
-    email           VARCHAR(100) NOT NULL UNIQUE,
-    phone           VARCHAR(20),
-    password_hash   VARCHAR(255) NOT NULL,
-    role            VARCHAR(20)  NOT NULL DEFAULT 'citizen',
-    status          VARCHAR(20)  NOT NULL DEFAULT 'active',
-    created_at      TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    municipality_id INT NULL,
-
-    CONSTRAINT fk_user_municipality
-        FOREIGN KEY (municipality_id) REFERENCES municipalities (id)
-            ON DELETE SET NULL,
-
-    CONSTRAINT chk_role
-        CHECK (role IN ('superadmin', 'municipal_head', 'citizen'))
-);
-
--- Only one municipal head per municipality
-CREATE UNIQUE INDEX uq_one_head_per_municipality
-    ON users (municipality_id, role);
-
--- ============================================================
--- Issues
--- ============================================================
-CREATE TABLE issues
-(
-    id          INT AUTO_INCREMENT PRIMARY KEY,
-    title       VARCHAR(200) NOT NULL,
-    description TEXT         NOT NULL,
-    category    VARCHAR(50)  NOT NULL,
-    status      VARCHAR(20)  NOT NULL DEFAULT 'open',
-    priority    VARCHAR(20)  NOT NULL DEFAULT 'medium',
-    image_path  VARCHAR(500),
-    is_spam     BOOLEAN      NOT NULL DEFAULT FALSE,
-    created_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    user_id     INT          NOT NULL,
-    ward_id     INT          NOT NULL,
-
-    CONSTRAINT fk_issue_user
-        FOREIGN KEY (user_id) REFERENCES users (id)
-            ON DELETE CASCADE,
-
-    CONSTRAINT fk_issue_ward
-        FOREIGN KEY (ward_id) REFERENCES wards (id)
-            ON DELETE CASCADE,
-
-    CONSTRAINT chk_status
-        CHECK (status IN ('open', 'in_progress', 'resolved', 'rejected')),
-
-    CONSTRAINT chk_priority
-        CHECK (priority IN ('low', 'medium', 'high'))
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    userId VARCHAR(100) NOT NULL UNIQUE,
+    firstName VARCHAR(100) NOT NULL,
+    lastName VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    phoneNumber VARCHAR(20),
+    password VARCHAR(255) NOT NULL,
+    role VARCHAR(50) NOT NULL DEFAULT 'Registered Citizen',
+    accountStatus VARCHAR(50) NOT NULL DEFAULT 'Verified Account',
+    municipality VARCHAR(100),
+    wardNo VARCHAR(50),
+    province VARCHAR(100),
+    memberSince TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 -- ============================================================
--- Upvotes
+-- Issues Table
 -- ============================================================
-CREATE TABLE upvotes
-(
-    id       INT AUTO_INCREMENT PRIMARY KEY,
-    issue_id INT NOT NULL,
-    user_id  INT NOT NULL,
-
-    CONSTRAINT fk_upvote_issue
-        FOREIGN KEY (issue_id) REFERENCES issues (id)
-            ON DELETE CASCADE,
-
-    CONSTRAINT fk_upvote_user
-        FOREIGN KEY (user_id) REFERENCES users (id)
-            ON DELETE CASCADE,
-
-    CONSTRAINT uq_upvote UNIQUE (issue_id, user_id)
+CREATE TABLE issues (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    issueId VARCHAR(100) NOT NULL UNIQUE,
+    title VARCHAR(200) NOT NULL,
+    description TEXT NOT NULL,
+    category VARCHAR(50),
+    status VARCHAR(50) DEFAULT 'Open',
+    priority VARCHAR(20) DEFAULT 'Medium',
+    imagePath VARCHAR(500),
+    location VARCHAR(200),
+    userId INT NOT NULL,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_issue_user FOREIGN KEY (userId) REFERENCES users (id) ON DELETE CASCADE,
+    INDEX idx_status (status),
+    INDEX idx_category (category),
+    INDEX idx_userId (userId)
 );
 
 -- ============================================================
--- Seed: Super Admin
+-- Upvotes Table
 -- ============================================================
-INSERT INTO users (full_name, email, phone, password_hash, role, municipality_id)
-VALUES ('Super Admin',
-        'superadmin@system.local',
-        NULL,
-        '$2b$12$replacethiswitharealhashedpasswordbeforedeployment',
-        'superadmin',
-        NULL);
+CREATE TABLE upvotes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    issueId INT NOT NULL,
+    userId INT NOT NULL,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_upvote_issue FOREIGN KEY (issueId) REFERENCES issues (id) ON DELETE CASCADE,
+    CONSTRAINT fk_upvote_user FOREIGN KEY (userId) REFERENCES users (id) ON DELETE CASCADE,
+    CONSTRAINT uq_upvote UNIQUE (issueId, userId),
+    INDEX idx_issueId (issueId),
+    INDEX idx_userId (userId)
+);
+
+-- ============================================================
+-- Comments Table
+-- ============================================================
+CREATE TABLE comments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    commentId VARCHAR(100) NOT NULL UNIQUE,
+    issueId INT NOT NULL,
+    userId INT NOT NULL,
+    content TEXT NOT NULL,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_comment_issue FOREIGN KEY (issueId) REFERENCES issues (id) ON DELETE CASCADE,
+    CONSTRAINT fk_comment_user FOREIGN KEY (userId) REFERENCES users (id) ON DELETE CASCADE,
+    INDEX idx_issueId (issueId),
+    INDEX idx_userId (userId)
+);
+
+-- ============================================================
+-- Seed: Super Admin User
+-- ============================================================
+-- Default Credentials:
+-- Email: superadmin@system.local
+-- Password: admin123
+-- ============================================================
+INSERT INTO users (userId, firstName, lastName, email, phoneNumber, password, role, accountStatus, municipality, wardNo, province, memberSince)
+VALUES ('ADMIN-001', 'Super', 'Admin', 'superadmin@system.local', NULL, 'S4H4hhggAOVIWUkBym6GHvxf5pVCUD7gHtunDfvFBaGdI0gv9rME1JFeA76c0pXA', 'Super Admin', 'Verified Account', 'System', 'N/A', 'System', CURRENT_TIMESTAMP);

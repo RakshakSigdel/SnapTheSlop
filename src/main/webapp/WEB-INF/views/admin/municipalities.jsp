@@ -62,16 +62,34 @@
 
 			<div style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:18px;">
 				<h2 style="font-size:14px; font-weight:700; color:#0f172a; margin:0 0 12px;">Add Municipality</h2>
-				<input placeholder="Municipality Name" style="width:100%; height:38px; border:1px solid #d1d5db; border-radius:7px; padding:0 10px; font-size:13px; margin-bottom:10px; font-family:'Inter',sans-serif;"/>
-				<input placeholder="Municipality Code" style="width:100%; height:38px; border:1px solid #d1d5db; border-radius:7px; padding:0 10px; font-size:13px; margin-bottom:10px; font-family:'Inter',sans-serif;"/>
-				<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
-					<input placeholder="Admin First Name" style="width:100%; height:38px; border:1px solid #d1d5db; border-radius:7px; padding:0 10px; font-size:13px; font-family:'Inter',sans-serif;"/>
-					<input placeholder="Admin Last Name" style="width:100%; height:38px; border:1px solid #d1d5db; border-radius:7px; padding:0 10px; font-size:13px; font-family:'Inter',sans-serif;"/>
-				</div>
-				<input placeholder="Admin Email Address" style="width:100%; height:38px; border:1px solid #d1d5db; border-radius:7px; padding:0 10px; font-size:13px; margin-bottom:10px; font-family:'Inter',sans-serif;"/>
-				<input placeholder="Admin Phone Number" style="width:100%; height:38px; border:1px solid #d1d5db; border-radius:7px; padding:0 10px; font-size:13px; margin-bottom:10px; font-family:'Inter',sans-serif;"/>
-				<input placeholder="Admin Password (Permanent)" style="width:100%; height:38px; border:1px solid #d1d5db; border-radius:7px; padding:0 10px; font-size:13px; margin-bottom:12px; font-family:'Inter',sans-serif;"/>
-				<button style="width:100%; background:#059669; color:#fff; border:none; height:38px; border-radius:7px; font-size:12px; font-weight:700; font-family:'Inter',sans-serif;">Register Municipality</button>
+
+				<% String errorMsg = (String) request.getAttribute("error"); %>
+				<% String successMsg = (String) request.getAttribute("success"); %>
+
+				<% if (errorMsg != null) { %>
+					<div style="background:#fee2e2; border:1px solid #fecaca; border-radius:7px; padding:10px; margin-bottom:12px; font-size:12px; color:#dc2626;">
+						<%= errorMsg %>
+					</div>
+				<% } %>
+
+				<% if (successMsg != null) { %>
+					<div style="background:#dcfce7; border:1px solid #bbf7d0; border-radius:7px; padding:10px; margin-bottom:12px; font-size:12px; color:#16a34a;">
+						<%= successMsg %>
+					</div>
+				<% } %>
+
+				<form method="POST" action="<%= request.getContextPath() %>/admin/municipalities" style="display:flex; flex-direction:column; gap:10px;">
+					<input type="text" name="municipalityName" placeholder="Municipality Name" value="<%= request.getAttribute("municipalityName") != null ? request.getAttribute("municipalityName") : "" %>" style="width:100%; height:38px; border:1px solid #d1d5db; border-radius:7px; padding:0 10px; font-size:13px; font-family:'Inter',sans-serif;"/>
+					<input type="text" name="municipalityCode" placeholder="Municipality Code" value="<%= request.getAttribute("municipalityCode") != null ? request.getAttribute("municipalityCode") : "" %>" style="width:100%; height:38px; border:1px solid #d1d5db; border-radius:7px; padding:0 10px; font-size:13px; font-family:'Inter',sans-serif;"/>
+					<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+						<input type="text" name="adminFirstName" placeholder="Admin First Name" value="<%= request.getAttribute("adminFirstName") != null ? request.getAttribute("adminFirstName") : "" %>" style="width:100%; height:38px; border:1px solid #d1d5db; border-radius:7px; padding:0 10px; font-size:13px; font-family:'Inter',sans-serif;"/>
+						<input type="text" name="adminLastName" placeholder="Admin Last Name" value="<%= request.getAttribute("adminLastName") != null ? request.getAttribute("adminLastName") : "" %>" style="width:100%; height:38px; border:1px solid #d1d5db; border-radius:7px; padding:0 10px; font-size:13px; font-family:'Inter',sans-serif;"/>
+					</div>
+					<input type="email" name="adminEmail" placeholder="Admin Email Address" value="<%= request.getAttribute("adminEmail") != null ? request.getAttribute("adminEmail") : "" %>" style="width:100%; height:38px; border:1px solid #d1d5db; border-radius:7px; padding:0 10px; font-size:13px; font-family:'Inter',sans-serif;"/>
+					<input type="tel" name="adminPhone" placeholder="Admin Phone Number" value="<%= request.getAttribute("adminPhone") != null ? request.getAttribute("adminPhone") : "" %>" style="width:100%; height:38px; border:1px solid #d1d5db; border-radius:7px; padding:0 10px; font-size:13px; font-family:'Inter',sans-serif;"/>
+					<input type="password" name="adminPassword" placeholder="Admin Password (Permanent)" style="width:100%; height:38px; border:1px solid #d1d5db; border-radius:7px; padding:0 10px; font-size:13px; font-family:'Inter',sans-serif;"/>
+					<button type="submit" style="width:100%; background:#059669; color:#fff; border:none; height:38px; border-radius:7px; font-size:12px; font-weight:700; font-family:'Inter',sans-serif; cursor:pointer;">Register Municipality</button>
+				</form>
 			</div>
 		</div>
 	</div>

@@ -136,22 +136,22 @@
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;">
                     <div>
                         <label class="field-label" for="firstName">First name</label>
-                        <input class="field-input" id="firstName" name="firstName" type="text" required placeholder="Hari"/>
+                        <input class="field-input" id="firstName" name="firstName" type="text" required placeholder="Hari" value="${firstName != null ? firstName : ''}"/>
                     </div>
                     <div>
                         <label class="field-label" for="lastName">Last name</label>
-                        <input class="field-input" id="lastName" name="lastName" type="text" required placeholder="Bahadur"/>
+                        <input class="field-input" id="lastName" name="lastName" type="text" required placeholder="Bahadur" value="${lastName != null ? lastName : ''}"/>
                     </div>
                 </div>
 
                 <div style="margin-bottom:14px;">
                     <label class="field-label" for="email">Email address</label>
-                    <input class="field-input" id="email" name="email" type="email" required placeholder="hari@example.com"/>
+                    <input class="field-input" id="email" name="email" type="email" required placeholder="hari@example.com" value="${email != null ? email : ''}"/>
                 </div>
 
                 <div style="margin-bottom:14px;">
                     <label class="field-label" for="phone">Phone number</label>
-                    <input class="field-input" id="phone" name="phone" type="tel" required placeholder="98XXXXXXXX"/>
+                    <input class="field-input" id="phone" name="phone" type="tel" required placeholder="98XXXXXXXX" value="${phone != null ? phone : ''}"/>
                 </div>
 
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;">
@@ -166,7 +166,7 @@
                 </div>
 
                 <div style="display:flex; align-items:flex-start; gap:8px; margin-bottom:22px;">
-                    <input type="checkbox" required style="width:15px; height:15px; accent-color:#059669; margin-top:2px; cursor:pointer;"/>
+                    <input type="checkbox" name="agreeToTerms" required style="width:15px; height:15px; accent-color:#059669; margin-top:2px; cursor:pointer;"/>
                     <span style="font-size:13px; color:#6b7280; line-height:1.5;">I agree to the <a href="#" style="color:#059669; text-decoration:underline;">Terms of Service</a> and <a href="#" style="color:#059669; text-decoration:underline;">Privacy Policy</a></span>
                 </div>
 
