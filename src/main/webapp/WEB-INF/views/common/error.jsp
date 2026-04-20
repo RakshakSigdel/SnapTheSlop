@@ -1,10 +1,40 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" isErrorPage="true" %>
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%
+    int statusCode = response.getStatus();
+    Integer jakartaStatus = (Integer) request.getAttribute("jakarta.servlet.error.status_code");
+    Integer javaxStatus = (Integer) request.getAttribute("javax.servlet.error.status_code");
+    if (jakartaStatus != null && jakartaStatus > 0) {
+        statusCode = jakartaStatus;
+    } else if (javaxStatus != null && javaxStatus > 0) {
+        statusCode = javaxStatus;
+    } else if (statusCode <= 0) {
+        statusCode = 404;
+    }
+    
+    String errorTitle = "Page Not Found";
+    String errorMessage = "Oops! The page you are looking for has vanished from the civic network.";
+    String errorIcon = "404";
+    
+    if (statusCode == 403) {
+        errorTitle = "Access Denied";
+        errorMessage = "You don't have permission to access this resource. Your role doesn't allow you to view this page.";
+        errorIcon = "403";
+    } else if (statusCode == 401) {
+        errorTitle = "Unauthorized";
+        errorMessage = "You need to be logged in to access this resource.";
+        errorIcon = "401";
+    } else if (statusCode == 500) {
+        errorTitle = "Server Error";
+        errorMessage = "Something went wrong on our end. Our team has been notified.";
+        errorIcon = "500";
+    }
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Page Not Found — SnapTheSlop</title>
+    <title><%= errorTitle %> — SnapTheSlop</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@700;800;900&display=swap" rel="stylesheet"/>
     <style>
         * {
@@ -210,17 +240,21 @@
 
         <div class="content">
             <div class="code-wrap">
-                <span class="glitch glitch-1">404</span>
-                <span class="glitch glitch-2">404</span>
-                <span>404</span>
+                <span class="glitch glitch-1"><%= errorIcon %></span>
+                <span class="glitch glitch-2"><%= errorIcon %></span>
+                <span><%= errorIcon %></span>
             </div>
 
-            <h1 class="heading">Page Not Found</h1>
-            <p class="desc">Oops! The page you are looking for has vanished from the civic network.</p>
+            <h1 class="heading"><%= errorTitle %></h1>
+            <p class="desc"><%= errorMessage %></p>
 
             <div class="actions">
-                <a class="btn btn-primary" href="<%= request.getContextPath() %>/">Return to Safety</a>
-                <a class="btn btn-secondary" href="javascript:history.back()">Go Back</a>
+                <a class="btn btn-primary" href="<%= request.getContextPath() %>/">
+                    <span style="margin-right: 8px;">🏠</span> Go to Home
+                </a>
+                <a class="btn btn-secondary" href="javascript:history.back()">
+                    <span style="margin-right: 8px;">←</span> Go Back
+                </a>
             </div>
         </div>
 

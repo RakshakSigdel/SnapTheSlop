@@ -14,7 +14,7 @@ import java.io.IOException;
 public class LoginServlet extends HttpServlet {
 
   private static final String LOGIN_VIEW = "/WEB-INF/views/user/login.jsp";
-  private UserDAO userDAO = new UserDAO();
+  private final UserDAO userDAO = new UserDAO();
 
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -51,6 +51,8 @@ public class LoginServlet extends HttpServlet {
       // Create session
       HttpSession session = request.getSession();
       session.setAttribute("loggedInUser", user);
+      session.setAttribute("user", user);
+      session.setAttribute("municipalityId", user.getMunicipalityId());
       session.setAttribute(
         "userName",
         user.getFirstName() + " " + user.getLastName()

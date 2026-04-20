@@ -85,7 +85,7 @@ public class AdminDAO {
         PasswordUtil.hashPassword(municipality.getAdminPassword())
       );
       userStmt.setString(7, "Municipal Head");
-      userStmt.setString(8, "Verified Account");
+      userStmt.setString(8, "Active");
       userStmt.setString(9, municipality.getName());
       userStmt.setString(10, "N/A");
       userStmt.setString(

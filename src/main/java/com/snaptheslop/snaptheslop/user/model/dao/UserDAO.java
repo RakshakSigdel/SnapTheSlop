@@ -1,12 +1,21 @@
 package com.snaptheslop.snaptheslop.user.model.dao;
 
 import com.snaptheslop.snaptheslop.config.DBConnection;
+import com.snaptheslop.snaptheslop.municipality.MunicipalityDAO;
 import com.snaptheslop.snaptheslop.user.model.UserDTO;
 import com.snaptheslop.snaptheslop.security.PasswordUtil;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class UserDAO {
+
+    private static final Logger LOGGER = Logger.getLogger(UserDAO.class.getName());
+
+    private final MunicipalityDAO municipalityDAO = new MunicipalityDAO();
 
     /**
      * Register a new user by saving their data to the database
@@ -27,13 +36,13 @@ public class UserDAO {
             pstmt.setString(7, user.getProvince());
             pstmt.setString(8, PasswordUtil.hashPassword(password));
             pstmt.setString(9, user.getRole() != null ? user.getRole() : "Registered Citizen");
-            pstmt.setString(10, user.getAccountStatus() != null ? user.getAccountStatus() : "Pending Verification");
+            pstmt.setString(10, user.getAccountStatus() != null ? user.getAccountStatus() : "Active");
             pstmt.setString(11, user.getUserId());
 
             int result = pstmt.executeUpdate();
             return result > 0;
         } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error registering user", e);
             return false;
         }
     }
@@ -57,7 +66,7 @@ public class UserDAO {
                 }
             }
         } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error authenticating user by email", e);
         }
 
         return null;
@@ -79,7 +88,7 @@ public class UserDAO {
                 return mapResultSetToUserDTO(rs);
             }
         } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error finding user by email", e);
         }
 
         return null;
@@ -101,7 +110,7 @@ public class UserDAO {
                 return mapResultSetToUserDTO(rs);
             }
         } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error finding user by userId", e);
         }
 
         return null;
@@ -127,9 +136,62 @@ public class UserDAO {
             int result = pstmt.executeUpdate();
             return result > 0;
         } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error updating user profile", e);
             return false;
         }
+    }
+
+    /**
+     * Update account status for a user (active/inactive)
+     */
+    public boolean updateUserAccountStatus(String userId, String accountStatus) {
+        if (userId == null || userId.trim().isEmpty()) {
+            return false;
+        }
+        if (accountStatus == null || accountStatus.trim().isEmpty()) {
+            return false;
+        }
+
+        String normalizedStatus = accountStatus.trim().toLowerCase();
+        if (!"active".equals(normalizedStatus) && !"inactive".equals(normalizedStatus)) {
+            return false;
+        }
+
+        String sql = "UPDATE users SET accountStatus = ? WHERE userId = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, "active".equals(normalizedStatus) ? "Active" : "Inactive");
+            pstmt.setString(2, userId.trim());
+
+            int result = pstmt.executeUpdate();
+            return result > 0;
+        } catch (SQLException | ClassNotFoundException e) {
+            LOGGER.log(Level.SEVERE, "Error updating account status", e);
+            return false;
+        }
+    }
+
+    /**
+     * Get all users for admin listing
+     */
+    public List<UserDTO> getAllUsers() {
+        List<UserDTO> users = new ArrayList<>();
+        String sql = "SELECT * FROM users ORDER BY createdAt DESC";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                users.add(mapResultSetToUserDTO(rs));
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            LOGGER.log(Level.SEVERE, "Error fetching all users", e);
+        }
+
+        return users;
     }
 
     /**
@@ -144,7 +206,15 @@ public class UserDAO {
         user.setPhoneNumber(rs.getString("phoneNumber"));
         user.setRole(rs.getString("role"));
         user.setAccountStatus(rs.getString("accountStatus"));
-        user.setMunicipality(rs.getString("municipality"));
+        String municipalityName = rs.getString("municipality");
+        user.setMunicipality(municipalityName);
+        try {
+            Integer municipalityId = municipalityName == null ? null : municipalityDAO.findMunicipalityIdByName(municipalityName);
+            user.setMunicipalityId(municipalityId != null ? municipalityId : -1);
+        } catch (SQLException | ClassNotFoundException e) {
+            LOGGER.log(Level.WARNING, "Unable to resolve municipalityId for user " + rs.getString("userId"), e);
+            user.setMunicipalityId(-1);
+        }
         user.setWardNo(rs.getString("wardNo"));
         user.setProvince(rs.getString("province"));
         user.setMemberSince(rs.getString("memberSince"));

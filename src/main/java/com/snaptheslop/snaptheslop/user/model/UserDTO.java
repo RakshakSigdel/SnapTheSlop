@@ -9,6 +9,7 @@ public class UserDTO {
     private String role;
     private String accountStatus;
     private String municipality;
+    private int municipalityId;
     private String wardNo;
     private String memberSince;
     private String province;
@@ -76,6 +77,14 @@ public class UserDTO {
 
     public void setMunicipality(String municipality) {
         this.municipality = municipality;
+    }
+
+    public int getMunicipalityId() {
+        return municipalityId;
+    }
+
+    public void setMunicipalityId(int municipalityId) {
+        this.municipalityId = municipalityId;
     }
 
     public String getWardNo() {
