@@ -137,7 +137,16 @@ public class AdminDAO {
    */
   public List<MunicipalityDTO> getAllMunicipalities() {
     List<MunicipalityDTO> municipalities = new ArrayList<>();
-    String sql = "SELECT * FROM municipalities";
+    String sql =
+      "SELECT m.id, m.name, m.district, m.province, m.contact_number, m.email, m.office_address, " +
+      "COUNT(DISTINCT w.id) AS ward_count, " +
+      "MAX(CASE WHEN UPPER(TRIM(u.role)) = 'MUNICIPAL HEAD' THEN u.email END) AS admin_email, " +
+      "MAX(CASE WHEN UPPER(TRIM(u.role)) = 'MUNICIPAL HEAD' THEN u.accountStatus END) AS admin_status " +
+      "FROM municipalities m " +
+      "LEFT JOIN wards w ON w.municipality_id = m.id " +
+      "LEFT JOIN users u ON u.municipality = m.name " +
+      "GROUP BY m.id, m.name, m.district, m.province, m.contact_number, m.email, m.office_address " +
+      "ORDER BY m.name";
 
     try (
       Connection conn = DBConnection.getConnection();
@@ -153,6 +162,15 @@ public class AdminDAO {
         municipality.setContactNumber(rs.getString("contact_number"));
         municipality.setEmail(rs.getString("email"));
         municipality.setOfficeAddress(rs.getString("office_address"));
+        municipality.setWardCount(rs.getInt("ward_count"));
+        municipality.setAdminEmail(rs.getString("admin_email"));
+
+        String adminStatus = rs.getString("admin_status");
+        municipality.setStatus(
+          adminStatus != null && !adminStatus.trim().isEmpty()
+            ? adminStatus
+            : "Pending"
+        );
         municipalities.add(municipality);
       }
     } catch (SQLException | ClassNotFoundException e) {
@@ -166,7 +184,19 @@ public class AdminDAO {
    * Get municipality by ID
    */
   public MunicipalityDTO getMunicipalityById(int id) {
-    String sql = "SELECT * FROM municipalities WHERE id = ?";
+    String sql =
+      "SELECT m.id, m.name, m.district, m.province, m.contact_number, m.email, m.office_address, " +
+      "COUNT(DISTINCT w.id) AS ward_count, " +
+      "MAX(CASE WHEN UPPER(TRIM(u.role)) = 'MUNICIPAL HEAD' THEN u.firstName END) AS admin_first_name, " +
+      "MAX(CASE WHEN UPPER(TRIM(u.role)) = 'MUNICIPAL HEAD' THEN u.lastName END) AS admin_last_name, " +
+      "MAX(CASE WHEN UPPER(TRIM(u.role)) = 'MUNICIPAL HEAD' THEN u.email END) AS admin_email, " +
+      "MAX(CASE WHEN UPPER(TRIM(u.role)) = 'MUNICIPAL HEAD' THEN u.phoneNumber END) AS admin_phone, " +
+      "MAX(CASE WHEN UPPER(TRIM(u.role)) = 'MUNICIPAL HEAD' THEN u.accountStatus END) AS admin_status " +
+      "FROM municipalities m " +
+      "LEFT JOIN wards w ON w.municipality_id = m.id " +
+      "LEFT JOIN users u ON u.municipality = m.name " +
+      "WHERE m.id = ? " +
+      "GROUP BY m.id, m.name, m.district, m.province, m.contact_number, m.email, m.office_address";
 
     try (
       Connection conn = DBConnection.getConnection();
@@ -179,11 +209,24 @@ public class AdminDAO {
         MunicipalityDTO municipality = new MunicipalityDTO();
         municipality.setId(rs.getInt("id"));
         municipality.setName(rs.getString("name"));
+        municipality.setOldName(rs.getString("name"));
         municipality.setDistrict(rs.getString("district"));
         municipality.setProvince(rs.getString("province"));
         municipality.setContactNumber(rs.getString("contact_number"));
         municipality.setEmail(rs.getString("email"));
         municipality.setOfficeAddress(rs.getString("office_address"));
+        municipality.setWardCount(rs.getInt("ward_count"));
+        municipality.setAdminFirstName(rs.getString("admin_first_name"));
+        municipality.setAdminLastName(rs.getString("admin_last_name"));
+        municipality.setAdminEmail(rs.getString("admin_email"));
+        municipality.setAdminPhone(rs.getString("admin_phone"));
+
+        String adminStatus = rs.getString("admin_status");
+        municipality.setStatus(
+          adminStatus != null && !adminStatus.trim().isEmpty()
+            ? adminStatus
+            : "Pending"
+        );
         return municipality;
       }
     } catch (SQLException | ClassNotFoundException e) {
@@ -191,6 +234,134 @@ public class AdminDAO {
     }
 
     return null;
+  }
+
+  public boolean updateMunicipalityAndAdmin(MunicipalityDTO municipality) {
+    Connection conn = null;
+    try {
+      conn = DBConnection.getConnection();
+      conn.setAutoCommit(false);
+
+      String updateMunicipalitySql =
+        "UPDATE municipalities SET name = ?, district = ?, province = ?, contact_number = ?, email = ?, office_address = ? WHERE id = ?";
+      try (PreparedStatement municipalityStmt = conn.prepareStatement(
+        updateMunicipalitySql
+      )) {
+        municipalityStmt.setString(1, municipality.getName());
+        municipalityStmt.setString(2, municipality.getDistrict());
+        municipalityStmt.setString(3, municipality.getProvince());
+        municipalityStmt.setString(4, municipality.getContactNumber());
+        municipalityStmt.setString(5, municipality.getAdminEmail());
+        municipalityStmt.setString(6, municipality.getOfficeAddress());
+        municipalityStmt.setInt(7, municipality.getId());
+
+        if (municipalityStmt.executeUpdate() <= 0) {
+          conn.rollback();
+          return false;
+        }
+      }
+
+      String oldName = municipality.getOldName();
+      if (oldName != null && !oldName.trim().isEmpty()) {
+        String updateAdminSql =
+          "UPDATE users SET firstName = ?, lastName = ?, email = ?, phoneNumber = ?, municipality = ?, province = ?, accountStatus = ? " +
+          "WHERE municipality = ? AND UPPER(TRIM(role)) = 'MUNICIPAL HEAD'";
+
+        try (PreparedStatement adminStmt = conn.prepareStatement(updateAdminSql)) {
+          adminStmt.setString(1, municipality.getAdminFirstName());
+          adminStmt.setString(2, municipality.getAdminLastName());
+          adminStmt.setString(3, municipality.getAdminEmail());
+          adminStmt.setString(4, municipality.getAdminPhone());
+          adminStmt.setString(5, municipality.getName());
+          adminStmt.setString(6, municipality.getProvince());
+          adminStmt.setString(
+            7,
+            municipality.getStatus() != null ? municipality.getStatus() : "Active"
+          );
+          adminStmt.setString(8, oldName);
+          adminStmt.executeUpdate();
+        }
+      }
+
+      conn.commit();
+      return true;
+    } catch (SQLException | ClassNotFoundException e) {
+      try {
+        if (conn != null) {
+          conn.rollback();
+        }
+      } catch (SQLException rollbackEx) {
+        rollbackEx.printStackTrace();
+      }
+      e.printStackTrace();
+      return false;
+    } finally {
+      try {
+        if (conn != null) {
+          conn.setAutoCommit(true);
+          conn.close();
+        }
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+    }
+  }
+
+  public boolean resetMunicipalityAdminPassword(int municipalityId, String hashedPassword) {
+    String municipalityNameSql = "SELECT name FROM municipalities WHERE id = ?";
+    String updatePasswordSql =
+      "UPDATE users SET password = ? WHERE municipality = ? AND UPPER(TRIM(role)) = 'MUNICIPAL HEAD'";
+
+    try (
+      Connection conn = DBConnection.getConnection();
+      PreparedStatement municipalityStmt = conn.prepareStatement(
+        municipalityNameSql
+      )
+    ) {
+      municipalityStmt.setInt(1, municipalityId);
+      ResultSet rs = municipalityStmt.executeQuery();
+      if (!rs.next()) {
+        return false;
+      }
+
+      String municipalityName = rs.getString("name");
+      try (PreparedStatement updateStmt = conn.prepareStatement(updatePasswordSql)) {
+        updateStmt.setString(1, hashedPassword);
+        updateStmt.setString(2, municipalityName);
+        return updateStmt.executeUpdate() > 0;
+      }
+    } catch (SQLException | ClassNotFoundException e) {
+      e.printStackTrace();
+      return false;
+    }
+  }
+
+  public boolean disableMunicipalityAdmin(int municipalityId) {
+    String municipalityNameSql = "SELECT name FROM municipalities WHERE id = ?";
+    String disableSql =
+      "UPDATE users SET accountStatus = 'Disabled' WHERE municipality = ? AND UPPER(TRIM(role)) = 'MUNICIPAL HEAD'";
+
+    try (
+      Connection conn = DBConnection.getConnection();
+      PreparedStatement municipalityStmt = conn.prepareStatement(
+        municipalityNameSql
+      )
+    ) {
+      municipalityStmt.setInt(1, municipalityId);
+      ResultSet rs = municipalityStmt.executeQuery();
+      if (!rs.next()) {
+        return false;
+      }
+
+      String municipalityName = rs.getString("name");
+      try (PreparedStatement disableStmt = conn.prepareStatement(disableSql)) {
+        disableStmt.setString(1, municipalityName);
+        return disableStmt.executeUpdate() > 0;
+      }
+    } catch (SQLException | ClassNotFoundException e) {
+      e.printStackTrace();
+      return false;
+    }
   }
 
   /**
