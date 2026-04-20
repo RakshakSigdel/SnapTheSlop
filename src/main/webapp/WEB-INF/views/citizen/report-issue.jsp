@@ -2,6 +2,7 @@
   Report Issue — NagarSewa
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="com.snaptheslop.snaptheslop.user.model.UserDTO" %>
 <jsp:include page="../common/header.jsp"/>
 
 <div class="flex min-h-screen">
@@ -62,10 +63,6 @@
             <select name="municipality" id="municipality" required
                     style="width:100%; height:44px; border:1.5px solid #e5e7eb; border-radius:8px; padding:0 12px; font-size:14px; color:#111827; background:#fff; outline:none; appearance:none; cursor:pointer; font-family:'Inter',sans-serif;">
               <option value="" disabled selected>Select municipality</option>
-              <option value="Kathmandu Metropolitan City">Kathmandu Metropolitan City</option>
-              <option value="Lalitpur Metropolitan City">Lalitpur Metropolitan City</option>
-              <option value="Bhaktapur Municipality">Bhaktapur Municipality</option>
-              <option value="Kirtipur Municipality">Kirtipur Municipality</option>
             </select>
           </div>
         </div>
@@ -122,42 +119,103 @@
   </div>
 </div>
 
+<%
+  UserDTO loggedInUser = (UserDTO) session.getAttribute("loggedInUser");
+%>
 <script>
+  var contextPath = '<%= request.getContextPath() %>';
+  var loggedInRole = '<%= loggedInUser != null && loggedInUser.getRole() != null ? loggedInUser.getRole().replace("\\", "\\\\").replace("'", "\\'") : "" %>';
+  var loggedInMunicipality = '<%= loggedInUser != null && loggedInUser.getMunicipality() != null ? loggedInUser.getMunicipality().replace("\\", "\\\\").replace("'", "\\'") : "" %>';
+  var isCitizenUser = loggedInRole && (
+    loggedInRole.trim().toUpperCase() === 'REGISTERED CITIZEN' ||
+    loggedInRole.trim().toUpperCase() === 'CITIZEN'
+  );
   var dropZone = document.getElementById('dropZone');
   var imageInput = document.getElementById('imageInput');
   dropZone.addEventListener('click', function() { imageInput.click(); });
   var municipality = document.getElementById('municipality');
   var ward = document.getElementById('ward');
-  var wardMap = {
-    'Kathmandu Metropolitan City': ['Ward 01', 'Ward 02', 'Ward 03', 'Ward 04', 'Ward 05'],
-    'Lalitpur Metropolitan City': ['Ward 06', 'Ward 07', 'Ward 08', 'Ward 09', 'Ward 10'],
-    'Bhaktapur Municipality': ['Ward 11', 'Ward 12', 'Ward 13'],
-    'Kirtipur Municipality': ['Ward 14', 'Ward 15']
-  };
 
-  function populateWards() {
-    var selectedMunicipality = municipality.value;
+  function lockMunicipalityForCitizen() {
+    if (!loggedInMunicipality) {
+      municipality.innerHTML = '';
+      var missingOption = document.createElement('option');
+      missingOption.value = '';
+      missingOption.disabled = true;
+      missingOption.selected = true;
+      missingOption.textContent = 'Your municipality is not configured';
+      municipality.appendChild(missingOption);
+      return;
+    }
+
+    municipality.innerHTML = '';
+    var option = document.createElement('option');
+    option.value = loggedInMunicipality;
+    option.textContent = loggedInMunicipality;
+    option.selected = true;
+    municipality.appendChild(option);
+    municipality.value = loggedInMunicipality;
+    municipality.disabled = true;
+
+    var hiddenMunicipalityInput = document.createElement('input');
+    hiddenMunicipalityInput.type = 'hidden';
+    hiddenMunicipalityInput.name = 'municipality';
+    hiddenMunicipalityInput.value = loggedInMunicipality;
+    document.getElementById('reportForm').appendChild(hiddenMunicipalityInput);
+
+    municipality.removeAttribute('name');
+    populateWards();
+  }
+
+  function setWardPlaceholder(text) {
     ward.innerHTML = '';
     var defaultOption = document.createElement('option');
     defaultOption.value = '';
     defaultOption.disabled = true;
     defaultOption.selected = true;
-    defaultOption.textContent = selectedMunicipality ? 'Select ward' : 'Select municipality first';
+    defaultOption.textContent = text;
     ward.appendChild(defaultOption);
+  }
 
-    if (!selectedMunicipality || !wardMap[selectedMunicipality]) {
+  function populateWards() {
+    if (!loggedInMunicipality) {
+      setWardPlaceholder('Your municipality is not configured');
       return;
     }
 
-    wardMap[selectedMunicipality].forEach(function(wardName) {
-      var option = document.createElement('option');
-      option.value = wardName;
-      option.textContent = wardName;
-      ward.appendChild(option);
-    });
+    setWardPlaceholder('Loading wards...');
+
+    fetch(contextPath + '/wards')
+      .then(function(response) {
+        if (!response.ok) {
+          return response.json().then(function(payload) {
+            throw new Error((payload && payload.message) ? payload.message : 'Failed to load wards');
+          }).catch(function() {
+            throw new Error('Failed to load wards');
+          });
+        }
+        return response.json();
+      })
+      .then(function(wards) {
+        setWardPlaceholder(wards.length > 0 ? 'Select ward' : 'No wards available');
+        wards.forEach(function(wardItem) {
+          var wardLabel = 'Ward ' + String(wardItem.wardNumber).padStart(2, '0');
+          var option = document.createElement('option');
+          option.value = wardLabel;
+          option.textContent = wardLabel;
+          ward.appendChild(option);
+        });
+      })
+      .catch(function(error) {
+        setWardPlaceholder(error && error.message ? error.message : 'Unable to load wards');
+      });
   }
 
-  municipality.addEventListener('change', populateWards);
+  if (isCitizenUser) {
+    lockMunicipalityForCitizen();
+  } else {
+    populateWards();
+  }
 
   dropZone.addEventListener('dragover', function(e) { e.preventDefault(); dropZone.style.borderColor='#059669'; });
   dropZone.addEventListener('dragleave', function() { dropZone.style.borderColor='#d1d5db'; });

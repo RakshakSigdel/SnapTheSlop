@@ -1,6 +1,12 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.util.List" %>
+<%@ page import="com.snaptheslop.snaptheslop.user.model.UserDTO" %>
 <% request.setAttribute("activePage", "citizens"); %>
 <jsp:include page="../common/header.jsp"/>
+
+<%
+	List<UserDTO> users = (List<UserDTO>) request.getAttribute("users");
+%>
 
 <div class="flex min-h-screen">
 	<jsp:include page="../common/admin-sidebar.jsp"/>
@@ -49,30 +55,28 @@
 					</tr>
 					</thead>
 					<tbody>
+					<% if (users == null || users.isEmpty()) { %>
+					<tr>
+						<td colspan="6" style="padding:14px 18px; font-size:13px; color:#64748b; text-align:center;">No users found.</td>
+					</tr>
+					<% } else { %>
+					<% for (UserDTO user : users) { %>
+					<%
+						String status = user.getAccountStatus() != null ? user.getAccountStatus() : "Active";
+						boolean inactive = "inactive".equalsIgnoreCase(status) || "suspended".equalsIgnoreCase(status) || "disabled".equalsIgnoreCase(status);
+						String statusBg = inactive ? "#fee2e2" : "#d1fae5";
+						String statusColor = inactive ? "#991b1b" : "#065f46";
+					%>
 					<tr style="border-bottom:1px solid #f8fafc;" onmouseover="this.style.background='#fafbfc'" onmouseout="this.style.background='transparent'">
-						<td style="padding:14px 18px;"><p style="font-size:13px; font-weight:600; color:#1e293b; margin:0;">Ramesh Sharma</p><p style="font-size:11px; color:#94a3b8; margin:2px 0 0;">CT-001</p></td>
-						<td style="padding:14px 18px; font-size:13px; color:#64748b;">ramesh.s@gmail.com</td>
-						<td style="padding:14px 18px; font-size:13px; color:#64748b;">04</td>
-						<td style="padding:14px 18px;"><span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:#d1fae5; color:#065f46;">Active</span></td>
-						<td style="padding:14px 18px; font-size:12px; color:#94a3b8;">Oct 2023</td>
-						<td style="padding:14px 18px; text-align:right;"><a href="<%= request.getContextPath() %>/admin/manage-user?id=CT-001" style="background:#059669; color:#fff; border:none; padding:5px 14px; border-radius:6px; font-size:11px; font-weight:600; text-decoration:none; display:inline-block;">Manage</a></td>
+						<td style="padding:14px 18px;"><p style="font-size:13px; font-weight:600; color:#1e293b; margin:0;"><%= (user.getFirstName() != null ? user.getFirstName() : "") %> <%= (user.getLastName() != null ? user.getLastName() : "") %></p><p style="font-size:11px; color:#94a3b8; margin:2px 0 0;"><%= user.getUserId() %></p></td>
+						<td style="padding:14px 18px; font-size:13px; color:#64748b;"><%= user.getEmail() %></td>
+						<td style="padding:14px 18px; font-size:13px; color:#64748b;"><%= user.getWardNo() != null ? user.getWardNo() : "-" %></td>
+						<td style="padding:14px 18px;"><span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:<%= statusBg %>; color:<%= statusColor %>;"><%= status %></span></td>
+						<td style="padding:14px 18px; font-size:12px; color:#94a3b8;"><%= user.getMemberSince() != null ? user.getMemberSince() : "-" %></td>
+						<td style="padding:14px 18px; text-align:right;"><a href="<%= request.getContextPath() %>/admin/manage-user?id=<%= user.getUserId() %>" style="background:#059669; color:#fff; border:none; padding:5px 14px; border-radius:6px; font-size:11px; font-weight:600; text-decoration:none; display:inline-block;">Manage</a></td>
 					</tr>
-					<tr style="border-bottom:1px solid #f8fafc;" onmouseover="this.style.background='#fafbfc'" onmouseout="this.style.background='transparent'">
-						<td style="padding:14px 18px;"><p style="font-size:13px; font-weight:600; color:#1e293b; margin:0;">Anita Dahal</p><p style="font-size:11px; color:#94a3b8; margin:2px 0 0;">CT-002</p></td>
-						<td style="padding:14px 18px; font-size:13px; color:#64748b;">anita.d@gmail.com</td>
-						<td style="padding:14px 18px; font-size:13px; color:#64748b;">15</td>
-						<td style="padding:14px 18px;"><span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:#fef3c7; color:#92400e;">Pending</span></td>
-						<td style="padding:14px 18px; font-size:12px; color:#94a3b8;">Nov 2023</td>
-						<td style="padding:14px 18px; text-align:right;"><a href="<%= request.getContextPath() %>/admin/manage-user?id=CT-002" style="background:#f1f5f9; color:#64748b; border:1px solid #e2e8f0; padding:5px 14px; border-radius:6px; font-size:11px; font-weight:600; text-decoration:none; display:inline-block;">Manage</a></td>
-					</tr>
-					<tr onmouseover="this.style.background='#fafbfc'" onmouseout="this.style.background='transparent'">
-						<td style="padding:14px 18px;"><p style="font-size:13px; font-weight:600; color:#1e293b; margin:0;">Binod Poudel</p><p style="font-size:11px; color:#94a3b8; margin:2px 0 0;">CT-003</p></td>
-						<td style="padding:14px 18px; font-size:13px; color:#64748b;">binod.p@mail.com</td>
-						<td style="padding:14px 18px; font-size:13px; color:#64748b;">09</td>
-						<td style="padding:14px 18px;"><span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:#fee2e2; color:#991b1b;">Suspended</span></td>
-						<td style="padding:14px 18px; font-size:12px; color:#94a3b8;">Aug 2023</td>
-						<td style="padding:14px 18px; text-align:right;"><a href="<%= request.getContextPath() %>/admin/manage-user?id=CT-003" style="background:#f1f5f9; color:#64748b; border:1px solid #e2e8f0; padding:5px 14px; border-radius:6px; font-size:11px; font-weight:600; text-decoration:none; display:inline-block;">Manage</a></td>
-					</tr>
+					<% } %>
+					<% } %>
 					</tbody>
 				</table>
 			</div>
