@@ -20,10 +20,7 @@ public class AdminMunicipalitiesServlet extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-    request.setAttribute("activePage", "municipalities");
-    request
-      .getRequestDispatcher("/WEB-INF/views/admin/municipalities.jsp")
-      .forward(request, response);
+    forwardMunicipalitiesPage(request, response);
   }
 
   @Override
@@ -34,6 +31,8 @@ public class AdminMunicipalitiesServlet extends HttpServlet {
     // Get form parameters
     String municipalityName = request.getParameter("municipalityName");
     String municipalityCode = request.getParameter("municipalityCode");
+    String municipalityPhone = request.getParameter("municipalityPhone");
+    String officeAddress = request.getParameter("officeAddress");
     String adminFirstName = request.getParameter("adminFirstName");
     String adminLastName = request.getParameter("adminLastName");
     String adminEmail = request.getParameter("adminEmail");
@@ -63,6 +62,14 @@ public class AdminMunicipalitiesServlet extends HttpServlet {
       errors.append("Valid admin email is required. ");
     }
 
+    if (municipalityPhone == null || municipalityPhone.trim().isEmpty()) {
+      errors.append("Municipality phone number is required. ");
+    }
+
+    if (officeAddress == null || officeAddress.trim().isEmpty()) {
+      errors.append("Office address is required. ");
+    }
+
     if (adminPassword == null || adminPassword.length() < 8) {
       errors.append("Admin password must be at least 8 characters. ");
     }
@@ -86,14 +93,13 @@ public class AdminMunicipalitiesServlet extends HttpServlet {
       request.setAttribute("error", errors.toString().trim());
       request.setAttribute("municipalityName", municipalityName);
       request.setAttribute("municipalityCode", municipalityCode);
+      request.setAttribute("municipalityPhone", municipalityPhone);
+      request.setAttribute("officeAddress", officeAddress);
       request.setAttribute("adminFirstName", adminFirstName);
       request.setAttribute("adminLastName", adminLastName);
       request.setAttribute("adminEmail", adminEmail);
       request.setAttribute("adminPhone", adminPhone);
-      request.setAttribute("activePage", "municipalities");
-      request
-        .getRequestDispatcher("/WEB-INF/views/admin/municipalities.jsp")
-        .forward(request, response);
+      forwardMunicipalitiesPage(request, response);
       return;
     }
 
@@ -101,10 +107,16 @@ public class AdminMunicipalitiesServlet extends HttpServlet {
     MunicipalityDTO municipality = new MunicipalityDTO();
     municipality.setName(municipalityName.trim());
     municipality.setCode(municipalityCode.trim());
+    municipality.setContactNumber(municipalityPhone.trim());
+    municipality.setOfficeAddress(officeAddress.trim());
     municipality.setAdminFirstName(adminFirstName.trim());
     municipality.setAdminLastName(adminLastName.trim());
     municipality.setAdminEmail(adminEmail.trim());
-    municipality.setAdminPhone(adminPhone);
+    municipality.setAdminPhone(
+      adminPhone != null && !adminPhone.trim().isEmpty()
+        ? adminPhone.trim()
+        : municipalityPhone.trim()
+    );
     municipality.setAdminPassword(adminPassword);
     municipality.setProvince("Madhesh Province");
     municipality.setDistrict("Itahari");
@@ -116,10 +128,7 @@ public class AdminMunicipalitiesServlet extends HttpServlet {
         "success",
         "Municipality registered successfully! Admin account created."
       );
-      request.setAttribute("activePage", "municipalities");
-      request
-        .getRequestDispatcher("/WEB-INF/views/admin/municipalities.jsp")
-        .forward(request, response);
+      forwardMunicipalitiesPage(request, response);
     } else {
       request.setAttribute(
         "error",
@@ -127,14 +136,24 @@ public class AdminMunicipalitiesServlet extends HttpServlet {
       );
       request.setAttribute("municipalityName", municipalityName);
       request.setAttribute("municipalityCode", municipalityCode);
+      request.setAttribute("municipalityPhone", municipalityPhone);
+      request.setAttribute("officeAddress", officeAddress);
       request.setAttribute("adminFirstName", adminFirstName);
       request.setAttribute("adminLastName", adminLastName);
       request.setAttribute("adminEmail", adminEmail);
       request.setAttribute("adminPhone", adminPhone);
-      request.setAttribute("activePage", "municipalities");
-      request
-        .getRequestDispatcher("/WEB-INF/views/admin/municipalities.jsp")
-        .forward(request, response);
+      forwardMunicipalitiesPage(request, response);
     }
+  }
+
+  private void forwardMunicipalitiesPage(
+    HttpServletRequest request,
+    HttpServletResponse response
+  ) throws ServletException, IOException {
+    request.setAttribute("municipalities", adminDAO.getAllMunicipalities());
+    request.setAttribute("activePage", "municipalities");
+    request
+      .getRequestDispatcher("/WEB-INF/views/admin/municipalities.jsp")
+      .forward(request, response);
   }
 }

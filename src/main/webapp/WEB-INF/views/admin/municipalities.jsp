@@ -1,4 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.util.List" %>
+<%@ page import="com.snaptheslop.snaptheslop.admin.model.MunicipalityDTO" %>
 <% request.setAttribute("activePage", "municipalities"); %>
 <jsp:include page="../common/header.jsp"/>
 
@@ -34,27 +36,40 @@
 						</tr>
 						</thead>
 						<tbody>
+						<%
+							List<MunicipalityDTO> municipalities = (List<MunicipalityDTO>) request.getAttribute("municipalities");
+							if (municipalities != null && !municipalities.isEmpty()) {
+								for (MunicipalityDTO municipality : municipalities) {
+									String adminEmail = municipality.getAdminEmail() != null && !municipality.getAdminEmail().trim().isEmpty()
+										? municipality.getAdminEmail()
+										: "pending setup";
+									String status = municipality.getStatus() != null ? municipality.getStatus().trim() : "Pending";
+									boolean isActive = "active".equalsIgnoreCase(status);
+						%>
 						<tr style="border-bottom:1px solid #f8fafc;" onmouseover="this.style.background='#fafbfc'" onmouseout="this.style.background='transparent'">
-							<td style="padding:14px 18px;"><p style="font-size:13px; font-weight:600; color:#1e293b; margin:0;">Kathmandu Metropolitan City</p><p style="font-size:11px; color:#94a3b8; margin:2px 0 0;">KMC-01</p></td>
-							<td style="padding:14px 18px; font-size:13px; color:#64748b;">s.karki@kmc.gov.np</td>
-							<td style="padding:14px 18px; font-size:13px; color:#64748b;">32</td>
-							<td style="padding:14px 18px;"><span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:#d1fae5; color:#065f46;">Active</span></td>
-							<td style="padding:14px 18px; text-align:right;"><a href="<%= request.getContextPath() %>/admin/manage-municipality?id=KMC-01" style="background:#059669; color:#fff; border:none; padding:5px 14px; border-radius:6px; font-size:11px; font-weight:600; text-decoration:none; display:inline-block;">Manage</a></td>
+							<td style="padding:14px 18px;">
+								<p style="font-size:13px; font-weight:600; color:#1e293b; margin:0;"><%= municipality.getName() %></p>
+								<p style="font-size:11px; color:#94a3b8; margin:2px 0 0;"><%= municipality.getContactNumber() != null && !municipality.getContactNumber().trim().isEmpty() ? municipality.getContactNumber() : "No phone" %></p>
+							</td>
+							<td style="padding:14px 18px; font-size:13px; color:#64748b;"><%= adminEmail %></td>
+							<td style="padding:14px 18px; font-size:13px; color:#64748b;"><%= municipality.getWardCount() %></td>
+							<td style="padding:14px 18px;">
+								<span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; <%= isActive ? "background:#d1fae5; color:#065f46;" : "background:#fef3c7; color:#92400e;" %>"><%= isActive ? "Active" : "Pending" %></span>
+							</td>
+							<td style="padding:14px 18px; text-align:right;">
+								<a href="<%= request.getContextPath() %>/admin/manage-municipality?id=<%= municipality.getId() %>" style="background:#059669; color:#fff; border:none; padding:5px 14px; border-radius:6px; font-size:11px; font-weight:600; text-decoration:none; display:inline-block;">Manage</a>
+							</td>
 						</tr>
-						<tr style="border-bottom:1px solid #f8fafc;" onmouseover="this.style.background='#fafbfc'" onmouseout="this.style.background='transparent'">
-							<td style="padding:14px 18px;"><p style="font-size:13px; font-weight:600; color:#1e293b; margin:0;">Lalitpur Metropolitan City</p><p style="font-size:11px; color:#94a3b8; margin:2px 0 0;">LMC-02</p></td>
-							<td style="padding:14px 18px; font-size:13px; color:#64748b;">a.gurung@lmc.gov.np</td>
-							<td style="padding:14px 18px; font-size:13px; color:#64748b;">29</td>
-							<td style="padding:14px 18px;"><span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:#d1fae5; color:#065f46;">Active</span></td>
-							<td style="padding:14px 18px; text-align:right;"><a href="<%= request.getContextPath() %>/admin/manage-municipality?id=LMC-02" style="background:#f1f5f9; color:#64748b; border:1px solid #e2e8f0; padding:5px 14px; border-radius:6px; font-size:11px; font-weight:600; text-decoration:none; display:inline-block;">Manage</a></td>
+						<%
+								}
+							} else {
+						%>
+						<tr>
+							<td colspan="5" style="padding:18px; text-align:center; font-size:13px; color:#64748b;">No municipalities registered yet.</td>
 						</tr>
-						<tr onmouseover="this.style.background='#fafbfc'" onmouseout="this.style.background='transparent'">
-							<td style="padding:14px 18px;"><p style="font-size:13px; font-weight:600; color:#1e293b; margin:0;">Bhaktapur Municipality</p><p style="font-size:11px; color:#94a3b8; margin:2px 0 0;">BMC-03</p></td>
-							<td style="padding:14px 18px; font-size:13px; color:#64748b;">pending setup</td>
-							<td style="padding:14px 18px; font-size:13px; color:#64748b;">10</td>
-							<td style="padding:14px 18px;"><span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:#fef3c7; color:#92400e;">Pending</span></td>
-							<td style="padding:14px 18px; text-align:right;"><a href="<%= request.getContextPath() %>/admin/manage-municipality?id=BMC-03" style="background:#f1f5f9; color:#64748b; border:1px solid #e2e8f0; padding:5px 14px; border-radius:6px; font-size:11px; font-weight:600; text-decoration:none; display:inline-block;">Manage</a></td>
-						</tr>
+						<%
+							}
+						%>
 						</tbody>
 					</table>
 				</div>
@@ -81,6 +96,8 @@
 				<form method="POST" action="<%= request.getContextPath() %>/admin/municipalities" style="display:flex; flex-direction:column; gap:10px;">
 					<input type="text" name="municipalityName" placeholder="Municipality Name" value="<%= request.getAttribute("municipalityName") != null ? request.getAttribute("municipalityName") : "" %>" style="width:100%; height:38px; border:1px solid #d1d5db; border-radius:7px; padding:0 10px; font-size:13px; font-family:'Inter',sans-serif;"/>
 					<input type="text" name="municipalityCode" placeholder="Municipality Code" value="<%= request.getAttribute("municipalityCode") != null ? request.getAttribute("municipalityCode") : "" %>" style="width:100%; height:38px; border:1px solid #d1d5db; border-radius:7px; padding:0 10px; font-size:13px; font-family:'Inter',sans-serif;"/>
+					<input type="text" name="officeAddress" placeholder="Office Address" value="<%= request.getAttribute("officeAddress") != null ? request.getAttribute("officeAddress") : "" %>" style="width:100%; height:38px; border:1px solid #d1d5db; border-radius:7px; padding:0 10px; font-size:13px; font-family:'Inter',sans-serif;"/>
+					<input type="tel" name="municipalityPhone" placeholder="Municipality Phone Number" value="<%= request.getAttribute("municipalityPhone") != null ? request.getAttribute("municipalityPhone") : "" %>" style="width:100%; height:38px; border:1px solid #d1d5db; border-radius:7px; padding:0 10px; font-size:13px; font-family:'Inter',sans-serif;"/>
 					<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
 						<input type="text" name="adminFirstName" placeholder="Admin First Name" value="<%= request.getAttribute("adminFirstName") != null ? request.getAttribute("adminFirstName") : "" %>" style="width:100%; height:38px; border:1px solid #d1d5db; border-radius:7px; padding:0 10px; font-size:13px; font-family:'Inter',sans-serif;"/>
 						<input type="text" name="adminLastName" placeholder="Admin Last Name" value="<%= request.getAttribute("adminLastName") != null ? request.getAttribute("adminLastName") : "" %>" style="width:100%; height:38px; border:1px solid #d1d5db; border-radius:7px; padding:0 10px; font-size:13px; font-family:'Inter',sans-serif;"/>

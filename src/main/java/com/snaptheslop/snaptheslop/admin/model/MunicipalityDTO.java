@@ -11,6 +11,7 @@ public class MunicipalityDTO {
     private String officeAddress;
     private int wardCount;
     private String status;
+    private String oldName;
 
     // Admin fields
     private String adminFirstName;
@@ -98,6 +99,14 @@ public class MunicipalityDTO {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getOldName() {
+        return oldName;
+    }
+
+    public void setOldName(String oldName) {
+        this.oldName = oldName;
     }
 
     public String getAdminFirstName() {
