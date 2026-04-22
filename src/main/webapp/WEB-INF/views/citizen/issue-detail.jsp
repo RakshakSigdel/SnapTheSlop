@@ -1,16 +1,27 @@
 <%--
-  Issue Detail — NagarSewa
+  Issue Detail — NagarSewa  (Sprint 5: live DB data)
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="com.snaptheslop.snaptheslop.issue.model.Issue" %>
 <jsp:include page="../common/header.jsp"/>
-
 <%
-String issueId = String.valueOf(request.getAttribute("issueId") == null ? "1" : request.getAttribute("issueId"));
-String issueTitle = String.valueOf(request.getAttribute("issueTitle") == null ? "Pothole near Ratna Park" : request.getAttribute("issueTitle"));
-String issueCategory = String.valueOf(request.getAttribute("issueCategory") == null ? "Roads & Potholes" : request.getAttribute("issueCategory"));
-String issueStatus = String.valueOf(request.getAttribute("issueStatus") == null ? "Pending" : request.getAttribute("issueStatus"));
-String issuePriority = String.valueOf(request.getAttribute("issuePriority") == null ? "High Priority" : request.getAttribute("issuePriority"));
-String issueLocation = String.valueOf(request.getAttribute("issueLocation") == null ? "Near Ratna Park bus stop, Ward 04" : request.getAttribute("issueLocation"));
+  Issue issue      = (Issue) request.getAttribute("issue");
+  String contextPath = request.getContextPath();
+  if (issue == null) { response.sendRedirect(contextPath + "/citizen/my-issues"); return; }
+
+  String st = issue.getStatus();
+  String statusBg, statusFg;
+  if ("Open".equals(st))            { statusBg="#fee2e2"; statusFg="#991b1b"; }
+  else if ("In Progress".equals(st)){ statusBg="#d1fae5"; statusFg="#065f46"; }
+  else if ("Resolved".equals(st))   { statusBg="#dcfce7"; statusFg="#166534"; }
+  else if ("Rejected".equals(st))   { statusBg="#f1f5f9"; statusFg="#64748b"; }
+  else                              { statusBg="#fef3c7"; statusFg="#92400e"; }
+
+  String pr = issue.getPriority() != null ? issue.getPriority() : "Medium";
+  String priorBg, priorFg;
+  if ("High".equals(pr)||"Critical".equals(pr)) { priorBg="#fee2e2"; priorFg="#991b1b"; }
+  else if ("Low".equals(pr))                    { priorBg="#f0fdf4"; priorFg="#166534"; }
+  else                                          { priorBg="#fef9c3"; priorFg="#854d0e"; }
 %>
 
 <div class="flex min-h-screen">
@@ -20,11 +31,11 @@ String issueLocation = String.valueOf(request.getAttribute("issueLocation") == n
 
     <div style="padding:18px 32px; border-bottom:1px solid #e2e8f0; background:#fff;">
       <nav style="display:flex; align-items:center; gap:6px; font-size:13px; color:#94a3b8;">
-        <a href="<%= request.getContextPath() %>/citizen/dashboard" style="color:#64748b; text-decoration:none;">Dashboard</a>
+        <a href="<%= contextPath %>/citizen/dashboard" style="color:#64748b; text-decoration:none;">Dashboard</a>
         <span>/</span>
-        <a href="<%= request.getContextPath() %>/citizen/my-issues" style="color:#64748b; text-decoration:none;">My Issues</a>
+        <a href="<%= contextPath %>/citizen/my-issues" style="color:#64748b; text-decoration:none;">My Issues</a>
         <span>/</span>
-        <span style="color:#0f172a; font-weight:600;">#NS-<%= issueId %></span>
+        <span style="color:#0f172a; font-weight:600;">#<%= issue.getIssueId() %></span>
       </nav>
     </div>
 
@@ -33,11 +44,11 @@ String issueLocation = String.valueOf(request.getAttribute("issueLocation") == n
       <!-- Header -->
       <div style="margin-bottom:24px;">
         <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
-          <span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:#fef3c7; color:#92400e;"><%= issueStatus %></span>
-          <span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:#fee2e2; color:#991b1b;"><%= issuePriority %></span>
+          <span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:<%= statusBg %>; color:<%= statusFg %>;"><%= st %></span>
+          <span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:<%= priorBg %>; color:<%= priorFg %>;"><%= pr %> Priority</span>
         </div>
-        <h1 style="font-family:'Outfit',sans-serif; font-size:26px; font-weight:800; color:#0f172a; margin-bottom:4px; letter-spacing:-0.5px;"><%= issueTitle %></h1>
-        <p style="font-size:13px; color:#94a3b8;">Filed Oct 11, 2023 · <%= issueCategory %> · <%= issueLocation %></p>
+        <h1 style="font-family:'Outfit',sans-serif; font-size:26px; font-weight:800; color:#0f172a; margin-bottom:4px; letter-spacing:-0.5px;"><%= issue.getTitle() %></h1>
+        <p style="font-size:13px; color:#94a3b8;">Filed <%= issue.getCreatedAtFormatted() %> · <%= issue.getCategory() != null ? issue.getCategory() : "—" %> · <%= issue.getLocation() != null ? issue.getLocation() : "—" %></p>
       </div>
 
       <div style="display:grid; grid-template-columns:5fr 3fr; gap:20px;">
@@ -48,58 +59,27 @@ String issueLocation = String.valueOf(request.getAttribute("issueLocation") == n
           <!-- Description -->
           <div style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:22px;">
             <h2 style="font-size:14px; font-weight:700; color:#0f172a; margin-bottom:10px;">Description</h2>
-            <p style="font-size:14px; color:#475569; line-height:1.8;">
-              There's a large pothole that opened up on the road right next to the Ratna Park bus stop. 
-              It's been there since the last heavy rain (probably about a week now). It's deep enough that 
-              motorcycles have to swerve around it. One auto-rickshaw got stuck in it yesterday evening.
-              The road sees heavy traffic — this needs fixing before someone gets hurt.
-            </p>
+            <p style="font-size:14px; color:#475569; line-height:1.8;"><%= issue.getDescription() != null ? issue.getDescription() : "No description provided." %></p>
           </div>
 
-          <!-- Photos -->
+          <!-- Photo -->
+          <% if (issue.getImagePath() != null && !issue.getImagePath().isBlank()) { %>
           <div style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:22px;">
-            <h2 style="font-size:14px; font-weight:700; color:#0f172a; margin-bottom:12px;">Photos</h2>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-              <div style="height:140px; border-radius:8px; background:#f1f5f9; border:1px solid #e2e8f0; display:flex; align-items:center; justify-content:center;">
-                <span style="font-size:12px; color:#94a3b8;">photo_1.jpg</span>
-              </div>
-              <div style="height:140px; border-radius:8px; background:#f1f5f9; border:1px solid #e2e8f0; display:flex; align-items:center; justify-content:center;">
-                <span style="font-size:12px; color:#94a3b8;">photo_2.jpg</span>
-              </div>
-            </div>
+            <h2 style="font-size:14px; font-weight:700; color:#0f172a; margin-bottom:12px;">Photo</h2>
+            <img src="<%= contextPath + issue.getImagePath() %>" alt="Issue photo"
+                 style="width:100%; max-height:300px; object-fit:cover; border-radius:8px; border:1px solid #e2e8f0;"/>
           </div>
+          <% } %>
 
           <!-- Comments -->
           <div style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:22px;">
-            <h2 style="font-size:14px; font-weight:700; color:#0f172a; margin-bottom:16px;">Comments (2)</h2>
+            <h2 style="font-size:14px; font-weight:700; color:#0f172a; margin-bottom:16px;">Comments</h2>
+            <p style="font-size:13px; color:#94a3b8; margin-bottom:12px;">Comments will appear here once the system is connected.</p>
 
-            <div style="display:flex; gap:10px; margin-bottom:16px; padding-bottom:16px; border-bottom:1px solid #f1f5f9;">
-              <div style="width:30px; height:30px; border-radius:50%; background:#dcfce7; display:flex; align-items:center; justify-content:center; color:#166534; font-size:11px; font-weight:700; flex-shrink:0;">AS</div>
-              <div>
-                <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
-                  <span style="font-size:13px; font-weight:600; color:#1e293b;">Arjun Sharma</span>
-                  <span style="font-size:11px; color:#94a3b8;">Oct 11</span>
-                </div>
-                <p style="font-size:13px; color:#475569; line-height:1.6;">This is getting worse every day. The rains last night made it even bigger. Can we get some urgency on this?</p>
-              </div>
-            </div>
-
-            <div style="display:flex; gap:10px; margin-bottom:16px; padding-bottom:16px; border-bottom:1px solid #f1f5f9;">
-              <div style="width:30px; height:30px; border-radius:50%; background:#d1fae5; display:flex; align-items:center; justify-content:center; color:#065f46; font-size:11px; font-weight:700; flex-shrink:0;">WO</div>
-              <div>
-                <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
-                  <span style="font-size:13px; font-weight:600; color:#1e293b;">Ward Office</span>
-                  <span style="padding:1px 6px; border-radius:4px; font-size:10px; font-weight:600; background:#dcfce7; color:#166534;">Official</span>
-                  <span style="font-size:11px; color:#94a3b8;">Oct 12</span>
-                </div>
-                <p style="font-size:13px; color:#475569; line-height:1.6;">This has been forwarded to the roads department. A crew is scheduled for inspection this Friday.</p>
-              </div>
-            </div>
-
-            <form action="<%= request.getContextPath() %>/comment/add" method="post">
-              <input type="hidden" name="issueId" value="1"/>
+            <form action="<%= contextPath %>/comment/add" method="post">
+              <input type="hidden" name="issueId" value="<%= issue.getId() %>"/>
               <textarea name="commentText" rows="2" placeholder="Write a comment..."
-                        style="width:100%; border:1.5px solid #e5e7eb; border-radius:8px; padding:10px 12px; font-size:13px; color:#111827; background:#fff; outline:none; resize:none; font-family:'Inter',sans-serif; margin-bottom:8px;"></textarea>
+                        style="width:100%; border:1.5px solid #e5e7eb; border-radius:8px; padding:10px 12px; font-size:13px; color:#111827; background:#fff; outline:none; resize:none; font-family:'Inter',sans-serif; margin-bottom:8px; box-sizing:border-box;"></textarea>
               <button type="submit" style="background:#0f172a; color:#fff; border:none; font-size:12px; font-weight:600; padding:8px 16px; border-radius:6px; cursor:pointer; font-family:'Inter',sans-serif;">Post</button>
             </form>
           </div>
@@ -112,52 +92,56 @@ String issueLocation = String.valueOf(request.getAttribute("issueLocation") == n
           <div style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:20px;">
             <h3 style="font-size:12px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:1px; margin-bottom:14px;">Details</h3>
             <div style="display:flex; flex-direction:column; gap:12px;">
-              <div><p style="font-size:12px; color:#94a3b8;">ID</p><p style="font-size:14px; font-weight:600; color:#0f172a;">#NS-<%= issueId %></p></div>
-              <div><p style="font-size:12px; color:#94a3b8;">Category</p><p style="font-size:14px; color:#1e293b;"><%= issueCategory %></p></div>
-              <div><p style="font-size:12px; color:#94a3b8;">Location</p><p style="font-size:14px; color:#1e293b;"><%= issueLocation %></p></div>
-              <div><p style="font-size:12px; color:#94a3b8;">Ward</p><p style="font-size:14px; color:#1e293b;">Ward 04</p></div>
-              <div><p style="font-size:12px; color:#94a3b8;">Filed by</p><p style="font-size:14px; color:#1e293b;">Arjun Sharma</p></div>
+              <div><p style="font-size:12px; color:#94a3b8; margin:0 0 2px;">ID</p><p style="font-size:14px; font-weight:600; color:#0f172a; margin:0;">#<%= issue.getIssueId() %></p></div>
+              <div><p style="font-size:12px; color:#94a3b8; margin:0 0 2px;">Category</p><p style="font-size:14px; color:#1e293b; margin:0;"><%= issue.getCategory() != null ? issue.getCategory() : "—" %></p></div>
+              <div><p style="font-size:12px; color:#94a3b8; margin:0 0 2px;">Location</p><p style="font-size:14px; color:#1e293b; margin:0;"><%= issue.getLocation() != null ? issue.getLocation() : "—" %></p></div>
+              <div><p style="font-size:12px; color:#94a3b8; margin:0 0 2px;">Ward</p><p style="font-size:14px; color:#1e293b; margin:0;">Ward <%= String.format("%02d", issue.getWardNo()) %></p></div>
+              <div><p style="font-size:12px; color:#94a3b8; margin:0 0 2px;">Municipality</p><p style="font-size:14px; color:#1e293b; margin:0;"><%= issue.getMunicipalityName() != null ? issue.getMunicipalityName() : "—" %></p></div>
+              <div><p style="font-size:12px; color:#94a3b8; margin:0 0 2px;">Filed by</p><p style="font-size:14px; color:#1e293b; margin:0;"><%= issue.getCitizenName() != null ? issue.getCitizenName() : "—" %></p></div>
+              <div><p style="font-size:12px; color:#94a3b8; margin:0 0 2px;">Filed on</p><p style="font-size:14px; color:#1e293b; margin:0;"><%= issue.getCreatedAtFormatted() %></p></div>
+              <% if (issue.getUpdatedAt() != null) { %>
+              <div><p style="font-size:12px; color:#94a3b8; margin:0 0 2px;">Last updated</p><p style="font-size:14px; color:#1e293b; margin:0;"><%= issue.getCreatedAtFormatted() %></p></div>
+              <% } %>
             </div>
           </div>
 
-          <!-- Timeline -->
+          <!-- Status Timeline -->
           <div style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:20px;">
-            <h3 style="font-size:12px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:1px; margin-bottom:14px;">Timeline</h3>
+            <h3 style="font-size:12px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:1px; margin-bottom:14px;">Status Timeline</h3>
             <div style="display:flex; flex-direction:column;">
+
+              <!-- Submitted (always shown) -->
               <div style="display:flex; gap:10px; padding-bottom:14px;">
                 <div style="display:flex; flex-direction:column; align-items:center;">
                   <div style="width:8px; height:8px; border-radius:50%; background:#059669;"></div>
                   <div style="width:1px; flex:1; background:#e2e8f0;"></div>
                 </div>
-                <div><p style="font-size:12px; font-weight:600; color:#059669;">Submitted</p><p style="font-size:11px; color:#94a3b8;">Oct 11, 9:30 AM</p></div>
+                <div><p style="font-size:12px; font-weight:600; color:#059669; margin:0;">Submitted</p><p style="font-size:11px; color:#94a3b8; margin:2px 0 0;"><%= issue.getCreatedAtFormatted() %></p></div>
               </div>
+
+              <!-- In Progress -->
               <div style="display:flex; gap:10px; padding-bottom:14px;">
                 <div style="display:flex; flex-direction:column; align-items:center;">
-                  <div style="width:8px; height:8px; border-radius:50%; background:#059669;"></div>
+                  <div style="width:8px; height:8px; border-radius:50%; background:<%= ("In Progress".equals(st)||"Resolved".equals(st)||"Rejected".equals(st)) ? "#059669" : "#e2e8f0" %>;"></div>
                   <div style="width:1px; flex:1; background:#e2e8f0;"></div>
                 </div>
-                <div><p style="font-size:12px; font-weight:600; color:#059669;">Acknowledged</p><p style="font-size:11px; color:#94a3b8;">Oct 12, 2:15 PM</p></div>
+                <div><p style="font-size:12px; font-weight:600; color:<%= ("In Progress".equals(st)||"Resolved".equals(st)||"Rejected".equals(st)) ? "#059669" : "#cbd5e1" %>; margin:0;">In Progress</p></div>
               </div>
-              <div style="display:flex; gap:10px; padding-bottom:14px;">
-                <div style="display:flex; flex-direction:column; align-items:center;">
-                  <div style="width:8px; height:8px; border-radius:50%; background:#f59e0b; box-shadow:0 0 0 3px rgba(245,158,11,0.15);"></div>
-                  <div style="width:1px; flex:1; background:#f1f5f9;"></div>
-                </div>
-                <div><p style="font-size:12px; font-weight:600; color:#d97706;">Under review</p><p style="font-size:11px; color:#94a3b8;">Waiting for crew</p></div>
-              </div>
+
+              <!-- Resolved / Rejected -->
               <div style="display:flex; gap:10px;">
-                <div><div style="width:8px; height:8px; border-radius:50%; background:#e2e8f0;"></div></div>
-                <div><p style="font-size:12px; color:#cbd5e1;">Resolved</p></div>
+                <div><div style="width:8px; height:8px; border-radius:50%; background:<%= ("Resolved".equals(st)||"Rejected".equals(st)) ? "#059669" : "#e2e8f0" %>;"></div></div>
+                <div><p style="font-size:12px; font-weight:600; color:<%= ("Resolved".equals(st)||"Rejected".equals(st)) ? "#059669" : "#cbd5e1" %>; margin:0;"><%= "Rejected".equals(st) ? "Rejected" : "Resolved" %></p></div>
               </div>
             </div>
           </div>
 
           <!-- Upvote -->
           <div style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:20px; text-align:center;">
-            <p style="font-family:'Outfit',sans-serif; font-size:36px; font-weight:800; color:#0f172a;">24</p>
-            <p style="font-size:12px; color:#94a3b8; margin-bottom:12px;">people support this report</p>
-            <form action="<%= request.getContextPath() %>/upvote" method="post" style="display:inline;">
-              <input type="hidden" name="issueId" value="1"/>
+            <p style="font-family:'Outfit',sans-serif; font-size:36px; font-weight:800; color:#0f172a; margin:0;"><%= issue.getUpvoteCount() %></p>
+            <p style="font-size:12px; color:#94a3b8; margin:4px 0 12px;">people support this report</p>
+            <form action="<%= contextPath %>/upvote" method="post" style="display:inline;">
+              <input type="hidden" name="issueId" value="<%= issue.getId() %>"/>
               <button type="submit" style="background:#f1f5f9; border:1px solid #e2e8f0; color:#1e293b; font-size:13px; font-weight:600; padding:8px 20px; border-radius:6px; cursor:pointer; font-family:'Inter',sans-serif; display:inline-flex; align-items:center; gap:6px;">
                 ▲ Upvote
               </button>
