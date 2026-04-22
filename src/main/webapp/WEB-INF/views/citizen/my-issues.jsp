@@ -1,8 +1,23 @@
 <%--
-  My Issues — NagarSewa
+  My Issues — NagarSewa  (Sprint 5: live DB data)
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="com.snaptheslop.snaptheslop.issue.model.Issue, java.util.List" %>
 <jsp:include page="../common/header.jsp"/>
+<%
+  List<Issue> issues        = (List<Issue>) request.getAttribute("issues");
+  String statusFilter       = (String)      request.getAttribute("statusFilter");
+  int currentPage           = request.getAttribute("currentPage")    != null ? (int) request.getAttribute("currentPage")    : 1;
+  int totalPages            = request.getAttribute("totalPages")     != null ? (int) request.getAttribute("totalPages")     : 1;
+  int totalCount            = request.getAttribute("totalCount")     != null ? (int) request.getAttribute("totalCount")     : 0;
+  int countAll              = request.getAttribute("countAll")       != null ? (int) request.getAttribute("countAll")       : 0;
+  int countOpen             = request.getAttribute("countOpen")      != null ? (int) request.getAttribute("countOpen")      : 0;
+  int countInProgress       = request.getAttribute("countInProgress")!= null ? (int) request.getAttribute("countInProgress"): 0;
+  int countResolved         = request.getAttribute("countResolved")  != null ? (int) request.getAttribute("countResolved")  : 0;
+  String successMessage     = (String)      request.getAttribute("successMessage");
+  String contextPath        = request.getContextPath();
+  if (issues == null) issues = new java.util.ArrayList<>();
+%>
 
 <div class="flex min-h-screen">
   <jsp:include page="../common/citizen-sidebar.jsp"/>
@@ -12,19 +27,26 @@
     <!-- Topbar -->
     <div style="padding:18px 32px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #e2e8f0; background:#fff;">
       <h1 style="font-family:'Outfit',sans-serif; font-size:18px; font-weight:700; color:#0f172a;">My Issue Reports</h1>
-      <a href="<%= request.getContextPath() %>/citizen/report-issue" style="display:inline-flex; align-items:center; gap:6px; background:#059669; color:#fff; padding:9px 18px; border-radius:8px; font-size:13px; font-weight:600; text-decoration:none;">
+      <a href="<%= contextPath %>/citizen/report-issue" style="display:inline-flex; align-items:center; gap:6px; background:#059669; color:#fff; padding:9px 18px; border-radius:8px; font-size:13px; font-weight:600; text-decoration:none;">
         <span style="font-size:16px; line-height:1;">+</span> New Report
       </a>
     </div>
 
     <div style="padding:28px 32px;">
 
+      <!-- Success banner -->
+      <% if (successMessage != null) { %>
+      <div style="background:#d1fae5; border:1px solid #6ee7b7; border-radius:8px; padding:12px 18px; margin-bottom:20px; font-size:13px; color:#065f46; font-weight:500;">
+        ✓ <%= successMessage %>
+      </div>
+      <% } %>
+
       <!-- Filter tabs -->
-      <div style="display:flex; gap:6px; margin-bottom:24px;">
-        <button style="padding:7px 16px; border-radius:6px; font-size:13px; font-weight:600; border:none; background:#0f172a; color:#fff; cursor:pointer; font-family:'Inter',sans-serif;">All (12)</button>
-        <button style="padding:7px 16px; border-radius:6px; font-size:13px; font-weight:600; border:1px solid #e2e8f0; background:#fff; color:#64748b; cursor:pointer; font-family:'Inter',sans-serif;">Pending (3)</button>
-        <button style="padding:7px 16px; border-radius:6px; font-size:13px; font-weight:600; border:1px solid #e2e8f0; background:#fff; color:#64748b; cursor:pointer; font-family:'Inter',sans-serif;">In Progress (1)</button>
-        <button style="padding:7px 16px; border-radius:6px; font-size:13px; font-weight:600; border:1px solid #e2e8f0; background:#fff; color:#64748b; cursor:pointer; font-family:'Inter',sans-serif;">Resolved (8)</button>
+      <div style="display:flex; gap:6px; margin-bottom:24px; flex-wrap:wrap;">
+        <a href="<%= contextPath %>/citizen/my-issues" style="padding:7px 16px; border-radius:6px; font-size:13px; font-weight:600; text-decoration:none; <%= (statusFilter == null) ? "background:#0f172a; color:#fff; border:none;" : "border:1px solid #e2e8f0; background:#fff; color:#64748b;" %>">All (<%= countAll %>)</a>
+        <a href="<%= contextPath %>/citizen/my-issues?status=Open" style="padding:7px 16px; border-radius:6px; font-size:13px; font-weight:600; text-decoration:none; <%= "Open".equals(statusFilter) ? "background:#0f172a; color:#fff; border:none;" : "border:1px solid #e2e8f0; background:#fff; color:#64748b;" %>">Open (<%= countOpen %>)</a>
+        <a href="<%= contextPath %>/citizen/my-issues?status=In+Progress" style="padding:7px 16px; border-radius:6px; font-size:13px; font-weight:600; text-decoration:none; <%= "In Progress".equals(statusFilter) ? "background:#0f172a; color:#fff; border:none;" : "border:1px solid #e2e8f0; background:#fff; color:#64748b;" %>">In Progress (<%= countInProgress %>)</a>
+        <a href="<%= contextPath %>/citizen/my-issues?status=Resolved" style="padding:7px 16px; border-radius:6px; font-size:13px; font-weight:600; text-decoration:none; <%= "Resolved".equals(statusFilter) ? "background:#0f172a; color:#fff; border:none;" : "border:1px solid #e2e8f0; background:#fff; color:#64748b;" %>">Resolved (<%= countResolved %>)</a>
       </div>
 
       <!-- Issues Table -->
@@ -35,79 +57,71 @@
               <th style="text-align:left; padding:12px 20px; font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:1px;">Issue</th>
               <th style="text-align:left; padding:12px 16px; font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:1px;">Category</th>
               <th style="text-align:left; padding:12px 16px; font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:1px;">Status</th>
+              <th style="text-align:left; padding:12px 16px; font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:1px;">Priority</th>
               <th style="text-align:left; padding:12px 16px; font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:1px;">Filed</th>
               <th style="text-align:left; padding:12px 16px; font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:1px;">Upvotes</th>
-              <th style="text-align:right; padding:12px 20px; font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:1px;"></th>
+              <th style="text-align:right; padding:12px 20px;"></th>
             </tr>
           </thead>
           <tbody>
+            <% if (issues.isEmpty()) { %>
+            <tr>
+              <td colspan="7" style="padding:40px 20px; text-align:center; color:#94a3b8; font-size:14px;">
+                You haven't reported any issues yet. <a href="<%= contextPath %>/citizen/report-issue" style="color:#059669; font-weight:600; text-decoration:none;">Report one now →</a>
+              </td>
+            </tr>
+            <% } else { for (Issue issue : issues) {
+                String st = issue.getStatus();
+                String statusBg, statusFg;
+                if ("Open".equals(st))           { statusBg="#fee2e2"; statusFg="#991b1b"; }
+                else if ("In Progress".equals(st)){ statusBg="#d1fae5"; statusFg="#065f46"; }
+                else if ("Resolved".equals(st))  { statusBg="#dcfce7"; statusFg="#166534"; }
+                else if ("Rejected".equals(st))  { statusBg="#f1f5f9"; statusFg="#64748b"; }
+                else                             { statusBg="#fef3c7"; statusFg="#92400e"; }
+
+                String pr = issue.getPriority();
+                String priorBg, priorFg;
+                if ("High".equals(pr)||"Critical".equals(pr)) { priorBg="#fee2e2"; priorFg="#991b1b"; }
+                else if ("Low".equals(pr))                    { priorBg="#f0fdf4"; priorFg="#166534"; }
+                else                                          { priorBg="#fef9c3"; priorFg="#854d0e"; }
+            %>
             <tr style="border-bottom:1px solid #f8fafc; transition:background 0.15s;" onmouseover="this.style.background='#fafbfc'" onmouseout="this.style.background='transparent'">
               <td style="padding:14px 20px;">
-                <p style="font-size:14px; font-weight:600; color:#1e293b;">Pothole near Ratna Park</p>
-                <p style="font-size:12px; color:#94a3b8;">#NS-8821 · Ward 04</p>
+                <p style="font-size:14px; font-weight:600; color:#1e293b; margin:0;"><%= issue.getTitle() %></p>
+                <p style="font-size:12px; color:#94a3b8; margin:2px 0 0;">#<%= issue.getIssueId() %> · Ward <%= issue.getWardNo() %></p>
               </td>
-              <td style="padding:14px 16px;"><span style="font-size:12px; color:#64748b;">Roads</span></td>
-              <td style="padding:14px 16px;"><span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:#fef3c7; color:#92400e;">Pending</span></td>
-              <td style="padding:14px 16px; font-size:12px; color:#94a3b8;">Oct 11</td>
-              <td style="padding:14px 16px; font-size:13px; font-weight:600; color:#64748b;">24</td>
-              <td style="padding:14px 20px; text-align:right;"><a href="<%= request.getContextPath() %>/citizen/issue-detail?id=1" style="font-size:12px; color:#059669; font-weight:600; text-decoration:none;">View →</a></td>
-            </tr>
-            <tr style="border-bottom:1px solid #f8fafc; transition:background 0.15s;" onmouseover="this.style.background='#fafbfc'" onmouseout="this.style.background='transparent'">
-              <td style="padding:14px 20px;">
-                <p style="font-size:14px; font-weight:600; color:#1e293b;">Streetlight out — Bagbazar</p>
-                <p style="font-size:12px; color:#94a3b8;">#NS-8815 · Ward 04</p>
+              <td style="padding:14px 16px;"><span style="font-size:12px; color:#64748b;"><%= issue.getCategory() != null ? issue.getCategory() : "—" %></span></td>
+              <td style="padding:14px 16px;">
+                <span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:<%= statusBg %>; color:<%= statusFg %>;"><%= st %></span>
               </td>
-              <td style="padding:14px 16px;"><span style="font-size:12px; color:#64748b;">Electrical</span></td>
-              <td style="padding:14px 16px;"><span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:#d1fae5; color:#065f46;">In Progress</span></td>
-              <td style="padding:14px 16px; font-size:12px; color:#94a3b8;">Oct 8</td>
-              <td style="padding:14px 16px; font-size:13px; font-weight:600; color:#64748b;">18</td>
-              <td style="padding:14px 20px; text-align:right;"><a href="<%= request.getContextPath() %>/citizen/issue-detail?id=2" style="font-size:12px; color:#059669; font-weight:600; text-decoration:none;">View →</a></td>
-            </tr>
-            <tr style="border-bottom:1px solid #f8fafc; transition:background 0.15s;" onmouseover="this.style.background='#fafbfc'" onmouseout="this.style.background='transparent'">
-              <td style="padding:14px 20px;">
-                <p style="font-size:14px; font-weight:600; color:#1e293b;">Garbage pile at Thapathali bridge</p>
-                <p style="font-size:12px; color:#94a3b8;">#NS-8790 · Ward 04</p>
+              <td style="padding:14px 16px;">
+                <span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:<%= priorBg %>; color:<%= priorFg %>;"><%= pr != null ? pr : "Medium" %></span>
               </td>
-              <td style="padding:14px 16px;"><span style="font-size:12px; color:#64748b;">Sanitation</span></td>
-              <td style="padding:14px 16px;"><span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:#d1fae5; color:#065f46;">Resolved</span></td>
-              <td style="padding:14px 16px; font-size:12px; color:#94a3b8;">Oct 5</td>
-              <td style="padding:14px 16px; font-size:13px; font-weight:600; color:#64748b;">31</td>
-              <td style="padding:14px 20px; text-align:right;"><a href="<%= request.getContextPath() %>/citizen/issue-detail?id=3" style="font-size:12px; color:#059669; font-weight:600; text-decoration:none;">View →</a></td>
-            </tr>
-            <tr style="border-bottom:1px solid #f8fafc; transition:background 0.15s;" onmouseover="this.style.background='#fafbfc'" onmouseout="this.style.background='transparent'">
-              <td style="padding:14px 20px;">
-                <p style="font-size:14px; font-weight:600; color:#1e293b;">Broken pipe near Pashupati</p>
-                <p style="font-size:12px; color:#94a3b8;">#NS-8752 · Ward 07</p>
+              <td style="padding:14px 16px; font-size:12px; color:#94a3b8;"><%= issue.getCreatedAtShort() %></td>
+              <td style="padding:14px 16px; font-size:13px; font-weight:600; color:#64748b;"><%= issue.getUpvoteCount() %></td>
+              <td style="padding:14px 20px; text-align:right;">
+                <a href="<%= contextPath %>/citizen/issue-detail?id=<%= issue.getId() %>" style="font-size:12px; color:#059669; font-weight:600; text-decoration:none;">View →</a>
               </td>
-              <td style="padding:14px 16px;"><span style="font-size:12px; color:#64748b;">Water</span></td>
-              <td style="padding:14px 16px;"><span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:#d1fae5; color:#065f46;">Resolved</span></td>
-              <td style="padding:14px 16px; font-size:12px; color:#94a3b8;">Sep 28</td>
-              <td style="padding:14px 16px; font-size:13px; font-weight:600; color:#64748b;">42</td>
-              <td style="padding:14px 20px; text-align:right;"><a href="<%= request.getContextPath() %>/citizen/issue-detail?id=4" style="font-size:12px; color:#059669; font-weight:600; text-decoration:none;">View →</a></td>
             </tr>
-            <tr style="transition:background 0.15s;" onmouseover="this.style.background='#fafbfc'" onmouseout="this.style.background='transparent'">
-              <td style="padding:14px 20px;">
-                <p style="font-size:14px; font-weight:600; color:#1e293b;">Overflowing drain — Sundhara</p>
-                <p style="font-size:12px; color:#94a3b8;">#NS-8701 · Ward 04</p>
-              </td>
-              <td style="padding:14px 16px;"><span style="font-size:12px; color:#64748b;">Drainage</span></td>
-              <td style="padding:14px 16px;"><span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:#fef3c7; color:#92400e;">Pending</span></td>
-              <td style="padding:14px 16px; font-size:12px; color:#94a3b8;">Sep 22</td>
-              <td style="padding:14px 16px; font-size:13px; font-weight:600; color:#64748b;">15</td>
-              <td style="padding:14px 20px; text-align:right;"><a href="<%= request.getContextPath() %>/citizen/issue-detail?id=5" style="font-size:12px; color:#059669; font-weight:600; text-decoration:none;">View →</a></td>
-            </tr>
+            <% } } %>
           </tbody>
         </table>
 
         <div style="padding:12px 20px; border-top:1px solid #f1f5f9; display:flex; align-items:center; justify-content:space-between;">
-          <span style="font-size:12px; color:#94a3b8;">Showing 5 of 12 reports</span>
+          <span style="font-size:12px; color:#94a3b8;">Showing <%= issues.size() %> of <%= totalCount %> reports</span>
+          <% if (totalPages > 1) { %>
           <div style="display:flex; gap:4px;">
-            <button style="width:30px; height:30px; border-radius:6px; border:1px solid #e2e8f0; background:#fff; color:#64748b; cursor:pointer; font-size:12px; display:flex; align-items:center; justify-content:center;">&lsaquo;</button>
-            <button style="width:30px; height:30px; border-radius:6px; border:none; background:#0f172a; color:#fff; cursor:pointer; font-size:12px; font-weight:700;">1</button>
-            <button style="width:30px; height:30px; border-radius:6px; border:1px solid #e2e8f0; background:#fff; color:#64748b; cursor:pointer; font-size:12px;">2</button>
-            <button style="width:30px; height:30px; border-radius:6px; border:1px solid #e2e8f0; background:#fff; color:#64748b; cursor:pointer; font-size:12px;">3</button>
-            <button style="width:30px; height:30px; border-radius:6px; border:1px solid #e2e8f0; background:#fff; color:#64748b; cursor:pointer; font-size:12px; display:flex; align-items:center; justify-content:center;">&rsaquo;</button>
+            <% if (currentPage > 1) { %>
+            <a href="<%= contextPath %>/citizen/my-issues?page=<%= currentPage - 1 %><%= statusFilter != null ? "&status=" + statusFilter : "" %>" style="width:30px; height:30px; border-radius:6px; border:1px solid #e2e8f0; background:#fff; color:#64748b; font-size:12px; display:flex; align-items:center; justify-content:center; text-decoration:none;">&lsaquo;</a>
+            <% } %>
+            <% for (int p = 1; p <= totalPages; p++) { %>
+            <a href="<%= contextPath %>/citizen/my-issues?page=<%= p %><%= statusFilter != null ? "&status=" + statusFilter : "" %>" style="width:30px; height:30px; border-radius:6px; border:<%= p == currentPage ? "none" : "1px solid #e2e8f0" %>; background:<%= p == currentPage ? "#0f172a" : "#fff" %>; color:<%= p == currentPage ? "#fff" : "#64748b" %>; font-size:12px; font-weight:<%= p == currentPage ? "700" : "400" %>; display:flex; align-items:center; justify-content:center; text-decoration:none;"><%= p %></a>
+            <% } %>
+            <% if (currentPage < totalPages) { %>
+            <a href="<%= contextPath %>/citizen/my-issues?page=<%= currentPage + 1 %><%= statusFilter != null ? "&status=" + statusFilter : "" %>" style="width:30px; height:30px; border-radius:6px; border:1px solid #e2e8f0; background:#fff; color:#64748b; font-size:12px; display:flex; align-items:center; justify-content:center; text-decoration:none;">&rsaquo;</a>
+            <% } %>
           </div>
+          <% } %>
         </div>
       </div>
     </div>
