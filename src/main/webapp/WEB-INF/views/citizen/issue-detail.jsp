@@ -3,9 +3,15 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="com.snaptheslop.snaptheslop.issue.model.Issue" %>
+<%@ page import="com.snaptheslop.snaptheslop.comment.model.Comment" %>
+<%@ page import="java.util.List" %>
 <jsp:include page="../common/header.jsp"/>
 <%
   Issue issue      = (Issue) request.getAttribute("issue");
+  List<Comment> issueComments = (List<Comment>) request.getAttribute("issueComments");
+  String successMessage = (String) request.getAttribute("successMessage");
+  String errorMessage = (String) request.getAttribute("errorMessage");
+  if (issueComments == null) issueComments = new java.util.ArrayList<>();
   String contextPath = request.getContextPath();
   if (issue == null) { response.sendRedirect(contextPath + "/citizen/my-issues"); return; }
 
@@ -40,6 +46,16 @@
     </div>
 
     <div style="padding:28px 32px;">
+      <% if (successMessage != null) { %>
+      <div style="background:#d1fae5; border:1px solid #6ee7b7; border-radius:8px; padding:12px 14px; margin-bottom:16px; font-size:13px; color:#065f46;">
+        <%= successMessage %>
+      </div>
+      <% } %>
+      <% if (errorMessage != null) { %>
+      <div style="background:#fee2e2; border:1px solid #fca5a5; border-radius:8px; padding:12px 14px; margin-bottom:16px; font-size:13px; color:#991b1b;">
+        <%= errorMessage %>
+      </div>
+      <% } %>
 
       <!-- Header -->
       <div style="margin-bottom:24px;">
@@ -74,10 +90,24 @@
           <!-- Comments -->
           <div style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:22px;">
             <h2 style="font-size:14px; font-weight:700; color:#0f172a; margin-bottom:16px;">Comments</h2>
-            <p style="font-size:13px; color:#94a3b8; margin-bottom:12px;">Comments will appear here once the system is connected.</p>
+
+            <% if (issueComments.isEmpty()) { %>
+            <p style="font-size:13px; color:#94a3b8; margin-bottom:12px;">No comments yet. Start the discussion.</p>
+            <% } else { %>
+              <% for (Comment comment : issueComments) { %>
+              <div style="padding:10px 0; border-bottom:1px solid #f1f5f9; margin-bottom:4px;">
+                <p style="font-size:12px; color:#64748b; margin:0 0 4px;">
+                  <strong><%= comment.getCommenterName() != null ? comment.getCommenterName() : "Citizen" %></strong>
+                  · <%= comment.getCreatedAtShort() %>
+                </p>
+                <p style="font-size:13px; color:#1f2937; margin:0; line-height:1.6;"><%= comment.getContent() %></p>
+              </div>
+              <% } %>
+            <% } %>
 
             <form action="<%= contextPath %>/comment/add" method="post">
               <input type="hidden" name="issueId" value="<%= issue.getId() %>"/>
+              <input type="hidden" name="returnUrl" value="/citizen/issue-detail?id=<%= issue.getId() %>"/>
               <textarea name="commentText" rows="2" placeholder="Write a comment..."
                         style="width:100%; border:1.5px solid #e5e7eb; border-radius:8px; padding:10px 12px; font-size:13px; color:#111827; background:#fff; outline:none; resize:none; font-family:'Inter',sans-serif; margin-bottom:8px; box-sizing:border-box;"></textarea>
               <button type="submit" style="background:#0f172a; color:#fff; border:none; font-size:12px; font-weight:600; padding:8px 16px; border-radius:6px; cursor:pointer; font-family:'Inter',sans-serif;">Post</button>
@@ -142,6 +172,7 @@
             <p style="font-size:12px; color:#94a3b8; margin:4px 0 12px;">people support this report</p>
             <form action="<%= contextPath %>/upvote" method="post" style="display:inline;">
               <input type="hidden" name="issueId" value="<%= issue.getId() %>"/>
+              <input type="hidden" name="returnUrl" value="/citizen/issue-detail?id=<%= issue.getId() %>"/>
               <button type="submit" style="background:#f1f5f9; border:1px solid #e2e8f0; color:#1e293b; font-size:13px; font-weight:600; padding:8px 20px; border-radius:6px; cursor:pointer; font-family:'Inter',sans-serif; display:inline-flex; align-items:center; gap:6px;">
                 ▲ Upvote
               </button>
