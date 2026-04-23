@@ -1,3 +1,8 @@
+<%@ page import="java.util.List" %>
+<%@ page import="com.snaptheslop.snaptheslop.notification.model.NotificationItem" %>
+<%@ page import="java.time.format.DateTimeFormatter" %>
+<%@ page import="java.time.LocalDateTime" %>
+<%@ page import="java.time.Duration" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
     String audience = (String) request.getAttribute("notificationAudience");
@@ -6,6 +11,26 @@
     String sidebarInclude = municipalityView
             ? "../common/municipality-sidebar.jsp"
             : "../common/citizen-sidebar.jsp";
+            
+    List<NotificationItem> notifications = (List<NotificationItem>) request.getAttribute("notifications");
+    int unreadCount = request.getAttribute("unreadCount") != null ? (int) request.getAttribute("unreadCount") : 0;
+%>
+
+<%!
+    private String formatTimeAgo(LocalDateTime dt) {
+        if (dt == null) return "Unknown";
+        Duration d = Duration.between(dt, LocalDateTime.now());
+        long hours = d.toHours();
+        if (hours == 0) {
+            long mins = d.toMinutes();
+            if (mins == 0) return "Just now";
+            return mins + " min ago";
+        } else if (hours < 24) {
+            return hours + " hr ago";
+        } else {
+            return dt.format(DateTimeFormatter.ofPattern("MMM dd, yyyy"));
+        }
+    }
 %>
 
 <div class="flex min-h-screen">
@@ -19,99 +44,51 @@
                     <%= municipalityView ? "Important updates for municipal operations and ward coordination." : "Recent updates on your reports and municipality actions." %>
                 </p>
             </div>
-            <button type="button" style="height:36px; border:1px solid #d1fae5; border-radius:8px; background:#ecfdf5; color:#065f46; font-size:12px; font-weight:600; padding:0 12px; cursor:pointer; font-family:'Inter',sans-serif;">
-                Mark all as read
-            </button>
+            <% if (unreadCount > 0) { %>
+            <form action="<%= request.getContextPath() %>/<%= municipalityView ? "municipality" : "citizen" %>/notifications/mark-read" method="post" style="margin:0;">
+                <button type="submit" style="height:36px; border:1px solid #d1fae5; border-radius:8px; background:#ecfdf5; color:#065f46; font-size:12px; font-weight:600; padding:0 12px; cursor:pointer; font-family:'Inter',sans-serif;">
+                    Mark all as read
+                </button>
+            </form>
+            <% } %>
         </div>
 
         <div style="padding:28px 32px; max-width:980px;">
-            <div style="display:flex; gap:8px; margin-bottom:16px;">
-                <button style="padding:7px 14px; border:none; border-radius:7px; background:#065f46; color:#fff; font-size:12px; font-weight:600; font-family:'Inter',sans-serif; cursor:pointer;">All</button>
-                <button style="padding:7px 14px; border:1px solid #e2e8f0; border-radius:7px; background:#fff; color:#64748b; font-size:12px; font-weight:600; font-family:'Inter',sans-serif; cursor:pointer;">Unread</button>
-                <button style="padding:7px 14px; border:1px solid #e2e8f0; border-radius:7px; background:#fff; color:#64748b; font-size:12px; font-weight:600; font-family:'Inter',sans-serif; cursor:pointer;">
-                    <%= municipalityView ? "Escalations" : "Resolved" %>
-                </button>
-            </div>
-
-            <% if (municipalityView) { %>
             <div style="display:flex; flex-direction:column; gap:10px;">
-                <div style="background:#fff; border:1px solid #a7f3d0; border-left:4px solid #059669; border-radius:10px; padding:14px 16px;">
+            
+            <% if (notifications != null && !notifications.isEmpty()) { %>
+                <% for (NotificationItem n : notifications) { 
+                    String rowBg = n.isRead() ? "#ffffff" : "#f0fdf4";
+                    String borderClass = n.isRead() ? "border: 1px solid #e2e8f0;" : "border: 1px solid #a7f3d0; border-left: 4px solid #059669;";
+                    String actionLink = "";
+                    String actionText = "";
+                    if ("CITIZEN".equals(n.getAudience())) {
+                        actionLink = request.getContextPath() + "/citizen/issue-detail?id=" + n.getIssueId();
+                        actionText = "View issue \u2192";
+                    } else if ("MUNICIPALITY".equals(n.getAudience())) {
+                        actionLink = request.getContextPath() + "/municipality/manage-issue?id=" + n.getIssueId();
+                        actionText = "Open issue \u2192";
+                    }
+                %>
+                <div style="background:<%=rowBg%>; <%= borderClass %> border-radius:10px; padding:14px 16px;">
                     <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px;">
                         <div>
-                            <p style="font-size:14px; font-weight:600; color:#0f172a; margin-bottom:2px;">Issue #NW-29402 crossed SLA threshold</p>
-                            <p style="font-size:13px; color:#64748b; line-height:1.6;">Water pipeline break in Ward 04 has been open for 26 hours. Escalation sent to water unit.</p>
+                            <p style="font-size:14px; font-weight:600; color:#0f172a; margin-bottom:2px;"><%= n.getTitle() %></p>
+                            <p style="font-size:13px; color:#64748b; line-height:1.6;"><%= n.getMessage() %></p>
                         </div>
-                        <span style="font-size:11px; color:#94a3b8; white-space:nowrap;">5 min ago</span>
+                        <span style="font-size:11px; color:#94a3b8; white-space:nowrap;"><%= formatTimeAgo(n.getCreatedAt()) %></span>
                     </div>
-                    <a href="<%= request.getContextPath() %>/municipality/manage-issue?id=NW-29402" style="display:inline-block; margin-top:10px; font-size:12px; color:#059669; font-weight:600; text-decoration:none;">Open issue →</a>
+                    <% if (n.getIssueId() != null && n.getIssueId() > 0) { %>
+                    <a href="<%= actionLink %>" style="display:inline-block; margin-top:10px; font-size:12px; color:#059669; font-weight:600; text-decoration:none;"><%= actionText %></a>
+                    <% } %>
                 </div>
-
-                <div style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:14px 16px;">
-                    <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px;">
-                        <div>
-                            <p style="font-size:14px; font-weight:600; color:#0f172a; margin-bottom:2px;">Ward 09 officer updated field note</p>
-                            <p style="font-size:13px; color:#64748b; line-height:1.6;">Streetlight outage inspection completed; contractor visit scheduled for tomorrow morning.</p>
-                        </div>
-                        <span style="font-size:11px; color:#94a3b8; white-space:nowrap;">40 min ago</span>
-                    </div>
-                </div>
-
-                <div style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:14px 16px;">
-                    <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px;">
-                        <div>
-                            <p style="font-size:14px; font-weight:600; color:#0f172a; margin-bottom:2px;">High community interest in #NW-29377</p>
-                            <p style="font-size:13px; color:#64748b; line-height:1.6;">Pothole report received 52 upvotes. Suggested priority level updated to High.</p>
-                        </div>
-                        <span style="font-size:11px; color:#94a3b8; white-space:nowrap;">Today, 9:20 AM</span>
-                    </div>
-                </div>
-
-                <div style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:14px 16px;">
-                    <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px;">
-                        <div>
-                            <p style="font-size:14px; font-weight:600; color:#0f172a; margin-bottom:2px;">Ward roster change pending approval</p>
-                            <p style="font-size:13px; color:#64748b; line-height:1.6;">Ward 15 head contact details were modified and are waiting for municipal confirmation.</p>
-                        </div>
-                        <span style="font-size:11px; color:#94a3b8; white-space:nowrap;">Yesterday</span>
-                    </div>
-                    <a href="<%= request.getContextPath() %>/municipality/ward-management" style="display:inline-block; margin-top:10px; font-size:12px; color:#059669; font-weight:600; text-decoration:none;">Review ward data →</a>
-                </div>
-            </div>
+                <% } %>
             <% } else { %>
-            <div style="display:flex; flex-direction:column; gap:10px;">
-                <div style="background:#fff; border:1px solid #a7f3d0; border-left:4px solid #059669; border-radius:10px; padding:14px 16px;">
-                    <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px;">
-                        <div>
-                            <p style="font-size:14px; font-weight:600; color:#0f172a; margin-bottom:2px;">Your issue #NS-8821 was acknowledged</p>
-                            <p style="font-size:13px; color:#64748b; line-height:1.6;">Ward office acknowledged your pothole report and assigned it to road maintenance.</p>
-                        </div>
-                        <span style="font-size:11px; color:#94a3b8; white-space:nowrap;">2 min ago</span>
-                    </div>
-                    <a href="<%= request.getContextPath() %>/citizen/issue-detail?id=1" style="display:inline-block; margin-top:10px; font-size:12px; color:#059669; font-weight:600; text-decoration:none;">View issue →</a>
+                <div style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:32px; text-align:center;">
+                    <p style="font-size:14px; color:#64748b; margin:0;">No notifications found.</p>
                 </div>
-
-                <div style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:14px 16px;">
-                    <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px;">
-                        <div>
-                            <p style="font-size:14px; font-weight:600; color:#0f172a; margin-bottom:2px;">Issue #NS-8815 status changed to In Progress</p>
-                            <p style="font-size:13px; color:#64748b; line-height:1.6;">An electrician crew has been assigned and work has started on your report.</p>
-                        </div>
-                        <span style="font-size:11px; color:#94a3b8; white-space:nowrap;">1 hour ago</span>
-                    </div>
-                    <a href="<%= request.getContextPath() %>/citizen/issue-detail?id=2" style="display:inline-block; margin-top:10px; font-size:12px; color:#059669; font-weight:600; text-decoration:none;">View issue →</a>
-                </div>
-
-                <div style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:14px 16px;">
-                    <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px;">
-                        <div>
-                            <p style="font-size:14px; font-weight:600; color:#0f172a; margin-bottom:2px;">Community upvotes increased on your report</p>
-                            <p style="font-size:13px; color:#64748b; line-height:1.6;">Your report #NS-8821 received 7 new upvotes from nearby residents.</p>
-                        </div>
-                        <span style="font-size:11px; color:#94a3b8; white-space:nowrap;">Today, 9:10 AM</span>
-                    </div>
-                </div>
-            </div>
             <% } %>
+            </div>
         </div>
     </div>
 </div>

@@ -1,5 +1,14 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<% String activePage = (String) request.getAttribute("activePage"); %>
+<%@ page import="com.snaptheslop.snaptheslop.util.SessionUtil" %>
+<%@ page import="com.snaptheslop.snaptheslop.notification.model.dao.NotificationDAO" %>
+<% 
+    String activePage = (String) request.getAttribute("activePage"); 
+    int mUnreadCount = 0;
+    int mUserDbId = SessionUtil.getLoggedInUserDbId(request);
+    if (mUserDbId > 0) {
+        mUnreadCount = new NotificationDAO().countUnreadForCitizen(mUserDbId);
+    }
+%>
 
 <div style="position:fixed; top:0; left:0; height:100vh; width:220px; background:#0f172a; border-right:1px solid #1e293b; display:flex; flex-direction:column; z-index:50;">
 
@@ -63,13 +72,18 @@
         </a>
 
                     <% if ("notifications".equals(activePage)) { %>
-                    <a href="<%= request.getContextPath() %>/citizen/notifications" style="display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:8px; margin-bottom:2px; text-decoration:none; font-size:13px; font-weight:600; background:#15342a; color:#34d399;">
+                    <a href="<%= request.getContextPath() %>/citizen/notifications" style="display:flex; justify-content:space-between; align-items:center; padding:9px 12px; border-radius:8px; margin-bottom:2px; text-decoration:none; font-size:13px; font-weight:600; background:#15342a; color:#34d399;">
                     <% } else { %>
-                    <a href="<%= request.getContextPath() %>/citizen/notifications" style="display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:8px; margin-bottom:2px; text-decoration:none; font-size:13px; font-weight:600; color:#64748b;">
+                    <a href="<%= request.getContextPath() %>/citizen/notifications" style="display:flex; justify-content:space-between; align-items:center; padding:9px 12px; border-radius:8px; margin-bottom:2px; text-decoration:none; font-size:13px; font-weight:600; color:#64748b;">
                     <% } %>
-            <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/></svg>
-            Notifications
-        </a>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/></svg>
+                            Notifications
+                        </div>
+                        <% if (mUnreadCount > 0) { %>
+                        <span style="background:#ef4444; color:#fff; font-size:10px; font-weight:700; padding:2px 6px; border-radius:10px; line-height:1;"><%= mUnreadCount %></span>
+                        <% } %>
+                    </a>
     </nav>
 
     <div style="padding:10px; border-top:1px solid #1e293b;">

@@ -122,6 +122,31 @@ CREATE TABLE
     );
 
 -- ============================================================
+-- Notifications Table
+-- ============================================================
+CREATE TABLE
+    notifications (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        audience ENUM ('CITIZEN', 'MUNICIPALITY') NOT NULL,
+        user_id INT NULL,
+        municipality_id INT NULL,
+        issue_id INT NULL,
+        type VARCHAR(50) NOT NULL,
+        title VARCHAR(200) NOT NULL,
+        message TEXT NOT NULL,
+        is_read TINYINT(1) NOT NULL DEFAULT 0,
+        event_key VARCHAR(255) NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT fk_notification_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+        CONSTRAINT fk_notification_municipality FOREIGN KEY (municipality_id) REFERENCES municipalities (id) ON DELETE CASCADE,
+        CONSTRAINT fk_notification_issue FOREIGN KEY (issue_id) REFERENCES issues (id) ON DELETE CASCADE,
+        UNIQUE KEY uq_notification_event (event_key),
+        INDEX idx_notification_audience_user (audience, user_id),
+        INDEX idx_notification_audience_municipality (audience, municipality_id),
+        INDEX idx_notification_created_at (created_at)
+    );
+
+-- ============================================================
 -- Seed: Super Admin User
 -- ============================================================
 -- Default Credentials:

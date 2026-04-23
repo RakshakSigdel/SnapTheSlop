@@ -61,6 +61,16 @@ public class UpvoteServlet extends HttpServlet {
 
 		upvoteDAO.toggleUpvote(issueId, userDbId);
 
+		// Check milestones
+		com.snaptheslop.snaptheslop.issue.model.Issue issue = new com.snaptheslop.snaptheslop.issue.model.dao.IssueDAO().findById(issueId);
+		if (issue != null) {
+			int upvoteCount = issue.getUpvoteCount();
+			if (upvoteCount == 25 || upvoteCount == 50 || upvoteCount == 100) {
+				new com.snaptheslop.snaptheslop.notification.model.dao.NotificationService()
+						.triggerUpvoteMilestone(issue, upvoteCount, upvoteCount);
+			}
+		}
+
 		String returnUrl = request.getParameter("returnUrl");
 		if (returnUrl != null && !returnUrl.isBlank()) {
 			response.sendRedirect(request.getContextPath() + returnUrl);

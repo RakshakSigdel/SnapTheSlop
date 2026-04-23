@@ -216,6 +216,32 @@ public class IssueDAO {
     }
 
     /**
+     * Find open issues older than the provided age (in hours) for SLA alerts.
+     */
+    public List<Issue> findOpenIssuesOlderThanHoursByMunicipality(int municipalityId, int minHoursOpen) {
+        String sql = buildBaseQuery()
+                + " WHERE i.municipality_id = ?"
+                + " AND i.status IN ('Open', 'In Progress')"
+                + " AND i.createdAt <= (NOW() - INTERVAL ? HOUR)"
+                + " ORDER BY i.createdAt ASC";
+
+        List<Issue> issues = new ArrayList<>();
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, municipalityId);
+            ps.setInt(2, minHoursOpen);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    issues.add(mapRow(rs));
+                }
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            LOGGER.log(Level.SEVERE, "Error finding SLA-aged issues for municipalityId: " + municipalityId, e);
+        }
+        return issues;
+    }
+
+    /**
      * Count all issues globally with optional status filter.
      */
     public int countAllIssues(String statusFilter) {

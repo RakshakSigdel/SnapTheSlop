@@ -70,6 +70,13 @@ public class CommentServlet extends HttpServlet {
 		comment.setContent(content.trim());
 		commentDAO.createComment(comment);
 
+		// Trigger Notification
+		com.snaptheslop.snaptheslop.issue.model.Issue issue = new com.snaptheslop.snaptheslop.issue.model.dao.IssueDAO().findById(issueId);
+		if (issue != null) {
+			new com.snaptheslop.snaptheslop.notification.model.dao.NotificationService()
+					.triggerNewComment(issue, userDbId, user.getRole());
+		}
+
 		redirectBack(request, response);
 	}
 

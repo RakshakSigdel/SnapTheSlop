@@ -137,6 +137,11 @@ public class MunicipalityManageIssueServlet extends HttpServlet {
 
         boolean updated = issueDAO.forceUpdateStatus(issue.getId(), effectiveStatus, effectivePriority);
         if (updated) {
+            // Trigger notifications
+            com.snaptheslop.snaptheslop.notification.model.dao.NotificationService notificationService = new com.snaptheslop.snaptheslop.notification.model.dao.NotificationService();
+            notificationService.triggerStatusChanged(issue, issue.getStatus(), effectiveStatus);
+            notificationService.triggerPriorityChanged(issue, issue.getPriority(), effectivePriority);
+
             flashSuccess(request, "Issue #" + issue.getIssueId()
                     + " updated: status=" + effectiveStatus + ", priority=" + effectivePriority + ".");
         } else {

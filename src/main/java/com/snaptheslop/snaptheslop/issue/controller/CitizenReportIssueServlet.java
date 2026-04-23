@@ -165,6 +165,11 @@ public class CitizenReportIssueServlet extends HttpServlet {
         if (newId == -1) {
             reloadForm(request, response, "Failed to submit your report. Please try again."); return;
         }
+        issue.setId(newId); // Set the generated DB ID so we can trigger notification 
+
+        // Trigger Notification
+        com.snaptheslop.snaptheslop.notification.model.dao.NotificationService notificationService = new com.snaptheslop.snaptheslop.notification.model.dao.NotificationService();
+        notificationService.triggerNewIssueReported(issue);
 
         // 9. Success
         request.getSession().setAttribute("successMessage", "Your issue has been reported successfully!");
