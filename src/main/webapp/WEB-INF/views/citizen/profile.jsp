@@ -1,4 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.util.List" %>
+<%@ page import="com.snaptheslop.snaptheslop.municipality.model.Municipality" %>
 <jsp:include page="../common/header.jsp"/>
 
 <%
@@ -9,6 +11,7 @@
     String memberSince = "Jan 2023", province = "Madhesh Province", userId = "NS-UI-000001";
     String initials = (String) request.getAttribute("profileInitials");
     if (initials == null) initials = "RY";
+    List<Municipality> municipalities = (List<Municipality>) request.getAttribute("municipalities");
 
     if (profileUserObj != null) {
         try {
@@ -104,7 +107,17 @@
 
             <div style="margin-bottom:12px;">
               <label style="display:block; font-size:13px; font-weight:600; color:#374151; margin-bottom:5px;">Municipality</label>
-              <input type="text" name="municipality" value="<%= municipality %>" style="width:100%; height:42px; border:1.5px solid #e5e7eb; border-radius:8px; padding:0 12px; font-size:14px; color:#111827; background:#fff; outline:none; font-family:'Inter',sans-serif;"/>
+              <select name="municipality" required style="width:100%; height:42px; border:1.5px solid #e5e7eb; border-radius:8px; padding:0 12px; font-size:14px; color:#111827; background:#fff; outline:none; font-family:'Inter',sans-serif;">
+                <option value="" disabled <%= (municipality == null || municipality.isBlank()) ? "selected" : "" %>>Select municipality</option>
+                <% if (municipalities != null) {
+                    for (Municipality muni : municipalities) {
+                        String muniName = muni.getName();
+                        boolean selected = muniName != null && muniName.equalsIgnoreCase(municipality);
+                %>
+                  <option value="<%= muniName %>" <%= selected ? "selected" : "" %>><%= muniName %></option>
+                <%  }
+                   } %>
+              </select>
             </div>
 
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:18px;">

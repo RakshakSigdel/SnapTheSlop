@@ -1,9 +1,33 @@
 <%--
-  Admin Issue Management — NagarSewa
+  Admin Issue Management — NagarSewa (live DB data)
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.util.List" %>
+<%@ page import="com.snaptheslop.snaptheslop.issue.model.Issue" %>
+<%@ page import="com.snaptheslop.snaptheslop.municipality.model.Municipality" %>
 <% request.setAttribute("activePage", "issue-management"); %>
 <jsp:include page="../common/header.jsp"/>
+<%
+  List<Issue> issues = (List<Issue>) request.getAttribute("issues");
+  List<Municipality> municipalities = (List<Municipality>) request.getAttribute("municipalities");
+  if (issues == null) issues = new java.util.ArrayList<>();
+  if (municipalities == null) municipalities = new java.util.ArrayList<>();
+
+  String categoryFilter = (String) request.getAttribute("categoryFilter");
+  String municipalityFilter = (String) request.getAttribute("municipalityFilter");
+  String wardFilter = (String) request.getAttribute("wardFilter");
+  String statusFilter = (String) request.getAttribute("statusFilter");
+
+  int totalCount = request.getAttribute("totalCount") != null ? (int) request.getAttribute("totalCount") : 0;
+  int filteredCount = request.getAttribute("filteredCount") != null ? (int) request.getAttribute("filteredCount") : 0;
+  int openCount = request.getAttribute("openCount") != null ? (int) request.getAttribute("openCount") : 0;
+  int inProgressCount = request.getAttribute("inProgressCount") != null ? (int) request.getAttribute("inProgressCount") : 0;
+  int resolvedCount = request.getAttribute("resolvedCount") != null ? (int) request.getAttribute("resolvedCount") : 0;
+  int currentPage = request.getAttribute("currentPage") != null ? (int) request.getAttribute("currentPage") : 1;
+  int totalPages = request.getAttribute("totalPages") != null ? (int) request.getAttribute("totalPages") : 1;
+
+  String contextPath = request.getContextPath();
+%>
 
 <div class="flex min-h-screen">
   <jsp:include page="../common/admin-sidebar.jsp"/>
@@ -13,30 +37,60 @@
     <div style="padding:18px 32px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #e2e8f0; background:#fff;">
       <div>
         <h1 style="font-family:'Outfit',sans-serif; font-size:18px; font-weight:700; color:#0f172a; margin:0;">Manage Issues</h1>
-        <p style="font-size:13px; color:#64748b; margin:2px 0 0;">Search, filter, sort, and act on issue reports from all municipalities.</p>
+        <p style="font-size:13px; color:#64748b; margin:2px 0 0;">Live issue reports across all municipalities.</p>
       </div>
-      <button style="padding:9px 18px; border-radius:8px; font-size:13px; font-weight:600; border:1px solid #e2e8f0; background:#fff; color:#64748b; cursor:pointer; font-family:'Inter',sans-serif;">Export Report</button>
+      <a href="<%= contextPath %>/admin/dashboard" style="padding:9px 18px; border-radius:8px; font-size:13px; font-weight:600; border:1px solid #e2e8f0; background:#fff; color:#64748b; text-decoration:none; font-family:'Inter',sans-serif;">Back to Dashboard</a>
     </div>
 
     <div style="padding:28px 32px;">
 
-      <div style="display:grid; grid-template-columns:2fr 1fr 1fr 1fr 1fr; gap:10px; margin-bottom:14px;">
-        <input type="text" placeholder="Search by issue title, ID, municipality, or reporter" style="height:40px; border:1px solid #d1d5db; border-radius:8px; padding:0 12px; font-size:13px; color:#111827; background:#fff; font-family:'Inter',sans-serif;"/>
-        <select style="height:40px; border:1px solid #d1d5db; border-radius:8px; padding:0 10px; font-size:13px; color:#111827; background:#fff; font-family:'Inter',sans-serif;"><option>Municipality: All</option><option>KMC</option><option>LMC</option><option>BMC</option></select>
-        <select style="height:40px; border:1px solid #d1d5db; border-radius:8px; padding:0 10px; font-size:13px; color:#111827; background:#fff; font-family:'Inter',sans-serif;"><option>Category: All</option><option>Roads</option><option>Water Supply</option><option>Sanitation</option></select>
-        <select style="height:40px; border:1px solid #d1d5db; border-radius:8px; padding:0 10px; font-size:13px; color:#111827; background:#fff; font-family:'Inter',sans-serif;"><option>Status: All</option><option>Open</option><option>Pending</option><option>In Progress</option><option>Resolved</option></select>
-        <select style="height:40px; border:1px solid #d1d5db; border-radius:8px; padding:0 10px; font-size:13px; color:#111827; background:#fff; font-family:'Inter',sans-serif;"><option>Sort: Reported Date</option><option>Sort: Upvotes</option><option>Sort: Severity</option></select>
-      </div>
+      <form method="get" action="<%= contextPath %>/admin/manage-issues">
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr 1fr; gap:10px; margin-bottom:14px;">
+          <select name="municipalityId" style="height:40px; border:1px solid #d1d5db; border-radius:8px; padding:0 10px; font-size:13px; color:#111827; background:#fff; font-family:'Inter',sans-serif;">
+            <option value="">Municipality: All</option>
+            <% for (Municipality muni : municipalities) {
+                 String muniId = String.valueOf(muni.getId());
+            %>
+              <option value="<%= muniId %>" <%= muniId.equals(municipalityFilter) ? "selected" : "" %>><%= muni.getName() %></option>
+            <% } %>
+          </select>
+
+          <select name="category" style="height:40px; border:1px solid #d1d5db; border-radius:8px; padding:0 10px; font-size:13px; color:#111827; background:#fff; font-family:'Inter',sans-serif;">
+            <option value="">Category: All</option>
+            <option value="Roads Potholes" <%= "Roads Potholes".equals(categoryFilter) ? "selected" : "" %>>Roads & Potholes</option>
+            <option value="Waste Management" <%= "Waste Management".equals(categoryFilter) ? "selected" : "" %>>Waste Management</option>
+            <option value="Water Supply" <%= "Water Supply".equals(categoryFilter) ? "selected" : "" %>>Water Supply</option>
+            <option value="Electricity" <%= "Electricity".equals(categoryFilter) ? "selected" : "" %>>Electricity</option>
+            <option value="Drainage" <%= "Drainage".equals(categoryFilter) ? "selected" : "" %>>Drainage</option>
+            <option value="Street Lighting" <%= "Street Lighting".equals(categoryFilter) ? "selected" : "" %>>Street Lighting</option>
+            <option value="Public Safety" <%= "Public Safety".equals(categoryFilter) ? "selected" : "" %>>Public Safety</option>
+            <option value="Sanitation" <%= "Sanitation".equals(categoryFilter) ? "selected" : "" %>>Sanitation</option>
+            <option value="Other" <%= "Other".equals(categoryFilter) ? "selected" : "" %>>Other</option>
+          </select>
+
+          <select name="status" style="height:40px; border:1px solid #d1d5db; border-radius:8px; padding:0 10px; font-size:13px; color:#111827; background:#fff; font-family:'Inter',sans-serif;">
+            <option value="">Status: All</option>
+            <option value="Open" <%= "Open".equals(statusFilter) ? "selected" : "" %>>Open</option>
+            <option value="In Progress" <%= "In Progress".equals(statusFilter) ? "selected" : "" %>>In Progress</option>
+            <option value="Resolved" <%= "Resolved".equals(statusFilter) ? "selected" : "" %>>Resolved</option>
+            <option value="Rejected" <%= "Rejected".equals(statusFilter) ? "selected" : "" %>>Rejected</option>
+          </select>
+
+          <input type="number" name="ward" min="1" placeholder="Ward (optional)" value="<%= wardFilter != null ? wardFilter : "" %>"
+                 style="height:40px; border:1px solid #d1d5db; border-radius:8px; padding:0 10px; font-size:13px; color:#111827; background:#fff; font-family:'Inter',sans-serif;"/>
+
+          <button type="submit" style="height:40px; border:none; border-radius:8px; background:#059669; color:#fff; font-size:13px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif;">Apply Filters</button>
+        </div>
+      </form>
 
       <div style="display:flex; gap:24px; margin-bottom:20px; padding-bottom:20px; border-bottom:1px solid #f1f5f9;">
-        <div><p style="font-size:11px; color:#94a3b8; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Total</p><p style="font-size:22px; font-weight:800; color:#0f172a; font-family:'Outfit',sans-serif;">1,429</p></div>
-        <div style="border-left:1px solid #e2e8f0; padding-left:24px;"><p style="font-size:11px; color:#94a3b8; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Open</p><p style="font-size:22px; font-weight:800; color:#dc2626; font-family:'Outfit',sans-serif;">284</p></div>
-        <div style="border-left:1px solid #e2e8f0; padding-left:24px;"><p style="font-size:11px; color:#94a3b8; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">In Progress</p><p style="font-size:22px; font-weight:800; color:#0d9488; font-family:'Outfit',sans-serif;">512</p></div>
-        <div style="border-left:1px solid #e2e8f0; padding-left:24px;"><p style="font-size:11px; color:#94a3b8; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Resolved</p><p style="font-size:22px; font-weight:800; color:#059669; font-family:'Outfit',sans-serif;">633</p></div>
-        <div style="border-left:1px solid #e2e8f0; padding-left:24px;"><p style="font-size:11px; color:#94a3b8; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Avg Response</p><p style="font-size:22px; font-weight:800; color:#0f172a; font-family:'Outfit',sans-serif;">4.2h</p></div>
+        <div><p style="font-size:11px; color:#94a3b8; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Total</p><p style="font-size:22px; font-weight:800; color:#0f172a; font-family:'Outfit',sans-serif;"><%= totalCount %></p></div>
+        <div style="border-left:1px solid #e2e8f0; padding-left:24px;"><p style="font-size:11px; color:#94a3b8; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Open</p><p style="font-size:22px; font-weight:800; color:#dc2626; font-family:'Outfit',sans-serif;"><%= openCount %></p></div>
+        <div style="border-left:1px solid #e2e8f0; padding-left:24px;"><p style="font-size:11px; color:#94a3b8; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">In Progress</p><p style="font-size:22px; font-weight:800; color:#0d9488; font-family:'Outfit',sans-serif;"><%= inProgressCount %></p></div>
+        <div style="border-left:1px solid #e2e8f0; padding-left:24px;"><p style="font-size:11px; color:#94a3b8; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Resolved</p><p style="font-size:22px; font-weight:800; color:#059669; font-family:'Outfit',sans-serif;"><%= resolvedCount %></p></div>
+        <div style="border-left:1px solid #e2e8f0; padding-left:24px;"><p style="font-size:11px; color:#94a3b8; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Filtered</p><p style="font-size:22px; font-weight:800; color:#0f172a; font-family:'Outfit',sans-serif;"><%= filteredCount %></p></div>
       </div>
 
-      <!-- Table -->
       <div style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; overflow:hidden;">
         <table style="width:100%; border-collapse:collapse;">
           <thead>
@@ -54,64 +108,58 @@
             </tr>
           </thead>
           <tbody>
-            <tr style="border-bottom:1px solid #f8fafc;" onmouseover="this.style.background='#fafbfc'" onmouseout="this.style.background='transparent'">
-              <td style="padding:14px 18px; font-size:13px; color:#94a3b8;">#NS-8921</td>
-              <td style="padding:14px 18px;"><p style="font-size:13px; font-weight:600; color:#1e293b;">Broken water main — Teku</p><p style="font-size:11px; color:#94a3b8;">Water Supply</p></td>
-              <td style="padding:14px 18px; font-size:13px; color:#64748b;">Ramesh S.</td>
-              <td style="padding:14px 18px; font-size:13px; color:#64748b;">KMC</td>
-              <td style="padding:14px 18px; font-size:13px; color:#64748b;">12</td>
-              <td style="padding:14px 18px;"><span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:#fee2e2; color:#991b1b;">Open</span></td>
-              <td style="padding:14px 18px;"><span style="font-size:12px; font-weight:600; color:#dc2626;">● Critical</span></td>
-              <td style="padding:14px 18px; font-size:12px; color:#0f172a; font-weight:700;">47</td>
-              <td style="padding:14px 18px; font-size:12px; color:#94a3b8;">Oct 12</td>
-              <td style="padding:14px 18px; text-align:right;"><a href="<%= request.getContextPath() %>/municipality/manage-issue?id=NS-8921" style="background:#059669; color:#fff; border:none; padding:5px 14px; border-radius:6px; font-size:11px; font-weight:600; text-decoration:none; display:inline-block;">Manage</a></td>
-            </tr>
-            <tr style="border-bottom:1px solid #f8fafc;" onmouseover="this.style.background='#fafbfc'" onmouseout="this.style.background='transparent'">
-              <td style="padding:14px 18px; font-size:13px; color:#94a3b8;">#NS-8922</td>
-              <td style="padding:14px 18px;"><p style="font-size:13px; font-weight:600; color:#1e293b;">Garbage at Swayambhu</p><p style="font-size:11px; color:#94a3b8;">Sanitation</p></td>
-              <td style="padding:14px 18px; font-size:13px; color:#64748b;">Anita D.</td>
-              <td style="padding:14px 18px; font-size:13px; color:#64748b;">KMC</td>
-              <td style="padding:14px 18px; font-size:13px; color:#64748b;">15</td>
-              <td style="padding:14px 18px;"><span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:#d1fae5; color:#065f46;">In Progress</span></td>
-              <td style="padding:14px 18px;"><span style="font-size:12px; font-weight:600; color:#d97706;">● High</span></td>
-              <td style="padding:14px 18px; font-size:12px; color:#0f172a; font-weight:700;">25</td>
-              <td style="padding:14px 18px; font-size:12px; color:#94a3b8;">Oct 11</td>
-              <td style="padding:14px 18px; text-align:right;"><a href="<%= request.getContextPath() %>/municipality/manage-issue?id=NS-8922" style="background:#f1f5f9; color:#64748b; border:1px solid #e2e8f0; padding:5px 14px; border-radius:6px; font-size:11px; font-weight:600; text-decoration:none; display:inline-block;">Manage</a></td>
-            </tr>
-            <tr style="border-bottom:1px solid #f8fafc;" onmouseover="this.style.background='#fafbfc'" onmouseout="this.style.background='transparent'">
-              <td style="padding:14px 18px; font-size:13px; color:#94a3b8;">#NS-8923</td>
-              <td style="padding:14px 18px;"><p style="font-size:13px; font-weight:600; color:#1e293b;">Streetlight — Balaju bypass</p><p style="font-size:11px; color:#94a3b8;">Electrical</p></td>
-              <td style="padding:14px 18px; font-size:13px; color:#64748b;">Vikram S.</td>
-              <td style="padding:14px 18px; font-size:13px; color:#64748b;">LMC</td>
-              <td style="padding:14px 18px; font-size:13px; color:#64748b;">09</td>
-              <td style="padding:14px 18px;"><span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:#d1fae5; color:#065f46;">Resolved</span></td>
-              <td style="padding:14px 18px;"><span style="font-size:12px; font-weight:600; color:#64748b;">● Low</span></td>
-              <td style="padding:14px 18px; font-size:12px; color:#0f172a; font-weight:700;">17</td>
-              <td style="padding:14px 18px; font-size:12px; color:#94a3b8;">Oct 10</td>
-              <td style="padding:14px 18px; text-align:right;"><a href="<%= request.getContextPath() %>/municipality/manage-issue?id=NS-8923" style="background:#f1f5f9; color:#64748b; border:1px solid #e2e8f0; padding:5px 14px; border-radius:6px; font-size:11px; font-weight:600; text-decoration:none; display:inline-block;">Manage</a></td>
-            </tr>
-            <tr onmouseover="this.style.background='#fafbfc'" onmouseout="this.style.background='transparent'">
-              <td style="padding:14px 18px; font-size:13px; color:#94a3b8;">#NS-8924</td>
-              <td style="padding:14px 18px;"><p style="font-size:13px; font-weight:600; color:#1e293b;">Pothole — Ratna Park junction</p><p style="font-size:11px; color:#94a3b8;">Roads</p></td>
-              <td style="padding:14px 18px; font-size:13px; color:#64748b;">Binod P.</td>
-              <td style="padding:14px 18px; font-size:13px; color:#64748b;">BMC</td>
-              <td style="padding:14px 18px; font-size:13px; color:#64748b;">04</td>
-              <td style="padding:14px 18px;"><span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:#fef3c7; color:#92400e;">Pending</span></td>
-              <td style="padding:14px 18px;"><span style="font-size:12px; font-weight:600; color:#2563eb;">● Medium</span></td>
-              <td style="padding:14px 18px; font-size:12px; color:#0f172a; font-weight:700;">31</td>
-              <td style="padding:14px 18px; font-size:12px; color:#94a3b8;">Oct 9</td>
-              <td style="padding:14px 18px; text-align:right;"><a href="<%= request.getContextPath() %>/municipality/manage-issue?id=NS-8924" style="background:#059669; color:#fff; border:none; padding:5px 14px; border-radius:6px; font-size:11px; font-weight:600; text-decoration:none; display:inline-block;">Manage</a></td>
-            </tr>
+            <% if (issues.isEmpty()) { %>
+              <tr>
+                <td colspan="10" style="padding:36px 18px; text-align:center; font-size:13px; color:#94a3b8;">No issues found for the selected filters.</td>
+              </tr>
+            <% } else {
+                 for (Issue issue : issues) {
+                   String st = issue.getStatus();
+                   String statusBg = "#f1f5f9";
+                   String statusFg = "#64748b";
+                   if ("Open".equals(st)) { statusBg = "#fee2e2"; statusFg = "#991b1b"; }
+                   else if ("In Progress".equals(st)) { statusBg = "#d1fae5"; statusFg = "#065f46"; }
+                   else if ("Resolved".equals(st)) { statusBg = "#dcfce7"; statusFg = "#166534"; }
+                   else if ("Rejected".equals(st)) { statusBg = "#f1f5f9"; statusFg = "#64748b"; }
+
+                   String pr = issue.getPriority() != null ? issue.getPriority() : "Medium";
+                   String priorityColor = "#2563eb";
+                   if ("Critical".equals(pr)) priorityColor = "#dc2626";
+                   else if ("High".equals(pr)) priorityColor = "#d97706";
+                   else if ("Low".equals(pr)) priorityColor = "#64748b";
+            %>
+              <tr style="border-bottom:1px solid #f8fafc;" onmouseover="this.style.background='#fafbfc'" onmouseout="this.style.background='transparent'">
+                <td style="padding:14px 18px; font-size:13px; color:#94a3b8;">#<%= issue.getIssueId() %></td>
+                <td style="padding:14px 18px;"><p style="font-size:13px; font-weight:600; color:#1e293b;"><%= issue.getTitle() %></p><p style="font-size:11px; color:#94a3b8;"><%= issue.getCategory() != null ? issue.getCategory() : "—" %></p></td>
+                <td style="padding:14px 18px; font-size:13px; color:#64748b;"><%= issue.getCitizenName() != null ? issue.getCitizenName() : "—" %></td>
+                <td style="padding:14px 18px; font-size:13px; color:#64748b;"><%= issue.getMunicipalityName() != null ? issue.getMunicipalityName() : "—" %></td>
+                <td style="padding:14px 18px; font-size:13px; color:#64748b;"><%= issue.getWardNo() %></td>
+                <td style="padding:14px 18px;"><span style="padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; background:<%= statusBg %>; color:<%= statusFg %>;"><%= st %></span></td>
+                <td style="padding:14px 18px;"><span style="font-size:12px; font-weight:600; color:<%= priorityColor %>;">● <%= pr %></span></td>
+                <td style="padding:14px 18px; font-size:12px; color:#0f172a; font-weight:700;"><%= issue.getUpvoteCount() %></td>
+                <td style="padding:14px 18px; font-size:12px; color:#94a3b8;"><%= issue.getCreatedAtShort() %></td>
+                <td style="padding:14px 18px; text-align:right;"><a href="<%= contextPath %>/municipality/manage-issue?id=<%= issue.getId() %>" style="background:#059669; color:#fff; border:none; padding:5px 14px; border-radius:6px; font-size:11px; font-weight:600; text-decoration:none; display:inline-block;">Manage</a></td>
+              </tr>
+            <%   }
+               } %>
           </tbody>
         </table>
+
         <div style="padding:12px 18px; border-top:1px solid #f1f5f9; display:flex; align-items:center; justify-content:space-between;">
-          <span style="font-size:12px; color:#94a3b8;">Showing 4 of 1,429</span>
+          <span style="font-size:12px; color:#94a3b8;">Showing <%= issues.size() %> of <%= filteredCount %> filtered issues</span>
+          <% if (totalPages > 1) { %>
           <div style="display:flex; gap:4px;">
-            <button style="width:28px; height:28px; border-radius:6px; border:1px solid #e2e8f0; background:#fff; color:#94a3b8; cursor:pointer; font-size:11px;">&lsaquo;</button>
-            <button style="width:28px; height:28px; border-radius:6px; border:none; background:#0f172a; color:#fff; font-size:12px; font-weight:700; cursor:pointer;">1</button>
-            <button style="width:28px; height:28px; border-radius:6px; border:1px solid #e2e8f0; background:#fff; color:#64748b; font-size:12px; cursor:pointer;">2</button>
-            <button style="width:28px; height:28px; border-radius:6px; border:1px solid #e2e8f0; background:#fff; color:#94a3b8; cursor:pointer; font-size:11px;">&rsaquo;</button>
+            <% if (currentPage > 1) { %>
+              <a href="<%= contextPath %>/admin/manage-issues?page=<%= currentPage - 1 %><%= municipalityFilter != null ? "&municipalityId=" + municipalityFilter : "" %><%= categoryFilter != null ? "&category=" + categoryFilter : "" %><%= wardFilter != null ? "&ward=" + wardFilter : "" %><%= statusFilter != null ? "&status=" + statusFilter : "" %>" style="width:28px; height:28px; border-radius:6px; border:1px solid #e2e8f0; background:#fff; color:#94a3b8; cursor:pointer; font-size:11px; display:flex; align-items:center; justify-content:center; text-decoration:none;">&lsaquo;</a>
+            <% } %>
+            <% for (int p = Math.max(1, currentPage - 2); p <= Math.min(totalPages, currentPage + 2); p++) { %>
+              <a href="<%= contextPath %>/admin/manage-issues?page=<%= p %><%= municipalityFilter != null ? "&municipalityId=" + municipalityFilter : "" %><%= categoryFilter != null ? "&category=" + categoryFilter : "" %><%= wardFilter != null ? "&ward=" + wardFilter : "" %><%= statusFilter != null ? "&status=" + statusFilter : "" %>" style="width:28px; height:28px; border-radius:6px; border:<%= p == currentPage ? "none" : "1px solid #e2e8f0" %>; background:<%= p == currentPage ? "#0f172a" : "#fff" %>; color:<%= p == currentPage ? "#fff" : "#64748b" %>; font-size:12px; font-weight:<%= p == currentPage ? "700" : "400" %>; display:flex; align-items:center; justify-content:center; text-decoration:none;"><%= p %></a>
+            <% } %>
+            <% if (currentPage < totalPages) { %>
+              <a href="<%= contextPath %>/admin/manage-issues?page=<%= currentPage + 1 %><%= municipalityFilter != null ? "&municipalityId=" + municipalityFilter : "" %><%= categoryFilter != null ? "&category=" + categoryFilter : "" %><%= wardFilter != null ? "&ward=" + wardFilter : "" %><%= statusFilter != null ? "&status=" + statusFilter : "" %>" style="width:28px; height:28px; border-radius:6px; border:1px solid #e2e8f0; background:#fff; color:#94a3b8; cursor:pointer; font-size:11px; display:flex; align-items:center; justify-content:center; text-decoration:none;">&rsaquo;</a>
+            <% } %>
           </div>
+          <% } %>
         </div>
       </div>
     </div>

@@ -60,10 +60,12 @@
           </div>
           <div>
             <label style="display:block; font-size:13px; font-weight:600; color:#374151; margin-bottom:6px;">Municipality <span style="color:#dc2626;">*</span></label>
-            <select name="municipality" id="municipality" required
-                    style="width:100%; height:44px; border:1.5px solid #e5e7eb; border-radius:8px; padding:0 12px; font-size:14px; color:#111827; background:#fff; outline:none; appearance:none; cursor:pointer; font-family:'Inter',sans-serif;">
-              <option value="" disabled selected>Select municipality</option>
-            </select>
+            <input type="text" id="municipality" value="<%= request.getAttribute("reportMunicipalityName") != null ? request.getAttribute("reportMunicipalityName") : "" %>" readonly
+                   style="width:100%; height:44px; border:1.5px solid #e5e7eb; border-radius:8px; padding:0 12px; font-size:14px; color:#111827; background:#f8fafc; outline:none; font-family:'Inter',sans-serif; cursor:not-allowed;"/>
+            <input type="hidden" name="municipality" value="<%= request.getAttribute("reportMunicipalityName") != null ? request.getAttribute("reportMunicipalityName") : "" %>"/>
+            <p style="margin-top:6px; font-size:12px; color:#64748b;">
+              Municipality is taken from your profile. To change it here, update your municipality in Profile first.
+            </p>
           </div>
         </div>
 
@@ -121,51 +123,18 @@
 
 <%
   UserDTO loggedInUser = (UserDTO) session.getAttribute("loggedInUser");
+  String reportMunicipalityName = (String) request.getAttribute("reportMunicipalityName");
+  if (reportMunicipalityName == null && loggedInUser != null) {
+    reportMunicipalityName = loggedInUser.getMunicipality();
+  }
 %>
 <script>
   var contextPath = '<%= request.getContextPath() %>';
-  var loggedInRole = '<%= loggedInUser != null && loggedInUser.getRole() != null ? loggedInUser.getRole().replace("\\", "\\\\").replace("'", "\\'") : "" %>';
-  var loggedInMunicipality = '<%= loggedInUser != null && loggedInUser.getMunicipality() != null ? loggedInUser.getMunicipality().replace("\\", "\\\\").replace("'", "\\'") : "" %>';
-  var isCitizenUser = loggedInRole && (
-    loggedInRole.trim().toUpperCase() === 'REGISTERED CITIZEN' ||
-    loggedInRole.trim().toUpperCase() === 'CITIZEN'
-  );
+  var loggedInMunicipality = '<%= reportMunicipalityName != null ? reportMunicipalityName.replace("\\", "\\\\").replace("'", "\\'") : "" %>';
   var dropZone = document.getElementById('dropZone');
   var imageInput = document.getElementById('imageInput');
   dropZone.addEventListener('click', function() { imageInput.click(); });
-  var municipality = document.getElementById('municipality');
   var ward = document.getElementById('ward');
-
-  function lockMunicipalityForCitizen() {
-    if (!loggedInMunicipality) {
-      municipality.innerHTML = '';
-      var missingOption = document.createElement('option');
-      missingOption.value = '';
-      missingOption.disabled = true;
-      missingOption.selected = true;
-      missingOption.textContent = 'Your municipality is not configured';
-      municipality.appendChild(missingOption);
-      return;
-    }
-
-    municipality.innerHTML = '';
-    var option = document.createElement('option');
-    option.value = loggedInMunicipality;
-    option.textContent = loggedInMunicipality;
-    option.selected = true;
-    municipality.appendChild(option);
-    municipality.value = loggedInMunicipality;
-    municipality.disabled = true;
-
-    var hiddenMunicipalityInput = document.createElement('input');
-    hiddenMunicipalityInput.type = 'hidden';
-    hiddenMunicipalityInput.name = 'municipality';
-    hiddenMunicipalityInput.value = loggedInMunicipality;
-    document.getElementById('reportForm').appendChild(hiddenMunicipalityInput);
-
-    municipality.removeAttribute('name');
-    populateWards();
-  }
 
   function setWardPlaceholder(text) {
     ward.innerHTML = '';
@@ -201,7 +170,7 @@
         wards.forEach(function(wardItem) {
           var wardLabel = 'Ward ' + String(wardItem.wardNumber).padStart(2, '0');
           var option = document.createElement('option');
-          option.value = wardLabel;
+          option.value = String(wardItem.wardNumber);
           option.textContent = wardLabel;
           ward.appendChild(option);
         });
@@ -211,11 +180,7 @@
       });
   }
 
-  if (isCitizenUser) {
-    lockMunicipalityForCitizen();
-  } else {
-    populateWards();
-  }
+  populateWards();
 
   dropZone.addEventListener('dragover', function(e) { e.preventDefault(); dropZone.style.borderColor='#059669'; });
   dropZone.addEventListener('dragleave', function() { dropZone.style.borderColor='#d1d5db'; });

@@ -95,7 +95,9 @@ public class Issue {
     public boolean isValidTransition(String nextStatus) {
         if (nextStatus == null) return false;
         switch (this.status) {
-            case "Open":        return "In Progress".equals(nextStatus) || "Rejected".equals(nextStatus);
+            case "Open":        return "In Progress".equals(nextStatus)
+                                       || "Resolved".equals(nextStatus)
+                                       || "Rejected".equals(nextStatus);
             case "In Progress": return "Resolved".equals(nextStatus)    || "Rejected".equals(nextStatus);
             default:            return false; // Resolved / Rejected are terminal
         }

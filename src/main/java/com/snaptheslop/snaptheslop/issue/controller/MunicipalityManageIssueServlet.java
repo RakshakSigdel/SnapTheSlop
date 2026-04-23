@@ -129,7 +129,7 @@ public class MunicipalityManageIssueServlet extends HttpServlet {
             if (!issue.isValidTransition(effectiveStatus)) {
                 flashError(request, "Invalid status transition: "
                         + issue.getStatus() + " → " + effectiveStatus
-                        + ". Allowed: Open→In Progress, In Progress→Resolved/Rejected.");
+                    + ". Allowed: Open→In Progress/Resolved/Rejected, In Progress→Resolved/Rejected.");
                 response.sendRedirect(request.getContextPath() + "/municipality/manage-issue?id=" + idParam);
                 return;
             }

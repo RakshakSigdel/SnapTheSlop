@@ -216,6 +216,30 @@ public class IssueDAO {
     }
 
     /**
+     * Count all issues globally with optional status filter.
+     */
+    public int countAllIssues(String statusFilter) {
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM issues i WHERE 1=1");
+        if (statusFilter != null && !statusFilter.isBlank()) {
+            sql.append(" AND i.status = ?");
+        }
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            if (statusFilter != null && !statusFilter.isBlank()) {
+                ps.setString(1, statusFilter);
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            LOGGER.log(Level.SEVERE, "Error counting all issues", e);
+        }
+        return 0;
+    }
+
+    /**
      * Browse all public issues (for citizen browse page), with optional filters.
      */
     public List<Issue> findAll(String categoryFilter,
@@ -255,6 +279,44 @@ public class IssueDAO {
             LOGGER.log(Level.SEVERE, "Error fetching all issues", e);
         }
         return issues;
+    }
+
+    /**
+     * Count all public issues with optional filters.
+     */
+    public int countAllFiltered(String categoryFilter,
+                                String municipalityIdFilter,
+                                String wardFilter,
+                                String statusFilter) {
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM issues i WHERE 1=1");
+        if (categoryFilter != null && !categoryFilter.isBlank())        sql.append(" AND i.category = ?");
+        if (municipalityIdFilter != null && !municipalityIdFilter.isBlank()) sql.append(" AND i.municipality_id = ?");
+        if (wardFilter != null && !wardFilter.isBlank())                sql.append(" AND i.ward_no = ?");
+        if (statusFilter != null && !statusFilter.isBlank())            sql.append(" AND i.status = ?");
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            int idx = 1;
+            if (categoryFilter != null && !categoryFilter.isBlank())        ps.setString(idx++, categoryFilter);
+            if (municipalityIdFilter != null && !municipalityIdFilter.isBlank()) {
+                try { ps.setInt(idx++, Integer.parseInt(municipalityIdFilter)); }
+                catch (NumberFormatException ex) { ps.setString(idx++, municipalityIdFilter); }
+            }
+            if (wardFilter != null && !wardFilter.isBlank()) {
+                try { ps.setInt(idx++, Integer.parseInt(wardFilter)); }
+                catch (NumberFormatException ex) { ps.setString(idx++, wardFilter); }
+            }
+            if (statusFilter != null && !statusFilter.isBlank())            ps.setString(idx, statusFilter);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            LOGGER.log(Level.SEVERE, "Error counting filtered issues", e);
+        }
+        return 0;
     }
 
     // ── UPDATE ─────────────────────────────────────────────────────────────

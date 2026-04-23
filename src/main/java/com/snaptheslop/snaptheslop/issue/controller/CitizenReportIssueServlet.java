@@ -6,6 +6,7 @@ import com.snaptheslop.snaptheslop.issue.model.dao.IssueDAO;
 import com.snaptheslop.snaptheslop.municipality.MunicipalityDAO;
 import com.snaptheslop.snaptheslop.municipality.model.Municipality;
 import com.snaptheslop.snaptheslop.user.model.UserDTO;
+import com.snaptheslop.snaptheslop.user.model.dao.UserDAO;
 import com.snaptheslop.snaptheslop.util.ImageUploadUtil;
 import com.snaptheslop.snaptheslop.util.SessionUtil;
 import jakarta.servlet.ServletException;
@@ -39,12 +40,26 @@ public class CitizenReportIssueServlet extends HttpServlet {
     private static final Logger LOGGER = Logger.getLogger(CitizenReportIssueServlet.class.getName());
     private final MunicipalityDAO municipalityDAO = new MunicipalityDAO();
     private final IssueDAO issueDAO = new IssueDAO();
+    private final UserDAO userDAO = new UserDAO();
 
     // ── GET ────────────────────────────────────────────────────────────────
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        UserDTO citizen = SessionUtil.getLoggedInUser(request);
+        if (citizen == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
+        UserDTO latestUser = userDAO.findUserById(citizen.getUserId());
+        if (latestUser != null) {
+            citizen = latestUser;
+            request.getSession().setAttribute("loggedInUser", citizen);
+            request.getSession().setAttribute("municipalityId", citizen.getMunicipalityId());
+        }
 
         String action = request.getParameter("action");
         if ("municipalities".equalsIgnoreCase(action)) {
@@ -53,14 +68,14 @@ public class CitizenReportIssueServlet extends HttpServlet {
         }
 
         request.setAttribute("activePage", "report-issue");
-        try {
-            request.setAttribute("municipalities", municipalityDAO.getAllMunicipalities());
-        } catch (SQLException | ClassNotFoundException e) {
-            LOGGER.log(Level.SEVERE, "Unable to load municipalities", e);
-            request.setAttribute("municipalities", Collections.emptyList());
+        int municipalityId = resolveMunicipalityIdFromUser(citizen);
+        String municipalityName = citizen.getMunicipality();
+        if (municipalityId <= 0 || blank(municipalityName)) {
             request.setAttribute("errorMessage",
-                    "Unable to load municipalities right now. Please try again.");
+                    "Your municipality is not configured in profile. Please update your profile first.");
         }
+        request.setAttribute("reportMunicipalityId", municipalityId);
+        request.setAttribute("reportMunicipalityName", municipalityName);
         request.getRequestDispatcher("/WEB-INF/views/citizen/report-issue.jsp").forward(request, response);
     }
 
@@ -80,7 +95,6 @@ public class CitizenReportIssueServlet extends HttpServlet {
         // 2. Read fields
         String title       = trimParam(request, "title");
         String category    = trimParam(request, "category");
-        String muniParam   = trimParam(request, "municipality");
         String wardParam   = trimParam(request, "ward");
         String location    = trimParam(request, "location");
         String description = trimParam(request, "description");
@@ -88,12 +102,22 @@ public class CitizenReportIssueServlet extends HttpServlet {
         if (priority == null || priority.isBlank()) priority = "Medium";
 
         // 3. Validate
-        String err = validate(title, category, muniParam, wardParam, location, description);
+        String err = validate(title, category, wardParam, location, description);
         if (err != null) { reloadForm(request, response, err); return; }
 
-        // 4. Resolve municipality id
-        int municipalityId = resolveMunicipalityId(muniParam);
-        if (municipalityId == -1) { reloadForm(request, response, "Invalid municipality selected."); return; }
+        // 4. Resolve municipality from the logged-in user's profile
+        UserDTO latestUser = userDAO.findUserById(citizen.getUserId());
+        if (latestUser != null) {
+            citizen = latestUser;
+            request.getSession().setAttribute("loggedInUser", citizen);
+            request.getSession().setAttribute("municipalityId", citizen.getMunicipalityId());
+        }
+
+        int municipalityId = resolveMunicipalityIdFromUser(citizen);
+        if (municipalityId <= 0) {
+            reloadForm(request, response, "Your municipality is not configured. Please update it in your profile first.");
+            return;
+        }
 
         // 5. Ward number
         int wardNo;
@@ -170,12 +194,11 @@ public class CitizenReportIssueServlet extends HttpServlet {
         }
     }
 
-    private String validate(String title, String category, String muni, String ward,
+    private String validate(String title, String category, String ward,
                             String location, String description) {
         if (blank(title))       return "Title is required.";
         if (title.length() > 200) return "Title must be 200 characters or fewer.";
         if (blank(category))    return "Category is required.";
-        if (blank(muni))        return "Municipality is required.";
         if (blank(ward))        return "Ward is required.";
         if (blank(location))    return "Location is required.";
         if (blank(description)) return "Description is required.";
@@ -190,8 +213,17 @@ public class CitizenReportIssueServlet extends HttpServlet {
         req.setAttribute("prevCategory",    req.getParameter("category"));
         req.setAttribute("prevLocation",    req.getParameter("location"));
         req.setAttribute("prevDescription", req.getParameter("description"));
-        try { req.setAttribute("municipalities", municipalityDAO.getAllMunicipalities()); }
-        catch (Exception ignored) { req.setAttribute("municipalities", Collections.emptyList()); }
+        UserDTO citizen = SessionUtil.getLoggedInUser(req);
+        if (citizen != null) {
+            UserDTO latestUser = userDAO.findUserById(citizen.getUserId());
+            if (latestUser != null) {
+                citizen = latestUser;
+                req.getSession().setAttribute("loggedInUser", citizen);
+                req.getSession().setAttribute("municipalityId", citizen.getMunicipalityId());
+            }
+            req.setAttribute("reportMunicipalityName", citizen.getMunicipality());
+            req.setAttribute("reportMunicipalityId", resolveMunicipalityIdFromUser(citizen));
+        }
         req.getRequestDispatcher("/WEB-INF/views/citizen/report-issue.jsp").forward(req, res);
     }
 
@@ -205,6 +237,23 @@ public class CitizenReportIssueServlet extends HttpServlet {
             LOGGER.log(Level.SEVERE, "Error resolving municipality id", e);
             return -1;
         }
+    }
+
+    private int resolveMunicipalityIdFromUser(UserDTO user) {
+        if (user == null) {
+            return -1;
+        }
+
+        if (user.getMunicipalityId() > 0) {
+            return user.getMunicipalityId();
+        }
+
+        String municipalityName = user.getMunicipality();
+        if (municipalityName == null || municipalityName.trim().isEmpty()) {
+            return -1;
+        }
+
+        return resolveMunicipalityId(municipalityName);
     }
 
     private int lookupUserDbId(String userId) {

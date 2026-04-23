@@ -1,5 +1,7 @@
 package com.snaptheslop.snaptheslop.user.controller;
 
+import com.snaptheslop.snaptheslop.municipality.MunicipalityDAO;
+import com.snaptheslop.snaptheslop.municipality.model.Municipality;
 import com.snaptheslop.snaptheslop.user.model.UserDTO;
 import com.snaptheslop.snaptheslop.user.model.dao.UserDAO;
 
@@ -10,12 +12,16 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.List;
 
 @WebServlet(name = "profileServlet", urlPatterns = {"/citizen/profile", "/profile"})
 public class ProfileServlet extends HttpServlet {
 
     private static final String PROFILE_VIEW = "/WEB-INF/views/citizen/profile.jsp";
-    private UserDAO userDAO = new UserDAO();
+    private final UserDAO userDAO = new UserDAO();
+    private final MunicipalityDAO municipalityDAO = new MunicipalityDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -33,9 +39,11 @@ public class ProfileServlet extends HttpServlet {
             if (updatedUser != null) {
                 profileUser = updatedUser;
                 request.getSession().setAttribute("loggedInUser", profileUser);
+                request.getSession().setAttribute("municipalityId", profileUser.getMunicipalityId());
             }
         }
 
+        request.setAttribute("municipalities", loadMunicipalities());
         request.setAttribute("profileUser", profileUser);
         request.setAttribute("profileInitials", buildInitials(profileUser.getFirstName(), profileUser.getLastName()));
         request.setAttribute("activePage", "profile");
@@ -51,26 +59,84 @@ public class ProfileServlet extends HttpServlet {
             return;
         }
 
+        String municipality = trimToNull(request.getParameter("municipality"));
+        if (!isValidMunicipality(municipality)) {
+            request.setAttribute("error", "Please select a valid municipality from the list.");
+            request.setAttribute("municipalities", loadMunicipalities());
+            request.setAttribute("profileUser", profileUser);
+            request.setAttribute("profileInitials", buildInitials(profileUser.getFirstName(), profileUser.getLastName()));
+            request.setAttribute("activePage", "profile");
+            request.getRequestDispatcher(PROFILE_VIEW).forward(request, response);
+            return;
+        }
+
         // Update profile data from request parameters
         profileUser.setFirstName(request.getParameter("firstName"));
         profileUser.setLastName(request.getParameter("lastName"));
         profileUser.setPhoneNumber(request.getParameter("phoneNumber"));
-        profileUser.setMunicipality(request.getParameter("municipality"));
+        profileUser.setMunicipality(municipality);
         profileUser.setWardNo(request.getParameter("wardNo"));
         profileUser.setProvince(request.getParameter("province"));
 
+        try {
+            Integer municipalityId = municipalityDAO.findMunicipalityIdByName(municipality);
+            profileUser.setMunicipalityId(municipalityId != null ? municipalityId : -1);
+            request.getSession().setAttribute("municipalityId", profileUser.getMunicipalityId());
+        } catch (SQLException | ClassNotFoundException e) {
+            request.setAttribute("error", "Unable to validate municipality right now. Please try again.");
+            request.setAttribute("municipalities", loadMunicipalities());
+            request.setAttribute("profileUser", profileUser);
+            request.setAttribute("profileInitials", buildInitials(profileUser.getFirstName(), profileUser.getLastName()));
+            request.setAttribute("activePage", "profile");
+            request.getRequestDispatcher(PROFILE_VIEW).forward(request, response);
+            return;
+        }
+
         // Update in database
         if (userDAO.updateUserProfile(profileUser)) {
+            UserDTO refreshedUser = userDAO.findUserById(profileUser.getUserId());
+            if (refreshedUser != null) {
+                profileUser = refreshedUser;
+            }
             request.getSession().setAttribute("loggedInUser", profileUser);
+            request.getSession().setAttribute("municipalityId", profileUser.getMunicipalityId());
             request.setAttribute("success", "Profile updated successfully!");
         } else {
             request.setAttribute("error", "Failed to update profile.");
         }
 
+        request.setAttribute("municipalities", loadMunicipalities());
         request.setAttribute("profileUser", profileUser);
         request.setAttribute("profileInitials", buildInitials(profileUser.getFirstName(), profileUser.getLastName()));
         request.setAttribute("activePage", "profile");
         request.getRequestDispatcher(PROFILE_VIEW).forward(request, response);
+    }
+
+    private List<Municipality> loadMunicipalities() {
+        try {
+            return municipalityDAO.getAllMunicipalities();
+        } catch (SQLException | ClassNotFoundException e) {
+            return Collections.emptyList();
+        }
+    }
+
+    private boolean isValidMunicipality(String municipalityName) {
+        if (municipalityName == null || municipalityName.isBlank()) {
+            return false;
+        }
+        try {
+            return municipalityDAO.findMunicipalityIdByName(municipalityName) != null;
+        } catch (SQLException | ClassNotFoundException e) {
+            return false;
+        }
+    }
+
+    private String trimToNull(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
     }
 
 

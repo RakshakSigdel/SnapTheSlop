@@ -9,6 +9,10 @@
   Issue issue          = (Issue)  request.getAttribute("issue");
   String reportImageUrl= (String) request.getAttribute("reportImageUrl");
   String contextPath   = request.getContextPath();
+  String successMessage = (String) session.getAttribute("successMessage");
+  String errorMessage = (String) session.getAttribute("errorMessage");
+  if (successMessage != null) session.removeAttribute("successMessage");
+  if (errorMessage != null) session.removeAttribute("errorMessage");
   if (issue == null) { response.sendRedirect(contextPath + "/municipality/issue-list"); return; }
   String currentStatus   = issue.getStatus()   != null ? issue.getStatus()   : "Open";
   String currentPriority = issue.getPriority() != null ? issue.getPriority() : "Medium";
@@ -27,6 +31,17 @@
     </div>
 
     <div style="padding:28px 32px;">
+      <% if (successMessage != null) { %>
+      <div style="background:#d1fae5; border:1px solid #6ee7b7; border-radius:8px; padding:12px 14px; margin-bottom:16px; font-size:13px; color:#065f46;">
+        <%= successMessage %>
+      </div>
+      <% } %>
+      <% if (errorMessage != null) { %>
+      <div style="background:#fee2e2; border:1px solid #fca5a5; border-radius:8px; padding:12px 14px; margin-bottom:16px; font-size:13px; color:#991b1b;">
+        <%= errorMessage %>
+      </div>
+      <% } %>
+
       <div style="display:grid; grid-template-columns:2fr 1fr; gap:16px;">
 
         <!-- Left: Issue form -->
@@ -52,7 +67,7 @@
 
             <!-- Status transition note -->
             <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:10px 14px; margin-bottom:14px; font-size:12px; color:#92400e;">
-              <strong>Status flow:</strong> Open → In Progress → Resolved / Rejected. Resolved and Rejected issues cannot be changed further.
+              <strong>Status flow:</strong> Open → In Progress / Resolved / Rejected. In Progress → Resolved / Rejected. Resolved and Rejected issues cannot be changed further.
             </div>
 
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px;">
@@ -126,7 +141,7 @@
           <div style="background:#ecfdf5; border:1px solid #bbf7d0; border-radius:10px; padding:16px;">
             <p style="font-size:12px; font-weight:700; color:#065f46; margin:0 0 4px;">Status Transitions</p>
             <% if ("Open".equals(currentStatus)) { %>
-            <p style="font-size:12px; color:#047857; margin:0; line-height:1.5;">Can move to: <strong>In Progress</strong> or <strong>Rejected</strong></p>
+            <p style="font-size:12px; color:#047857; margin:0; line-height:1.5;">Can move to: <strong>In Progress</strong>, <strong>Resolved</strong> or <strong>Rejected</strong></p>
             <% } else if ("In Progress".equals(currentStatus)) { %>
             <p style="font-size:12px; color:#047857; margin:0; line-height:1.5;">Can move to: <strong>Resolved</strong> or <strong>Rejected</strong></p>
             <% } else { %>
