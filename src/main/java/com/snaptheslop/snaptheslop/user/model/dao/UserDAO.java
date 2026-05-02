@@ -174,6 +174,28 @@ public class UserDAO {
     }
 
     /**
+     * Delete user by userId
+     */
+    public boolean deleteUserByUserId(String userId) {
+        if (userId == null || userId.trim().isEmpty()) {
+            return false;
+        }
+
+        String sql = "DELETE FROM users WHERE userId = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, userId.trim());
+            int result = pstmt.executeUpdate();
+            return result > 0;
+        } catch (SQLException | ClassNotFoundException e) {
+            LOGGER.log(Level.SEVERE, "Error deleting user with userId: " + userId, e);
+            return false;
+        }
+    }
+
+    /**
      * Get all users for admin listing
      */
     public List<UserDTO> getAllUsers() {

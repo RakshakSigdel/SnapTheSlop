@@ -159,12 +159,227 @@
           <div style="background:#fff; border:1px solid #fecaca; border-radius:10px; padding:18px;">
             <p style="font-size:12px; font-weight:700; color:#dc2626; margin-bottom:4px;">Danger zone</p>
             <p style="font-size:12px; color:#64748b; margin-bottom:10px;">This action cannot be undone.</p>
-            <button style="background:#fff; color:#dc2626; border:1px solid #fecaca; font-size:12px; font-weight:600; padding:7px 14px; border-radius:6px; cursor:pointer; font-family:'Inter',sans-serif;">Delete account</button>
+            <button id="deleteAccountBtn" type="button" style="background:#fff; color:#dc2626; border:1px solid #fecaca; font-size:12px; font-weight:600; padding:7px 14px; border-radius:6px; cursor:pointer; font-family:'Inter',sans-serif;">Delete account</button>
           </div>
         </div>
       </div>
     </div>
   </div>
 </div>
-</body>
-</html>
+            <!-- Delete confirmation modal -->
+            <div id="deleteModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:9999;">
+              <div style="background:#fff; padding:20px; border-radius:8px; width:420px; max-width:90%; box-shadow:0 6px 18px rgba(0,0,0,0.2);">
+                <h3 style="margin:0 0 8px; font-size:16px;">Confirm account deletion</h3>
+                <p style="margin:0 0 16px; color:#374151;">Are you sure you want to delete your account? This will remove your profile and associated data. This action cannot be undone.</p>
+                <div style="display:flex; gap:8px; justify-content:flex-end;">
+                  <button id="cancelDeleteBtn" type="button" style="background:#fff; border:1px solid #e5e7eb; padding:8px 12px; border-radius:6px; cursor:pointer;">Cancel</button>
+                  <button id="confirmDeleteBtn" type="button" style="background:#dc2626; color:#fff; border:none; padding:8px 12px; border-radius:6px; cursor:pointer;">Delete account</button>
+                </div>
+              </div>
+            </div>
+
+            <script>
+              (function(){
+                var deleteBtn = document.getElementById('deleteAccountBtn');
+                var modal = document.getElementById('deleteModal');
+                var cancelBtn = document.getElementById('cancelDeleteBtn');
+                var confirmBtn = document.getElementById('confirmDeleteBtn');
+
+                if (!deleteBtn) return;
+
+                deleteBtn.addEventListener('click', function(e){
+                  modal.style.display = 'flex';
+                });
+
+                cancelBtn.addEventListener('click', function(){
+                  modal.style.display = 'none';
+                });
+
+                confirmBtn.addEventListener('click', function(){
+                  confirmBtn.disabled = true;
+                  confirmBtn.textContent = 'Deleting...';
+
+                  fetch('<%= request.getContextPath() %>/citizen/delete-account', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                      'Accept': 'application/json',
+                      'Content-Type': 'application/json'
+                    }
+                          }).then(function(res){
+                            return res.json().then(function(body){
+                              if (res.ok && body.success) {
+                                                    // show a confirmation container with actions (landing / signup)
+                                                    modal.style.display = 'none';
+                                                    var msg = body.message || 'Account deleted successfully';
+
+                                                                                            // add a subtle blurred overlay behind the confirmation card
+                                                                                            var overlay = document.createElement('div');
+                                                                                            overlay.id = 'deletedBlurOverlay';
+                                                                                            overlay.style.position = 'fixed';
+                                                                                            overlay.style.inset = '0';
+                                                                                            overlay.style.background = 'rgba(255,255,255,0.6)';
+                                                                                            overlay.style.backdropFilter = 'blur(6px)';
+                                                                                            overlay.style.webkitBackdropFilter = 'blur(6px)';
+                                                                                            overlay.style.zIndex = 9999;
+
+                                                                                            var dlg = document.createElement('div');
+                                                                                            dlg.id = 'deletedConfirmModal';
+                                                                                            dlg.style.position = 'fixed';
+                                                                                            dlg.style.inset = '0';
+                                                                                            dlg.style.display = 'flex';
+                                                                                            dlg.style.alignItems = 'center';
+                                                                                            dlg.style.justifyContent = 'center';
+                                                                                            dlg.style.zIndex = 10000;
+
+                                                                                            var card = document.createElement('div');
+                                                                                            card.style.background = '#ecfdf5';
+                                                                                            card.style.border = '1px solid #bbf7d0';
+                                                                                            card.style.padding = '20px';
+                                                                                            card.style.borderRadius = '10px';
+                                                                                            card.style.boxShadow = '0 10px 30px rgba(2,6,23,0.2)';
+                                                                                            card.style.maxWidth = '520px';
+                                                                                            card.style.width = '90%';
+
+                                                    var h = document.createElement('h3');
+                                                    h.style.margin = '0 0 8px';
+                                                    h.style.color = '#064e3b';
+                                                    h.textContent = msg;
+
+                                                    var p = document.createElement('p');
+                                                    p.style.margin = '0 0 16px';
+                                                    p.style.color = '#065f46';
+                                                    p.textContent = 'Your account and associated data have been removed. You can return to the landing page or sign up again.';
+
+                                                    var actions = document.createElement('div');
+                                                    actions.style.display = 'flex';
+                                                    actions.style.justifyContent = 'flex-end';
+                                                    actions.style.gap = '8px';
+
+                                                    var goHome = document.createElement('button');
+                                                    goHome.textContent = 'Go to landing page';
+                                                    // Primary button style matching requested palette
+                                                    goHome.style.background = '#059669';
+                                                    goHome.style.color = '#ffffff';
+                                                    goHome.style.border = 'none';
+                                                    goHome.style.padding = '12px 18px';
+                                                    goHome.style.borderRadius = '12px';
+                                                    goHome.style.cursor = 'pointer';
+                                                    goHome.style.fontWeight = '700';
+                                                    goHome.style.fontSize = '15px';
+                                                    // hover effect
+                                                    goHome.addEventListener('mouseenter', function(){ goHome.style.background = '#047f56'; });
+                                                    goHome.addEventListener('mouseleave', function(){ goHome.style.background = '#059669'; });
+
+                                                    var signUp = document.createElement('button');
+                                                    signUp.textContent = 'Sign up';
+                                  // Secondary button: white with green border/text
+                                                    signUp.style.background = '#059669';
+                                                    signUp.style.color = '#ffffff';
+                                                    signUp.style.border = 'none';
+                                                    signUp.style.padding = '12px 18px';
+                                                    signUp.style.borderRadius = '12px';
+                                                    signUp.style.cursor = 'pointer';
+                                                    signUp.style.fontWeight = '700';
+                                                    signUp.style.fontSize = '15px';
+
+                                                    // hover effect
+                                                    signUp.addEventListener('mouseenter', function(){ signUp.style.background = '#047f56'; });
+                                                    signUp.addEventListener('mouseleave', function(){ signUp.style.background = '#059669'; });
+
+                                                    actions.appendChild(signUp);
+                                                    actions.appendChild(goHome);
+                                                    card.appendChild(h);
+                                                    card.appendChild(p);
+                                                    card.appendChild(actions);
+                                                    dlg.appendChild(card);
+                                                                                            // append overlay first, then the dialog so the card sits above the blurred background
+                                                                                            document.body.appendChild(overlay);
+                                                                                            document.body.appendChild(dlg);
+
+                                                                                            function removeDeletedDialog() {
+                                                                                              var existing = document.getElementById('deletedConfirmModal');
+                                                                                              var ov = document.getElementById('deletedBlurOverlay');
+                                                                                              if (existing) existing.remove();
+                                                                                              if (ov) ov.remove();
+                                                                                            }
+
+                                                                                            goHome.addEventListener('click', function(){ removeDeletedDialog(); window.location = '<%= request.getContextPath() %>/'; });
+                                                                                            signUp.addEventListener('click', function(){ removeDeletedDialog(); window.location = '<%= request.getContextPath() %>/register'; });
+                              } else {
+                                // show inline error banner
+                                modal.style.display = 'none';
+                                var errMsg = body && body.message ? body.message : 'Unable to delete account';
+                                var eb = document.createElement('div');
+                                eb.setAttribute('role', 'alert');
+                                eb.style.position = 'fixed';
+                                eb.style.top = '20px';
+                                eb.style.left = '50%';
+                                eb.style.transform = 'translateX(-50%)';
+                                eb.style.background = '#fee2e2';
+                                eb.style.color = '#991b1b';
+                                eb.style.border = '1px solid #fecaca';
+                                eb.style.padding = '12px 20px';
+                                eb.style.borderRadius = '8px';
+                                eb.style.boxShadow = '0 6px 18px rgba(0,0,0,0.06)';
+                                eb.style.zIndex = 10000;
+                                eb.style.fontSize = '14px';
+                                eb.textContent = errMsg;
+                                document.body.appendChild(eb);
+                                setTimeout(function(){
+                                  eb.remove();
+                                }, 3000);
+                                confirmBtn.disabled = false;
+                                confirmBtn.textContent = 'Delete account';
+                              }
+                            }).catch(function(){
+                              modal.style.display = 'none';
+                              var eb = document.createElement('div');
+                              eb.setAttribute('role', 'alert');
+                              eb.style.position = 'fixed';
+                              eb.style.top = '20px';
+                              eb.style.left = '50%';
+                              eb.style.transform = 'translateX(-50%)';
+                              eb.style.background = '#fee2e2';
+                              eb.style.color = '#991b1b';
+                              eb.style.border = '1px solid #fecaca';
+                              eb.style.padding = '12px 20px';
+                              eb.style.borderRadius = '8px';
+                              eb.style.boxShadow = '0 6px 18px rgba(0,0,0,0.06)';
+                              eb.style.zIndex = 10000;
+                              eb.style.fontSize = '14px';
+                              eb.textContent = 'Unexpected response from server';
+                              document.body.appendChild(eb);
+                              setTimeout(function(){ eb.remove(); }, 3000);
+                              confirmBtn.disabled = false;
+                              confirmBtn.textContent = 'Delete account';
+                            });
+                          }).catch(function(err){
+                            console.error(err);
+                            modal.style.display = 'none';
+                            var eb = document.createElement('div');
+                            eb.setAttribute('role', 'alert');
+                            eb.style.position = 'fixed';
+                            eb.style.top = '20px';
+                            eb.style.left = '50%';
+                            eb.style.transform = 'translateX(-50%)';
+                            eb.style.background = '#fee2e2';
+                            eb.style.color = '#991b1b';
+                            eb.style.border = '1px solid #fecaca';
+                            eb.style.padding = '12px 20px';
+                            eb.style.borderRadius = '8px';
+                            eb.style.boxShadow = '0 6px 18px rgba(0,0,0,0.06)';
+                            eb.style.zIndex = 10000;
+                            eb.style.fontSize = '14px';
+                            eb.textContent = 'Network error while deleting account';
+                            document.body.appendChild(eb);
+                            setTimeout(function(){ eb.remove(); }, 3000);
+                            confirmBtn.disabled = false;
+                            confirmBtn.textContent = 'Delete account';
+                          });
+                });
+              })();
+            </script>
+
+            </body>
+            </html>
