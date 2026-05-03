@@ -36,6 +36,84 @@ public class CommentDAO {
 		}
 	}
 
+	public Comment findById(int id) {
+		String sql = "SELECT c.id, c.commentId, c.issueId, c.userId, c.content, c.createdAt, c.updatedAt, "
+				+ "CONCAT(u.firstName, ' ', u.lastName) AS commenterName "
+				+ "FROM comments c "
+				+ "LEFT JOIN users u ON c.userId = u.id "
+				+ "WHERE c.id = ?";
+
+		try (Connection conn = DBConnection.getConnection();
+			 PreparedStatement ps = conn.prepareStatement(sql)) {
+			ps.setInt(1, id);
+			try (ResultSet rs = ps.executeQuery()) {
+				if (rs.next()) {
+					return mapRow(rs);
+				}
+			}
+		} catch (SQLException | ClassNotFoundException e) {
+			LOGGER.log(Level.SEVERE, "Error finding comment by id: " + id, e);
+		}
+		return null;
+	}
+
+	public Comment findByIdAndUserId(int id, int userId) {
+		String sql = "SELECT c.id, c.commentId, c.issueId, c.userId, c.content, c.createdAt, c.updatedAt, "
+				+ "CONCAT(u.firstName, ' ', u.lastName) AS commenterName "
+				+ "FROM comments c "
+				+ "LEFT JOIN users u ON c.userId = u.id "
+				+ "WHERE c.id = ? AND c.userId = ?";
+
+		try (Connection conn = DBConnection.getConnection();
+			 PreparedStatement ps = conn.prepareStatement(sql)) {
+			ps.setInt(1, id);
+			ps.setInt(2, userId);
+			try (ResultSet rs = ps.executeQuery()) {
+				if (rs.next()) {
+					return mapRow(rs);
+				}
+			}
+		} catch (SQLException | ClassNotFoundException e) {
+			LOGGER.log(Level.SEVERE, "Error finding comment by id and owner: " + id + "/" + userId, e);
+		}
+		return null;
+	}
+
+	public boolean updateCommentByOwner(int commentDbId, int ownerUserId, String content) {
+		if (commentDbId <= 0 || ownerUserId <= 0 || content == null || content.trim().isEmpty()) {
+			return false;
+		}
+
+		String sql = "UPDATE comments SET content = ?, updatedAt = NOW() WHERE id = ? AND userId = ?";
+		try (Connection conn = DBConnection.getConnection();
+			 PreparedStatement ps = conn.prepareStatement(sql)) {
+			ps.setString(1, content.trim());
+			ps.setInt(2, commentDbId);
+			ps.setInt(3, ownerUserId);
+			return ps.executeUpdate() > 0;
+		} catch (SQLException | ClassNotFoundException e) {
+			LOGGER.log(Level.SEVERE, "Error updating comment by owner: " + commentDbId + "/" + ownerUserId, e);
+		}
+		return false;
+	}
+
+	public boolean deleteCommentByOwner(int commentDbId, int ownerUserId) {
+		if (commentDbId <= 0 || ownerUserId <= 0) {
+			return false;
+		}
+
+		String sql = "DELETE FROM comments WHERE id = ? AND userId = ?";
+		try (Connection conn = DBConnection.getConnection();
+			 PreparedStatement ps = conn.prepareStatement(sql)) {
+			ps.setInt(1, commentDbId);
+			ps.setInt(2, ownerUserId);
+			return ps.executeUpdate() > 0;
+		} catch (SQLException | ClassNotFoundException e) {
+			LOGGER.log(Level.SEVERE, "Error deleting comment by owner: " + commentDbId + "/" + ownerUserId, e);
+		}
+		return false;
+	}
+
 	public Map<Integer, List<Comment>> findByIssueIds(List<Integer> issueIds, int maxPerIssue) {
 		if (issueIds == null || issueIds.isEmpty()) {
 			return Collections.emptyMap();
@@ -154,5 +232,18 @@ public class CommentDAO {
 		}
 
 		return comments;
+	}
+
+	private Comment mapRow(ResultSet rs) throws SQLException {
+		Comment comment = new Comment();
+		comment.setId(rs.getInt("id"));
+		comment.setCommentId(rs.getString("commentId"));
+		comment.setIssueId(rs.getInt("issueId"));
+		comment.setUserId(rs.getInt("userId"));
+		comment.setContent(rs.getString("content"));
+		comment.setCreatedAt(rs.getTimestamp("createdAt"));
+		comment.setUpdatedAt(rs.getTimestamp("updatedAt"));
+		comment.setCommenterName(rs.getString("commenterName"));
+		return comment;
 	}
 }

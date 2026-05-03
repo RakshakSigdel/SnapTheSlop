@@ -7,9 +7,9 @@ CREATE DATABASE snaptheslop;
 
 USE snaptheslop;
 
--- ============================================================
+
 -- Municipalities Table
--- ============================================================
+
 CREATE TABLE
     municipalities (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -21,9 +21,8 @@ CREATE TABLE
         office_address TEXT
     );
 
--- ============================================================
 -- Wards Table
--- ============================================================
+
 CREATE TABLE
     wards (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -37,9 +36,9 @@ CREATE TABLE
         INDEX idx_municipality_id (municipality_id)
     );
 
--- ============================================================
+
 -- Users Table
--- ============================================================
+
 CREATE TABLE
     users (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -59,9 +58,9 @@ CREATE TABLE
         updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     );
 
--- ============================================================
+
 -- Issues Table
--- ============================================================
+
 CREATE TABLE
     issues (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -87,9 +86,9 @@ CREATE TABLE
         INDEX idx_issue_ward (ward_no)
     );
 
--- ============================================================
+
 -- Upvotes Table
--- ============================================================
+
 CREATE TABLE
     upvotes (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -103,9 +102,9 @@ CREATE TABLE
         INDEX idx_userId (userId)
     );
 
--- ============================================================
+
 -- Comments Table
--- ============================================================
+
 CREATE TABLE
     comments (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -121,9 +120,9 @@ CREATE TABLE
         INDEX idx_userId (userId)
     );
 
--- ============================================================
+
 -- Notifications Table
--- ============================================================
+
 CREATE TABLE
     notifications (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -146,13 +145,13 @@ CREATE TABLE
         INDEX idx_notification_created_at (created_at)
     );
 
--- ============================================================
+
 -- Seed: Super Admin User
--- ============================================================
+
 -- Default Credentials:
 -- Email: superadmin@system.local
 -- Password: admin123
--- ============================================================
+
 INSERT INTO
     users (
         userId,
@@ -184,33 +183,5 @@ VALUES
         CURRENT_TIMESTAMP
     );
 
--- ============================================================
+
 -- Migration: Add Municipality and Ward Support to Issues
--- Description: Adds municipality_id and ward_no columns to issues table
---              and ensures unique ward numbering per municipality
--- ============================================================
-
-
--- Add UNIQUE constraint to wards table
-
--- ALTER TABLE wards ADD CONSTRAINT uq_ward_number_per_municipality UNIQUE (municipality_id, ward_number);
--- -- Add new columns and constraints to issues table
--- ALTER TABLE issues
--- ADD COLUMN IF NOT EXISTS municipality_id INT NOT NULL,
--- ADD COLUMN IF NOT EXISTS ward_no INT NOT NULL,
--- ADD CONSTRAINT fk_issue_municipality FOREIGN KEY (municipality_id) REFERENCES municipalities (id) ON DELETE RESTRICT,
--- ADD INDEX idx_issue_municipality (municipality_id),
--- ADD INDEX idx_issue_ward (ward_no);
--- -- Normalize user account status to active/inactive model
--- ALTER TABLE users MODIFY COLUMN accountStatus VARCHAR(50) NOT NULL DEFAULT 'Active';
--- UPDATE users
--- SET
---     accountStatus = 'Active'
--- WHERE
---     accountStatus IS NULL
---     OR LOWER(TRIM(accountStatus)) IN (
---         'verified account',
---         'pending verification',
---         'verified',
---         'enabled'
---     );

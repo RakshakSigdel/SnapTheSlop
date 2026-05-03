@@ -52,6 +52,7 @@ public class CitizenBrowseIssuesServlet extends HttpServlet {
         String municipalityFilter= trim(request.getParameter("municipalityId"));
         String wardFilter        = trim(request.getParameter("ward"));
         String statusFilter      = trim(request.getParameter("status"));
+        String keywordFilter     = trim(request.getParameter("keyword"));
 
         int page = 1;
         try { page = Math.max(1, Integer.parseInt(request.getParameter("page"))); }
@@ -59,7 +60,7 @@ public class CitizenBrowseIssuesServlet extends HttpServlet {
 
         // Fetch live data from DB
         List<Issue> issues = issueDAO.findAll(
-                categoryFilter, municipalityFilter, wardFilter, statusFilter, page, PAGE_SIZE);
+                categoryFilter, municipalityFilter, wardFilter, statusFilter, keywordFilter, page, PAGE_SIZE);
 
         if (issues == null) {
             issues = Collections.emptyList();
@@ -90,7 +91,7 @@ public class CitizenBrowseIssuesServlet extends HttpServlet {
         }
 
         // Pagination info
-        int totalCount = issueDAO.countAllFiltered(categoryFilter, municipalityFilter, wardFilter, statusFilter);
+        int totalCount = issueDAO.countAllFiltered(categoryFilter, municipalityFilter, wardFilter, statusFilter, keywordFilter);
         int totalPages = (int) Math.ceil((double) totalCount / PAGE_SIZE);
         if (totalPages < 1) {
             totalPages = 1;
@@ -114,6 +115,7 @@ public class CitizenBrowseIssuesServlet extends HttpServlet {
         request.setAttribute("municipalityFilter", municipalityFilter);
         request.setAttribute("wardFilter",         wardFilter);
         request.setAttribute("statusFilter",       statusFilter);
+        request.setAttribute("keywordFilter",      keywordFilter);
         request.setAttribute("currentPage",        page);
         request.setAttribute("totalPages",         totalPages);
         request.setAttribute("totalCount",         totalCount);

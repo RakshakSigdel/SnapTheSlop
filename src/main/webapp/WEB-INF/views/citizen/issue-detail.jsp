@@ -4,16 +4,20 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="com.snaptheslop.snaptheslop.issue.model.Issue" %>
 <%@ page import="com.snaptheslop.snaptheslop.comment.model.Comment" %>
+<%@ page import="com.snaptheslop.snaptheslop.util.SessionUtil" %>
 <%@ page import="java.util.List" %>
 <jsp:include page="../common/header.jsp"/>
 <%
   Issue issue      = (Issue) request.getAttribute("issue");
   List<Comment> issueComments = (List<Comment>) request.getAttribute("issueComments");
+  boolean canModifyIssue = request.getAttribute("canModifyIssue") != null && Boolean.TRUE.equals(request.getAttribute("canModifyIssue"));
+  int currentUserDbId = SessionUtil.getLoggedInUserDbId(request);
   String successMessage = (String) request.getAttribute("successMessage");
   String errorMessage = (String) request.getAttribute("errorMessage");
   if (issueComments == null) issueComments = new java.util.ArrayList<>();
   String contextPath = request.getContextPath();
   if (issue == null) { response.sendRedirect(contextPath + "/citizen/my-issues"); return; }
+  String commentReturnUrl = "/citizen/issue-detail?id=" + issue.getId();
 
   String st = issue.getStatus();
   String statusBg, statusFg;
@@ -101,6 +105,16 @@
                   · <%= comment.getCreatedAtShort() %>
                 </p>
                 <p style="font-size:13px; color:#1f2937; margin:0; line-height:1.6;"><%= comment.getContent() %></p>
+                <% if (currentUserDbId > 0 && currentUserDbId == comment.getUserId()) { %>
+                <div style="display:flex; gap:8px; margin-top:8px;">
+                  <a href="<%= contextPath %>/citizen/comment-edit?id=<%= comment.getId() %>&returnUrl=<%= java.net.URLEncoder.encode(commentReturnUrl, java.nio.charset.StandardCharsets.UTF_8) %>" style="display:inline-flex; align-items:center; justify-content:center; padding:6px 12px; border-radius:6px; background:#059669; color:#fff; font-size:11px; font-weight:700; text-decoration:none;">Edit</a>
+                  <form action="<%= contextPath %>/citizen/comment-delete" method="post" onsubmit="return confirm('Delete this comment permanently?');" style="margin:0;">
+                    <input type="hidden" name="commentId" value="<%= comment.getId() %>"/>
+                    <input type="hidden" name="returnUrl" value="<%= commentReturnUrl %>"/>
+                    <button type="submit" style="padding:6px 12px; border-radius:6px; background:#fff; color:#b91c1c; border:1px solid #fecaca; font-size:11px; font-weight:700; cursor:pointer;">Delete</button>
+                  </form>
+                </div>
+                <% } %>
               </div>
               <% } %>
             <% } %>
@@ -133,6 +147,16 @@
               <div><p style="font-size:12px; color:#94a3b8; margin:0 0 2px;">Last updated</p><p style="font-size:14px; color:#1e293b; margin:0;"><%= issue.getCreatedAtFormatted() %></p></div>
               <% } %>
             </div>
+
+            <% if (canModifyIssue) { %>
+            <div style="display:flex; gap:10px; margin-top:18px; flex-wrap:wrap;">
+              <a href="<%= contextPath %>/citizen/issue-edit?id=<%= issue.getId() %>" style="display:inline-flex; align-items:center; justify-content:center; padding:10px 16px; border-radius:8px; background:#059669; color:#fff; font-size:13px; font-weight:700; text-decoration:none;">Edit Report</a>
+              <form action="<%= contextPath %>/citizen/issue-delete" method="post" onsubmit="return confirm('Delete this report permanently?');" style="margin:0;">
+                <input type="hidden" name="issueId" value="<%= issue.getId() %>"/>
+                <button type="submit" style="padding:10px 16px; border-radius:8px; background:#fff; color:#b91c1c; border:1px solid #fecaca; font-size:13px; font-weight:700; cursor:pointer;">Delete Report</button>
+              </form>
+            </div>
+            <% } %>
           </div>
 
           <!-- Status Timeline -->

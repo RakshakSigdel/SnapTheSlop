@@ -1,7 +1,7 @@
 <%--
   Admin Issue Management — NagarSewa (live DB data)
 --%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="java.util.List" %>
 <%@ page import="com.snaptheslop.snaptheslop.issue.model.Issue" %>
 <%@ page import="com.snaptheslop.snaptheslop.municipality.model.Municipality" %>
@@ -17,6 +17,7 @@
   String municipalityFilter = (String) request.getAttribute("municipalityFilter");
   String wardFilter = (String) request.getAttribute("wardFilter");
   String statusFilter = (String) request.getAttribute("statusFilter");
+  String keywordFilter = (String) request.getAttribute("keywordFilter");
 
   int totalCount = request.getAttribute("totalCount") != null ? (int) request.getAttribute("totalCount") : 0;
   int filteredCount = request.getAttribute("filteredCount") != null ? (int) request.getAttribute("filteredCount") : 0;
@@ -45,7 +46,8 @@
     <div style="padding:28px 32px;">
 
       <form method="get" action="<%= contextPath %>/admin/manage-issues">
-        <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr 1fr; gap:10px; margin-bottom:14px;">
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr 1fr 1fr; gap:10px; margin-bottom:14px;">
+          <input type="text" name="keyword" placeholder="Search title or category" value="<%= keywordFilter != null ? keywordFilter : "" %>" style="height:40px; border:1px solid #d1d5db; border-radius:8px; padding:0 10px; font-size:13px; color:#111827; background:#fff; font-family:'Inter',sans-serif;"/>
           <select name="municipalityId" style="height:40px; border:1px solid #d1d5db; border-radius:8px; padding:0 10px; font-size:13px; color:#111827; background:#fff; font-family:'Inter',sans-serif;">
             <option value="">Municipality: All</option>
             <% for (Municipality muni : municipalities) {
@@ -150,13 +152,13 @@
           <% if (totalPages > 1) { %>
           <div style="display:flex; gap:4px;">
             <% if (currentPage > 1) { %>
-              <a href="<%= contextPath %>/admin/manage-issues?page=<%= currentPage - 1 %><%= municipalityFilter != null ? "&municipalityId=" + municipalityFilter : "" %><%= categoryFilter != null ? "&category=" + categoryFilter : "" %><%= wardFilter != null ? "&ward=" + wardFilter : "" %><%= statusFilter != null ? "&status=" + statusFilter : "" %>" style="width:28px; height:28px; border-radius:6px; border:1px solid #e2e8f0; background:#fff; color:#94a3b8; cursor:pointer; font-size:11px; display:flex; align-items:center; justify-content:center; text-decoration:none;">&lsaquo;</a>
+              <a href="<%= contextPath %>/admin/manage-issues?page=<%= currentPage - 1 %><%= municipalityFilter != null ? "&municipalityId=" + java.net.URLEncoder.encode(municipalityFilter, java.nio.charset.StandardCharsets.UTF_8) : "" %><%= categoryFilter != null ? "&category=" + java.net.URLEncoder.encode(categoryFilter, java.nio.charset.StandardCharsets.UTF_8) : "" %><%= wardFilter != null ? "&ward=" + java.net.URLEncoder.encode(wardFilter, java.nio.charset.StandardCharsets.UTF_8) : "" %><%= statusFilter != null ? "&status=" + java.net.URLEncoder.encode(statusFilter, java.nio.charset.StandardCharsets.UTF_8) : "" %><%= keywordFilter != null ? "&keyword=" + java.net.URLEncoder.encode(keywordFilter, java.nio.charset.StandardCharsets.UTF_8) : "" %>" style="width:28px; height:28px; border-radius:6px; border:1px solid #e2e8f0; background:#fff; color:#94a3b8; cursor:pointer; font-size:11px; display:flex; align-items:center; justify-content:center; text-decoration:none;">&lsaquo;</a>
             <% } %>
             <% for (int p = Math.max(1, currentPage - 2); p <= Math.min(totalPages, currentPage + 2); p++) { %>
-              <a href="<%= contextPath %>/admin/manage-issues?page=<%= p %><%= municipalityFilter != null ? "&municipalityId=" + municipalityFilter : "" %><%= categoryFilter != null ? "&category=" + categoryFilter : "" %><%= wardFilter != null ? "&ward=" + wardFilter : "" %><%= statusFilter != null ? "&status=" + statusFilter : "" %>" style="width:28px; height:28px; border-radius:6px; border:<%= p == currentPage ? "none" : "1px solid #e2e8f0" %>; background:<%= p == currentPage ? "#0f172a" : "#fff" %>; color:<%= p == currentPage ? "#fff" : "#64748b" %>; font-size:12px; font-weight:<%= p == currentPage ? "700" : "400" %>; display:flex; align-items:center; justify-content:center; text-decoration:none;"><%= p %></a>
+              <a href="<%= contextPath %>/admin/manage-issues?page=<%= p %><%= municipalityFilter != null ? "&municipalityId=" + java.net.URLEncoder.encode(municipalityFilter, java.nio.charset.StandardCharsets.UTF_8) : "" %><%= categoryFilter != null ? "&category=" + java.net.URLEncoder.encode(categoryFilter, java.nio.charset.StandardCharsets.UTF_8) : "" %><%= wardFilter != null ? "&ward=" + java.net.URLEncoder.encode(wardFilter, java.nio.charset.StandardCharsets.UTF_8) : "" %><%= statusFilter != null ? "&status=" + java.net.URLEncoder.encode(statusFilter, java.nio.charset.StandardCharsets.UTF_8) : "" %><%= keywordFilter != null ? "&keyword=" + java.net.URLEncoder.encode(keywordFilter, java.nio.charset.StandardCharsets.UTF_8) : "" %>" style="width:28px; height:28px; border-radius:6px; border:<%= p == currentPage ? "none" : "1px solid #e2e8f0" %>; background:<%= p == currentPage ? "#0f172a" : "#fff" %>; color:<%= p == currentPage ? "#fff" : "#64748b" %>; font-size:12px; font-weight:<%= p == currentPage ? "700" : "400" %>; display:flex; align-items:center; justify-content:center; text-decoration:none;"><%= p %></a>
             <% } %>
             <% if (currentPage < totalPages) { %>
-              <a href="<%= contextPath %>/admin/manage-issues?page=<%= currentPage + 1 %><%= municipalityFilter != null ? "&municipalityId=" + municipalityFilter : "" %><%= categoryFilter != null ? "&category=" + categoryFilter : "" %><%= wardFilter != null ? "&ward=" + wardFilter : "" %><%= statusFilter != null ? "&status=" + statusFilter : "" %>" style="width:28px; height:28px; border-radius:6px; border:1px solid #e2e8f0; background:#fff; color:#94a3b8; cursor:pointer; font-size:11px; display:flex; align-items:center; justify-content:center; text-decoration:none;">&rsaquo;</a>
+              <a href="<%= contextPath %>/admin/manage-issues?page=<%= currentPage + 1 %><%= municipalityFilter != null ? "&municipalityId=" + java.net.URLEncoder.encode(municipalityFilter, java.nio.charset.StandardCharsets.UTF_8) : "" %><%= categoryFilter != null ? "&category=" + java.net.URLEncoder.encode(categoryFilter, java.nio.charset.StandardCharsets.UTF_8) : "" %><%= wardFilter != null ? "&ward=" + java.net.URLEncoder.encode(wardFilter, java.nio.charset.StandardCharsets.UTF_8) : "" %><%= statusFilter != null ? "&status=" + java.net.URLEncoder.encode(statusFilter, java.nio.charset.StandardCharsets.UTF_8) : "" %><%= keywordFilter != null ? "&keyword=" + java.net.URLEncoder.encode(keywordFilter, java.nio.charset.StandardCharsets.UTF_8) : "" %>" style="width:28px; height:28px; border-radius:6px; border:1px solid #e2e8f0; background:#fff; color:#94a3b8; cursor:pointer; font-size:11px; display:flex; align-items:center; justify-content:center; text-decoration:none;">&rsaquo;</a>
             <% } %>
           </div>
           <% } %>

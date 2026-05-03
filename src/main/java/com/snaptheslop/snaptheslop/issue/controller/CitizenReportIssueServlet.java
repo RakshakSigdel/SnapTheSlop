@@ -19,7 +19,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -69,6 +68,9 @@ public class CitizenReportIssueServlet extends HttpServlet {
 
         request.setAttribute("activePage", "report-issue");
         int municipalityId = resolveMunicipalityIdFromUser(citizen);
+        if (municipalityId > 0) {
+            request.getSession().setAttribute("municipalityId", municipalityId);
+        }
         String municipalityName = citizen.getMunicipality();
         if (municipalityId <= 0 || blank(municipalityName)) {
             request.setAttribute("errorMessage",
@@ -118,8 +120,13 @@ public class CitizenReportIssueServlet extends HttpServlet {
             reloadForm(request, response, "Your municipality is not configured. Please update it in your profile first.");
             return;
         }
+        request.getSession().setAttribute("municipalityId", municipalityId);
 
         // 5. Ward number
+        if (wardParam == null || wardParam.isBlank()) {
+            reloadForm(request, response, "Ward is required.");
+            return;
+        }
         int wardNo;
         try { wardNo = Integer.parseInt(wardParam); }
         catch (NumberFormatException e) { reloadForm(request, response, "Invalid ward selected."); return; }
@@ -227,7 +234,11 @@ public class CitizenReportIssueServlet extends HttpServlet {
                 req.getSession().setAttribute("municipalityId", citizen.getMunicipalityId());
             }
             req.setAttribute("reportMunicipalityName", citizen.getMunicipality());
-            req.setAttribute("reportMunicipalityId", resolveMunicipalityIdFromUser(citizen));
+            int municipalityId = resolveMunicipalityIdFromUser(citizen);
+            if (municipalityId > 0) {
+                req.getSession().setAttribute("municipalityId", municipalityId);
+            }
+            req.setAttribute("reportMunicipalityId", municipalityId);
         }
         req.getRequestDispatcher("/WEB-INF/views/citizen/report-issue.jsp").forward(req, res);
     }
@@ -250,7 +261,13 @@ public class CitizenReportIssueServlet extends HttpServlet {
         }
 
         if (user.getMunicipalityId() > 0) {
-            return user.getMunicipalityId();
+            try {
+                if (municipalityDAO.findById(user.getMunicipalityId()) != null) {
+                    return user.getMunicipalityId();
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.WARNING, "Failed to validate municipalityId from user session/profile", e);
+            }
         }
 
         String municipalityName = user.getMunicipality();
@@ -258,7 +275,11 @@ public class CitizenReportIssueServlet extends HttpServlet {
             return -1;
         }
 
-        return resolveMunicipalityId(municipalityName);
+        int resolvedId = resolveMunicipalityId(municipalityName);
+        if (resolvedId > 0) {
+            user.setMunicipalityId(resolvedId);
+        }
+        return resolvedId;
     }
 
     private int lookupUserDbId(String userId) {

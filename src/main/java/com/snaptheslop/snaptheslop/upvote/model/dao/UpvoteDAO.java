@@ -97,6 +97,35 @@ public class UpvoteDAO {
 		return result;
 	}
 
+	/**
+	 * Return a list of upvoters for an issue. Each entry is a Map with keys: name, email.
+	 * This is used by municipality/admin views to see who supported a report.
+	 */
+	public java.util.List<java.util.Map<String,String>> findUpvotersByIssueId(int issueId) {
+		String sql = "SELECT u.id, CONCAT(u.firstName, ' ', u.lastName) AS name, u.email "
+				+ "FROM upvotes up JOIN users u ON up.userId = u.id "
+				+ "WHERE up.issueId = ? ORDER BY up.createdAt DESC";
+
+		java.util.List<java.util.Map<String,String>> result = new java.util.ArrayList<>();
+		try (Connection conn = DBConnection.getConnection();
+			 PreparedStatement ps = conn.prepareStatement(sql)) {
+			ps.setInt(1, issueId);
+			try (ResultSet rs = ps.executeQuery()) {
+				while (rs.next()) {
+					java.util.Map<String,String> m = new java.util.HashMap<>();
+					m.put("name", rs.getString("name") != null ? rs.getString("name") : "Citizen");
+					m.put("email", rs.getString("email") != null ? rs.getString("email") : "");
+					result.add(m);
+				}
+			}
+		} catch (SQLException | ClassNotFoundException e) {
+			LOGGER.log(Level.SEVERE, "Error fetching upvoters for issueId=" + issueId, e);
+			return java.util.Collections.emptyList();
+		}
+
+		return result;
+	}
+
 	private boolean hasUserUpvoted(Connection conn, int issueId, int userId) throws SQLException {
 		String sql = "SELECT 1 FROM upvotes WHERE issueId = ? AND userId = ? LIMIT 1";
 		try (PreparedStatement ps = conn.prepareStatement(sql)) {

@@ -1,14 +1,20 @@
 package com.snaptheslop.snaptheslop.issue.controller;
 
+import com.snaptheslop.snaptheslop.config.DBConnection;
 import com.snaptheslop.snaptheslop.comment.model.Comment;
 import com.snaptheslop.snaptheslop.comment.model.dao.CommentDAO;
 import com.snaptheslop.snaptheslop.issue.model.Issue;
 import com.snaptheslop.snaptheslop.issue.model.dao.IssueDAO;
+import com.snaptheslop.snaptheslop.user.model.UserDTO;
+import com.snaptheslop.snaptheslop.util.SessionUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
@@ -50,6 +56,10 @@ public class CitizenIssueDetailServlet extends HttpServlet {
             return;
         }
 
+        UserDTO citizen = SessionUtil.getLoggedInUser(request);
+        int userDbId = resolveLoggedInUserDbId(request, citizen);
+        request.setAttribute("canModifyIssue", userDbId > 0 && userDbId == issue.getUserId());
+
         List<Comment> issueComments = commentDAO.findByIssueId(issue.getId());
         if (issueComments == null) {
             issueComments = Collections.emptyList();
@@ -70,5 +80,31 @@ public class CitizenIssueDetailServlet extends HttpServlet {
         request.setAttribute("issueComments", issueComments);
         request.setAttribute("activePage", "browse-issues");
         request.getRequestDispatcher("/WEB-INF/views/citizen/issue-detail.jsp").forward(request, response);
+    }
+
+    private int resolveLoggedInUserDbId(HttpServletRequest request, UserDTO citizen) {
+        int userDbId = SessionUtil.getLoggedInUserDbId(request);
+        if (userDbId > 0) {
+            return userDbId;
+        }
+        if (citizen == null || citizen.getUserId() == null) {
+            return -1;
+        }
+
+        String sql = "SELECT id FROM users WHERE userId = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, citizen.getUserId());
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    userDbId = rs.getInt(1);
+                    SessionUtil.setLoggedInUserDbId(request, userDbId);
+                    return userDbId;
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.warning("Unable to resolve logged in user id for issue detail: " + e.getMessage());
+        }
+        return -1;
     }
 }

@@ -92,15 +92,41 @@ public class IssueDAO {
     }
 
     /**
+     * Find a single issue by numeric id and owner id.
+     * Used by citizen edit/delete flows to enforce ownership at the DAO layer.
+     */
+    public Issue findByIdAndUserId(int id, int userId) {
+        String sql = buildBaseQuery() + " WHERE i.id = ? AND i.userId = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ps.setInt(2, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return mapRow(rs);
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            LOGGER.log(Level.SEVERE, "Error finding issue by id and owner: " + id + "/" + userId, e);
+        }
+        return null;
+    }
+
+    /**
      * Get all issues submitted by a specific user (by users.id).
      * Optional filter: statusFilter (null = all).
      * Supports pagination.
      */
     public List<Issue> findByUserId(int userId, String statusFilter, int page, int pageSize) {
+        return findByUserId(userId, statusFilter, null, page, pageSize);
+    }
+
+    public List<Issue> findByUserId(int userId, String statusFilter, String keywordFilter, int page, int pageSize) {
         StringBuilder sql = new StringBuilder(buildBaseQuery());
         sql.append(" WHERE i.userId = ?");
         if (statusFilter != null && !statusFilter.isBlank()) {
-            sql.append(" AND i.status = ?");
+            sql.append(" AND LOWER(i.status) = LOWER(?)");
+        }
+        if (keywordFilter != null && !keywordFilter.isBlank()) {
+            appendKeywordClause(sql);
         }
         sql.append(" ORDER BY i.createdAt DESC");
         sql.append(" LIMIT ? OFFSET ?");
@@ -112,6 +138,10 @@ public class IssueDAO {
             ps.setInt(idx++, userId);
             if (statusFilter != null && !statusFilter.isBlank()) {
                 ps.setString(idx++, statusFilter);
+            }
+            if (keywordFilter != null && !keywordFilter.isBlank()) {
+                bindKeyword(ps, idx, keywordFilter);
+                idx += 2;
             }
             ps.setInt(idx++, pageSize);
             ps.setInt(idx, (page - 1) * pageSize);
@@ -129,15 +159,25 @@ public class IssueDAO {
      * Count issues for a user, with optional status filter (for pagination UI).
      */
     public int countByUserId(int userId, String statusFilter) {
+        return countByUserId(userId, statusFilter, null);
+    }
+
+    public int countByUserId(int userId, String statusFilter, String keywordFilter) {
         StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM issues i WHERE i.userId = ?");
         if (statusFilter != null && !statusFilter.isBlank()) {
-            sql.append(" AND i.status = ?");
+            sql.append(" AND LOWER(i.status) = LOWER(?)");
+        }
+        if (keywordFilter != null && !keywordFilter.isBlank()) {
+            appendKeywordClause(sql);
         }
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             ps.setInt(1, userId);
             if (statusFilter != null && !statusFilter.isBlank()) {
                 ps.setString(2, statusFilter);
+            }
+            if (keywordFilter != null && !keywordFilter.isBlank()) {
+                bindKeyword(ps, statusFilter != null && !statusFilter.isBlank() ? 3 : 2, keywordFilter);
             }
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return rs.getInt(1);
@@ -158,16 +198,29 @@ public class IssueDAO {
                                             String wardFilter,
                                             int page,
                                             int pageSize) {
+        return findByMunicipalityId(municipalityId, statusFilter, categoryFilter, wardFilter, null, page, pageSize);
+    }
+
+    public List<Issue> findByMunicipalityId(int municipalityId,
+                                            String statusFilter,
+                                            String categoryFilter,
+                                            String wardFilter,
+                                            String keywordFilter,
+                                            int page,
+                                            int pageSize) {
         StringBuilder sql = new StringBuilder(buildBaseQuery());
         sql.append(" WHERE i.municipality_id = ?");
         if (statusFilter != null && !statusFilter.isBlank()) {
-            sql.append(" AND i.status = ?");
+            sql.append(" AND LOWER(i.status) = LOWER(?)");
         }
         if (categoryFilter != null && !categoryFilter.isBlank()) {
-            sql.append(" AND i.category = ?");
+            sql.append(" AND LOWER(i.category) = LOWER(?)");
         }
         if (wardFilter != null && !wardFilter.isBlank()) {
             sql.append(" AND i.ward_no = ?");
+        }
+        if (keywordFilter != null && !keywordFilter.isBlank()) {
+            appendKeywordClause(sql);
         }
         sql.append(" ORDER BY i.createdAt DESC LIMIT ? OFFSET ?");
 
@@ -181,6 +234,10 @@ public class IssueDAO {
             if (wardFilter != null && !wardFilter.isBlank()) {
                 try { ps.setInt(idx++, Integer.parseInt(wardFilter)); }
                 catch (NumberFormatException ex) { ps.setString(idx++, wardFilter); }
+            }
+            if (keywordFilter != null && !keywordFilter.isBlank()) {
+                bindKeyword(ps, idx, keywordFilter);
+                idx += 2;
             }
             ps.setInt(idx++, pageSize);
             ps.setInt(idx, (page - 1) * pageSize);
@@ -198,14 +255,24 @@ public class IssueDAO {
      * Count issues for a municipality (for pagination and stats).
      */
     public int countByMunicipalityId(int municipalityId, String statusFilter) {
+        return countByMunicipalityId(municipalityId, statusFilter, null);
+    }
+
+    public int countByMunicipalityId(int municipalityId, String statusFilter, String keywordFilter) {
         StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM issues i WHERE i.municipality_id = ?");
         if (statusFilter != null && !statusFilter.isBlank()) {
-            sql.append(" AND i.status = ?");
+            sql.append(" AND LOWER(i.status) = LOWER(?)");
+        }
+        if (keywordFilter != null && !keywordFilter.isBlank()) {
+            appendKeywordClause(sql);
         }
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             ps.setInt(1, municipalityId);
             if (statusFilter != null && !statusFilter.isBlank()) ps.setString(2, statusFilter);
+            if (keywordFilter != null && !keywordFilter.isBlank()) {
+                bindKeyword(ps, statusFilter != null && !statusFilter.isBlank() ? 3 : 2, keywordFilter);
+            }
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return rs.getInt(1);
             }
@@ -245,14 +312,24 @@ public class IssueDAO {
      * Count all issues globally with optional status filter.
      */
     public int countAllIssues(String statusFilter) {
+        return countAllIssues(statusFilter, null);
+    }
+
+    public int countAllIssues(String statusFilter, String keywordFilter) {
         StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM issues i WHERE 1=1");
         if (statusFilter != null && !statusFilter.isBlank()) {
-            sql.append(" AND i.status = ?");
+            sql.append(" AND LOWER(i.status) = LOWER(?)");
+        }
+        if (keywordFilter != null && !keywordFilter.isBlank()) {
+            appendKeywordClause(sql);
         }
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             if (statusFilter != null && !statusFilter.isBlank()) {
                 ps.setString(1, statusFilter);
+            }
+            if (keywordFilter != null && !keywordFilter.isBlank()) {
+                bindKeyword(ps, statusFilter != null && !statusFilter.isBlank() ? 2 : 1, keywordFilter);
             }
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -274,11 +351,22 @@ public class IssueDAO {
                                String statusFilter,
                                int page,
                                int pageSize) {
+        return findAll(categoryFilter, municipalityIdFilter, wardFilter, statusFilter, null, page, pageSize);
+    }
+
+    public List<Issue> findAll(String categoryFilter,
+                               String municipalityIdFilter,
+                               String wardFilter,
+                               String statusFilter,
+                               String keywordFilter,
+                               int page,
+                               int pageSize) {
         StringBuilder sql = new StringBuilder(buildBaseQuery() + " WHERE 1=1");
-        if (categoryFilter != null && !categoryFilter.isBlank())        sql.append(" AND i.category = ?");
+        if (categoryFilter != null && !categoryFilter.isBlank())        sql.append(" AND LOWER(i.category) = LOWER(?)");
         if (municipalityIdFilter != null && !municipalityIdFilter.isBlank()) sql.append(" AND i.municipality_id = ?");
         if (wardFilter != null && !wardFilter.isBlank())                sql.append(" AND i.ward_no = ?");
-        if (statusFilter != null && !statusFilter.isBlank())            sql.append(" AND i.status = ?");
+        if (statusFilter != null && !statusFilter.isBlank())            sql.append(" AND LOWER(i.status) = LOWER(?)");
+        if (keywordFilter != null && !keywordFilter.isBlank())          appendKeywordClause(sql);
         sql.append(" ORDER BY i.createdAt DESC LIMIT ? OFFSET ?");
 
         List<Issue> issues = new ArrayList<>();
@@ -295,6 +383,10 @@ public class IssueDAO {
                 catch (NumberFormatException ex) { ps.setString(idx++, wardFilter); }
             }
             if (statusFilter != null && !statusFilter.isBlank())            ps.setString(idx++, statusFilter);
+            if (keywordFilter != null && !keywordFilter.isBlank()) {
+                bindKeyword(ps, idx, keywordFilter);
+                idx += 2;
+            }
             ps.setInt(idx++, pageSize);
             ps.setInt(idx, (page - 1) * pageSize);
 
@@ -314,11 +406,20 @@ public class IssueDAO {
                                 String municipalityIdFilter,
                                 String wardFilter,
                                 String statusFilter) {
+        return countAllFiltered(categoryFilter, municipalityIdFilter, wardFilter, statusFilter, null);
+    }
+
+    public int countAllFiltered(String categoryFilter,
+                                String municipalityIdFilter,
+                                String wardFilter,
+                                String statusFilter,
+                                String keywordFilter) {
         StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM issues i WHERE 1=1");
-        if (categoryFilter != null && !categoryFilter.isBlank())        sql.append(" AND i.category = ?");
+        if (categoryFilter != null && !categoryFilter.isBlank())        sql.append(" AND LOWER(i.category) = LOWER(?)");
         if (municipalityIdFilter != null && !municipalityIdFilter.isBlank()) sql.append(" AND i.municipality_id = ?");
         if (wardFilter != null && !wardFilter.isBlank())                sql.append(" AND i.ward_no = ?");
-        if (statusFilter != null && !statusFilter.isBlank())            sql.append(" AND i.status = ?");
+        if (statusFilter != null && !statusFilter.isBlank())            sql.append(" AND LOWER(i.status) = LOWER(?)");
+        if (keywordFilter != null && !keywordFilter.isBlank())          appendKeywordClause(sql);
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql.toString())) {
@@ -333,6 +434,9 @@ public class IssueDAO {
                 catch (NumberFormatException ex) { ps.setString(idx++, wardFilter); }
             }
             if (statusFilter != null && !statusFilter.isBlank())            ps.setString(idx, statusFilter);
+            if (keywordFilter != null && !keywordFilter.isBlank()) {
+                bindKeyword(ps, idx, keywordFilter);
+            }
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -383,6 +487,52 @@ public class IssueDAO {
         return false;
     }
 
+    /**
+     * Update the editable fields of an issue, restricted to the owning citizen.
+     */
+    public boolean updateIssueByOwner(Issue issue, int ownerUserId) {
+        if (issue == null || issue.getId() <= 0 || ownerUserId <= 0) {
+            return false;
+        }
+
+        String sql = "UPDATE issues SET title = ?, description = ?, category = ?, location = ?, ward_no = ?, imagePath = ?, updatedAt = NOW() WHERE id = ? AND userId = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, issue.getTitle());
+            ps.setString(2, issue.getDescription());
+            ps.setString(3, issue.getCategory());
+            ps.setString(4, issue.getLocation());
+            ps.setInt(5, issue.getWardNo());
+            ps.setString(6, issue.getImagePath());
+            ps.setInt(7, issue.getId());
+            ps.setInt(8, ownerUserId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException | ClassNotFoundException e) {
+            LOGGER.log(Level.SEVERE, "Error updating issue for owner: " + issue.getId() + "/" + ownerUserId, e);
+        }
+        return false;
+    }
+
+    /**
+     * Delete an issue, restricted to the owning citizen.
+     */
+    public boolean deleteIssueByOwner(int issueDbId, int ownerUserId) {
+        if (issueDbId <= 0 || ownerUserId <= 0) {
+            return false;
+        }
+
+        String sql = "DELETE FROM issues WHERE id = ? AND userId = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, issueDbId);
+            ps.setInt(2, ownerUserId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException | ClassNotFoundException e) {
+            LOGGER.log(Level.SEVERE, "Error deleting issue for owner: " + issueDbId + "/" + ownerUserId, e);
+        }
+        return false;
+    }
+
     // ── HELPERS ────────────────────────────────────────────────────────────
 
     private boolean doUpdateStatus(int issueDbId, String newStatus) {
@@ -412,6 +562,25 @@ public class IssueDAO {
                "FROM issues i " +
                "LEFT JOIN users u ON i.userId = u.id " +
                "LEFT JOIN municipalities m ON i.municipality_id = m.id";
+    }
+
+    private void appendKeywordClause(StringBuilder sql) {
+        sql.append(" AND (LOWER(i.title) LIKE ? ESCAPE '\\' OR LOWER(i.category) LIKE ? ESCAPE '\\')");
+    }
+
+    private void bindKeyword(PreparedStatement ps, int startIndex, String keywordFilter) throws SQLException {
+        String pattern = toLikePattern(keywordFilter);
+        ps.setString(startIndex, pattern);
+        ps.setString(startIndex + 1, pattern);
+    }
+
+    private String toLikePattern(String value) {
+        String normalized = value == null ? "" : value.trim().toLowerCase();
+        String escaped = normalized
+                .replace("\\", "\\\\")
+                .replace("%", "\\%")
+                .replace("_", "\\_");
+        return "%" + escaped + "%";
     }
 
     private Issue mapRow(ResultSet rs) throws SQLException {

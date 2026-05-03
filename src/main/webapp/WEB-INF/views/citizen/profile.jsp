@@ -5,12 +5,12 @@
 
 <%
     Object profileUserObj = request.getAttribute("profileUser");
-    String firstName = "Ramesh", lastName = "Yadav", email = "ramesh.yadav@municipality.gov.np";
-    String phone = "+977 9841123456", role = "Registered Citizen", status = "Verified Account";
-    String municipality = "Janakpur Sub-Metropolitan City", wardNo = "Ward No. 7";
-    String memberSince = "Jan 2023", province = "Madhesh Province", userId = "NS-UI-000001";
+    String firstName = "", lastName = "", email = "";
+    String phone = "", role = "Registered Citizen", status = "";
+    String municipality = "", wardNo = "";
+    String memberSince = "", province = "", userId = "";
     String initials = (String) request.getAttribute("profileInitials");
-    if (initials == null) initials = "RY";
+    if (initials == null) initials = "";
     List<Municipality> municipalities = (List<Municipality>) request.getAttribute("municipalities");
 
     if (profileUserObj != null) {
@@ -107,14 +107,15 @@
 
             <div style="margin-bottom:12px;">
               <label style="display:block; font-size:13px; font-weight:600; color:#374151; margin-bottom:5px;">Municipality</label>
-              <select name="municipality" required style="width:100%; height:42px; border:1.5px solid #e5e7eb; border-radius:8px; padding:0 12px; font-size:14px; color:#111827; background:#fff; outline:none; font-family:'Inter',sans-serif;">
-                <option value="" disabled <%= (municipality == null || municipality.isBlank()) ? "selected" : "" %>>Select municipality</option>
+              <select name="municipality" id="municipalitySelect" required style="width:100%; height:42px; border:1.5px solid #e5e7eb; border-radius:8px; padding:0 12px; font-size:14px; color:#111827; background:#fff; outline:none; font-family:'Inter',sans-serif;">
+                <option value="" data-id="" disabled <%= (municipality == null || municipality.isBlank()) ? "selected" : "" %>>Select municipality</option>
                 <% if (municipalities != null) {
                     for (Municipality muni : municipalities) {
                         String muniName = muni.getName();
+                        int muniId = muni.getId();
                         boolean selected = muniName != null && muniName.equalsIgnoreCase(municipality);
                 %>
-                  <option value="<%= muniName %>" <%= selected ? "selected" : "" %>><%= muniName %></option>
+                  <option value="<%= muniName %>" data-id="<%= muniId %>" <%= selected ? "selected" : "" %>><%= muniName %></option>
                 <%  }
                    } %>
               </select>
@@ -123,7 +124,9 @@
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:18px;">
               <div>
                 <label style="display:block; font-size:13px; font-weight:600; color:#374151; margin-bottom:5px;">Ward</label>
-                <input type="text" name="wardNo" value="<%= wardNo %>" style="width:100%; height:42px; border:1.5px solid #e5e7eb; border-radius:8px; padding:0 12px; font-size:14px; color:#111827; background:#fff; outline:none; font-family:'Inter',sans-serif;"/>
+                <select name="wardNo" id="profileWard" style="width:100%; height:42px; border:1.5px solid #e5e7eb; border-radius:8px; padding:0 12px; font-size:14px; color:#111827; background:#fff; outline:none; font-family:'Inter',sans-serif;">
+                  <option value="" disabled selected>Select municipality first</option>
+                </select>
               </div>
               <div>
                 <label style="display:block; font-size:13px; font-weight:600; color:#374151; margin-bottom:5px;">Province</label>
@@ -378,6 +381,69 @@
                             confirmBtn.textContent = 'Delete account';
                           });
                 });
+              })();
+            </script>
+
+            <script>
+              // Profile page: load wards when municipality changes
+              (function(){
+                var muniSelect = document.getElementById('municipalitySelect');
+                var wardSelect = document.getElementById('profileWard');
+                function setWardPlaceholder(text){
+                  wardSelect.innerHTML = '';
+                  var opt = document.createElement('option');
+                  opt.value = '';
+                  opt.disabled = true;
+                  opt.selected = true;
+                  opt.textContent = text;
+                  wardSelect.appendChild(opt);
+                }
+
+                function populateWardsForMunicipality(muniId, preselectedWard){
+                  if (!muniId) { setWardPlaceholder('Select municipality first'); return; }
+                  setWardPlaceholder('Loading wards...');
+                  fetch('<%= request.getContextPath() %>/api/wards?municipalityId=' + encodeURIComponent(muniId))
+                    .then(function(res){ return res.json(); })
+                    .then(function(wards){
+                      wardSelect.innerHTML = '';
+                      if (!wards || wards.length === 0) {
+                        setWardPlaceholder('No wards available');
+                        return;
+                      }
+                      var defaultOpt = document.createElement('option');
+                      defaultOpt.value = '';
+                      defaultOpt.disabled = true;
+                      defaultOpt.textContent = 'Select ward';
+                      defaultOpt.selected = true;
+                      wardSelect.appendChild(defaultOpt);
+                      wards.forEach(function(w){
+                        var o = document.createElement('option');
+                        o.value = String(w.wardNumber);
+                        o.textContent = 'Ward ' + String(w.wardNumber);
+                        if (preselectedWard && preselectedWard.replaceAll('Ward','').trim() === String(w.wardNumber)) {
+                          o.selected = true;
+                        }
+                        wardSelect.appendChild(o);
+                      });
+                    }).catch(function(){ setWardPlaceholder('Unable to load wards'); });
+                }
+
+                if (muniSelect) {
+                  // on change, fetch wards using selected option data-id
+                  muniSelect.addEventListener('change', function(){
+                    var opt = muniSelect.options[muniSelect.selectedIndex];
+                    var id = opt ? opt.getAttribute('data-id') : '';
+                    populateWardsForMunicipality(id, '');
+                  });
+
+                  // on page load, if municipality is prefilled, load wards
+                  (function init(){
+                    var sel = muniSelect.options[muniSelect.selectedIndex];
+                    var id = sel ? sel.getAttribute('data-id') : '';
+                    var preWard = '<%= wardNo != null ? wardNo : "" %>';
+                    if (id) populateWardsForMunicipality(id, preWard);
+                  })();
+                }
               })();
             </script>
 

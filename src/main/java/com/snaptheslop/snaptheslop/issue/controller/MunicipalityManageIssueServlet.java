@@ -2,6 +2,8 @@ package com.snaptheslop.snaptheslop.issue.controller;
 
 import com.snaptheslop.snaptheslop.issue.model.Issue;
 import com.snaptheslop.snaptheslop.issue.model.dao.IssueDAO;
+import com.snaptheslop.snaptheslop.comment.model.dao.CommentDAO;
+import com.snaptheslop.snaptheslop.upvote.model.dao.UpvoteDAO;
 import com.snaptheslop.snaptheslop.user.model.UserDTO;
 import com.snaptheslop.snaptheslop.util.SessionUtil;
 import jakarta.servlet.ServletException;
@@ -37,6 +39,8 @@ public class MunicipalityManageIssueServlet extends HttpServlet {
             java.util.Arrays.asList("Low", "Medium", "High", "Critical"));
 
     private final IssueDAO issueDAO = new IssueDAO();
+    private final CommentDAO commentDAO = new CommentDAO();
+    private final UpvoteDAO upvoteDAO = new UpvoteDAO();
 
     // ── GET ────────────────────────────────────────────────────────────────
 
@@ -71,8 +75,14 @@ public class MunicipalityManageIssueServlet extends HttpServlet {
             reportImageUrl = request.getContextPath() + issue.getImagePath();
         }
 
+        // Load comments and upvoter details so municipality can review citizen feedback
+        java.util.List<com.snaptheslop.snaptheslop.comment.model.Comment> issueComments = commentDAO.findByIssueId(issue.getId());
+        java.util.List<java.util.Map<String,String>> issueUpvoters = upvoteDAO.findUpvotersByIssueId(issue.getId());
+
         request.setAttribute("activePage", "issue-reports");
         request.setAttribute("issue", issue);
+        request.setAttribute("issueComments", issueComments);
+        request.setAttribute("issueUpvoters", issueUpvoters);
         request.setAttribute("reportImageUrl", reportImageUrl);
         request.getRequestDispatcher("/WEB-INF/views/municipality/manageIssue.jsp").forward(request, response);
     }

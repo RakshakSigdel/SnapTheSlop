@@ -20,6 +20,7 @@
   String municipalityFilter = (String) request.getAttribute("municipalityFilter");
   String wardFilter = (String) request.getAttribute("wardFilter");
   String statusFilter = (String) request.getAttribute("statusFilter");
+  String keywordFilter = (String) request.getAttribute("keywordFilter");
   String successMessage = (String) request.getAttribute("successMessage");
   String errorMessage = (String) request.getAttribute("errorMessage");
 
@@ -57,7 +58,8 @@
       </div>
       <% } %>
 
-      <form method="get" action="<%= contextPath %>/citizen/browse-issues" style="background:#ffffff; border:1px solid #dbe3ee; border-radius:12px; padding:12px; margin-bottom:16px; display:grid; grid-template-columns:1fr 1fr 1fr 1fr auto; gap:8px;">
+      <form method="get" action="<%= contextPath %>/citizen/browse-issues" style="background:#ffffff; border:1px solid #dbe3ee; border-radius:12px; padding:12px; margin-bottom:16px; display:grid; grid-template-columns:1fr 1fr 1fr 1fr 1fr auto; gap:8px;">
+        <input type="text" name="keyword" placeholder="Search title or category" value="<%= keywordFilter != null ? keywordFilter : "" %>" style="height:38px; border:1px solid #d5deea; border-radius:8px; padding:0 10px; font-size:13px; background:#fbfdff;"/>
         <select name="category" style="height:38px; border:1px solid #d5deea; border-radius:8px; padding:0 10px; font-size:13px; background:#fbfdff;">
           <option value="">All Categories</option>
           <option value="Roads Potholes" <%= "Roads Potholes".equals(categoryFilter) ? "selected" : "" %>>Roads & Potholes</option>
@@ -117,6 +119,7 @@
              if (municipalityFilter != null) returnUrl += "&municipalityId=" + java.net.URLEncoder.encode(municipalityFilter, "UTF-8");
              if (wardFilter != null) returnUrl += "&ward=" + java.net.URLEncoder.encode(wardFilter, "UTF-8");
              if (statusFilter != null) returnUrl += "&status=" + java.net.URLEncoder.encode(statusFilter, "UTF-8");
+              if (keywordFilter != null) returnUrl += "&keyword=" + java.net.URLEncoder.encode(keywordFilter, "UTF-8");
              returnUrl += "#issue-" + issue.getId();
         %>
         <article id="issue-<%= issue.getId() %>" style="display:grid; grid-template-columns:64px 1fr; background:#ffffff; border:1px solid #dbe3ee; border-radius:12px; overflow:hidden; margin-bottom:12px;">
@@ -178,7 +181,7 @@
       <% if (totalPages > 1) { %>
       <div style="display:flex; gap:6px; justify-content:center; margin-top:14px;">
         <% for (int p = Math.max(1, currentPage - 2); p <= Math.min(totalPages, currentPage + 2); p++) { %>
-          <a href="<%= contextPath %>/citizen/browse-issues?page=<%= p %><%= categoryFilter != null ? "&category=" + java.net.URLEncoder.encode(categoryFilter, "UTF-8") : "" %><%= municipalityFilter != null ? "&municipalityId=" + java.net.URLEncoder.encode(municipalityFilter, "UTF-8") : "" %><%= wardFilter != null ? "&ward=" + java.net.URLEncoder.encode(wardFilter, "UTF-8") : "" %><%= statusFilter != null ? "&status=" + java.net.URLEncoder.encode(statusFilter, "UTF-8") : "" %>"
+          <a href="<%= contextPath %>/citizen/browse-issues?page=<%= p %><%= categoryFilter != null ? "&category=" + java.net.URLEncoder.encode(categoryFilter, "UTF-8") : "" %><%= municipalityFilter != null ? "&municipalityId=" + java.net.URLEncoder.encode(municipalityFilter, "UTF-8") : "" %><%= wardFilter != null ? "&ward=" + java.net.URLEncoder.encode(wardFilter, "UTF-8") : "" %><%= statusFilter != null ? "&status=" + java.net.URLEncoder.encode(statusFilter, "UTF-8") : "" %><%= keywordFilter != null ? "&keyword=" + java.net.URLEncoder.encode(keywordFilter, "UTF-8") : "" %>"
              style="min-width:34px; height:34px; border-radius:8px; display:flex; align-items:center; justify-content:center; text-decoration:none; font-size:12px; font-weight:700; border:<%= p == currentPage ? "none" : "1px solid #d5deea" %>; background:<%= p == currentPage ? "#0f172a" : "#ffffff" %>; color:<%= p == currentPage ? "#ffffff" : "#475569" %>;">
             <%= p %>
           </a>
