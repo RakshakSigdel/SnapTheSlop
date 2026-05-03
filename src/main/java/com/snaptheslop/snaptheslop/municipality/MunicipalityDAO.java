@@ -110,22 +110,44 @@ public class MunicipalityDAO {
             }
 
             String normalizedName = normalizeMunicipalityName(name);
+            String strippedInputName = stripMunicipalityQualifiers(normalizedName);
             String fallbackSql = "SELECT id, name FROM municipalities";
+            Integer matchedId = null;
+            boolean ambiguousMatch = false;
             try (PreparedStatement fallbackStatement = connection.prepareStatement(fallbackSql);
                     ResultSet fallbackResultSet = fallbackStatement.executeQuery()) {
                 while (fallbackResultSet.next()) {
                     String dbName = fallbackResultSet.getString("name");
-                    if (normalizedName.equals(normalizeMunicipalityName(dbName))) {
-                        return fallbackResultSet.getInt("id");
+                    String normalizedDbName = normalizeMunicipalityName(dbName);
+                    String strippedDbName = stripMunicipalityQualifiers(normalizedDbName);
+
+                    boolean match = normalizedName.equals(normalizedDbName)
+                            || normalizedDbName.startsWith(normalizedName)
+                            || normalizedName.startsWith(normalizedDbName)
+                            || strippedInputName.equals(strippedDbName)
+                            || (!strippedInputName.isEmpty() && strippedDbName.startsWith(strippedInputName));
+
+                    if (match) {
+                        int currentId = fallbackResultSet.getInt("id");
+                        if (matchedId == null) {
+                            matchedId = currentId;
+                        } else if (!matchedId.equals(currentId)) {
+                            ambiguousMatch = true;
+                            break;
+                        }
                     }
                 }
             }
+
+            if (ambiguousMatch) {
+                LOGGER.log(Level.WARNING, "Ambiguous municipality match for name: {0}", name);
+                return null;
+            }
+            return matchedId;
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error finding municipality by name '" + name + "': " + e.getMessage(), e);
             throw e;
         }
-
-        return null;
     }
 
     private String normalizeMunicipalityName(String value) {
@@ -134,6 +156,21 @@ public class MunicipalityDAO {
         }
         return value.trim().toLowerCase()
                 .replaceAll("[^a-z0-9]", "");
+    }
+
+    private String stripMunicipalityQualifiers(String normalizedValue) {
+        if (normalizedValue == null || normalizedValue.isEmpty()) {
+            return "";
+        }
+
+        return normalizedValue
+                .replace("submetropolitancity", "")
+                .replace("metropolitancity", "")
+                .replace("ruralmunicipality", "")
+                .replace("municipality", "")
+                .replace("nagarpalika", "")
+                .replace("gaunpalika", "")
+                .trim();
     }
 
     /**

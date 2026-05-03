@@ -3,6 +3,7 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="com.snaptheslop.snaptheslop.issue.model.Issue" %>
+<%@ page import="com.snaptheslop.snaptheslop.comment.model.Comment" %>
 <% request.setAttribute("activePage", "issue-reports"); %>
 <jsp:include page="../common/header.jsp"/>
 <%
@@ -16,6 +17,10 @@
   if (issue == null) { response.sendRedirect(contextPath + "/municipality/issue-list"); return; }
   String currentStatus   = issue.getStatus()   != null ? issue.getStatus()   : "Open";
   String currentPriority = issue.getPriority() != null ? issue.getPriority() : "Medium";
+  java.util.List<Comment> issueComments = (java.util.List<Comment>) request.getAttribute("issueComments");
+  java.util.List<java.util.Map<String,String>> issueUpvoters = (java.util.List<java.util.Map<String,String>>) request.getAttribute("issueUpvoters");
+  if (issueComments == null) issueComments = new java.util.ArrayList<>();
+  if (issueUpvoters == null) issueUpvoters = new java.util.ArrayList<>();
 %>
 
 <div class="flex min-h-screen">
@@ -59,6 +64,21 @@
           <div style="margin-bottom:16px;">
             <p style="font-size:12px; color:#94a3b8; margin:0 0 4px;">Description</p>
             <p style="font-size:13px; color:#334155; line-height:1.6; margin:0;"><%= issue.getDescription() != null ? issue.getDescription() : "No description." %></p>
+          </div>
+
+          <!-- Comments (read-only for municipality) -->
+          <div style="margin-bottom:16px; background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:12px;">
+            <h3 style="font-size:13px; font-weight:700; color:#0f172a; margin:0 0 10px;">Comments (<%= issueComments.size() %>)</h3>
+            <% if (issueComments.isEmpty()) { %>
+              <p style="font-size:13px; color:#94a3b8; margin:6px 0 0;">No comments yet.</p>
+            <% } else { %>
+              <% for (Comment c : issueComments) { %>
+                <div style="padding:8px 0; border-bottom:1px solid #f1f5f9;">
+                  <p style="font-size:12px; color:#64748b; margin:0 0 4px;"><strong><%= c.getCommenterName() != null ? c.getCommenterName() : "Citizen" %></strong> · <%= c.getCreatedAtShort() %></p>
+                  <p style="font-size:13px; color:#1f2937; margin:0; line-height:1.5;"><%= c.getContent() %></p>
+                </div>
+              <% } %>
+            <% } %>
           </div>
 
           <!-- Status transition form (Sprint 5 Task 4 & 5) -->
@@ -125,6 +145,25 @@
             <p style="font-size:13px; color:#1f2937; margin:0 0 4px; font-weight:600;"><%= issue.getCitizenName() != null ? issue.getCitizenName() : "—" %></p>
             <p style="font-size:12px; color:#64748b; margin:0 0 2px;">Ward <%= String.format("%02d", issue.getWardNo()) %> Resident</p>
             <p style="font-size:12px; color:#64748b; margin:0;"><%= issue.getCitizenEmail() != null ? issue.getCitizenEmail() : "" %></p>
+          </div>
+
+          <!-- Upvoters list -->
+          <div style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:16px;">
+            <h3 style="font-size:13px; font-weight:700; color:#0f172a; margin:0 0 10px;">Supporters</h3>
+            <p style="font-size:14px; font-weight:700; color:#0f172a; margin:0;"><%= issue.getUpvoteCount() %></p>
+            <p style="font-size:12px; color:#94a3b8; margin:6px 0 10px;">citizens who upvoted this issue</p>
+            <% if (issueUpvoters.isEmpty()) { %>
+              <p style="font-size:13px; color:#94a3b8; margin:0;">No supporters yet.</p>
+            <% } else { %>
+              <div style="display:flex; flex-direction:column; gap:8px;">
+                <% for (java.util.Map<String,String> u : issueUpvoters) { %>
+                  <div style="display:flex; flex-direction:column;">
+                    <span style="font-size:13px; color:#1f2937; font-weight:600;"><%= u.get("name") %></span>
+                    <span style="font-size:12px; color:#64748b;"><%= u.get("email") %></span>
+                  </div>
+                <% } %>
+              </div>
+            <% } %>
           </div>
 
           <!-- Timeline (Sprint 5 Task 5 — audit-friendly timestamps) -->

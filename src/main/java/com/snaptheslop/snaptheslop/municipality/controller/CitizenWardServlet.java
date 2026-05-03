@@ -102,7 +102,9 @@ public class CitizenWardServlet extends HttpServlet {
         }
 
         if (user.getMunicipalityId() > 0) {
-            return user.getMunicipalityId();
+            if (municipalityDAO.findById(user.getMunicipalityId()) != null) {
+                return user.getMunicipalityId();
+            }
         }
 
         if (user.getMunicipality() == null || user.getMunicipality().trim().isEmpty()) {
@@ -110,7 +112,11 @@ public class CitizenWardServlet extends HttpServlet {
         }
 
         Integer municipalityId = municipalityDAO.findMunicipalityIdByName(user.getMunicipality().trim());
-        return municipalityId != null ? municipalityId : -1;
+        if (municipalityId != null && municipalityId > 0) {
+            user.setMunicipalityId(municipalityId);
+            return municipalityId;
+        }
+        return -1;
     }
 
     private boolean isCitizen(UserDTO user) {

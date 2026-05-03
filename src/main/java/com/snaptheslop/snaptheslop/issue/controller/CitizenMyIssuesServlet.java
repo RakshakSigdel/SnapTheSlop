@@ -49,6 +49,7 @@ public class CitizenMyIssuesServlet extends HttpServlet {
 
         // Filter & pagination params
         String statusFilter = request.getParameter("status");
+        String keywordFilter = request.getParameter("keyword");
         int page = 1;
         try { page = Math.max(1, Integer.parseInt(request.getParameter("page"))); }
         catch (NumberFormatException ignored) {}
@@ -57,15 +58,15 @@ public class CitizenMyIssuesServlet extends HttpServlet {
         List<Issue> issues = Collections.emptyList();
         int totalCount = 0;
         if (userDbId != -1) {
-            issues     = issueDAO.findByUserId(userDbId, statusFilter, page, PAGE_SIZE);
-            totalCount = issueDAO.countByUserId(userDbId, statusFilter);
+            issues     = issueDAO.findByUserId(userDbId, statusFilter, keywordFilter, page, PAGE_SIZE);
+            totalCount = issueDAO.countByUserId(userDbId, statusFilter, keywordFilter);
         }
 
         // Status counts for filter tabs
-        int countAll        = issueDAO.countByUserId(userDbId, null);
-        int countOpen       = issueDAO.countByUserId(userDbId, "Open");
-        int countInProgress = issueDAO.countByUserId(userDbId, "In Progress");
-        int countResolved   = issueDAO.countByUserId(userDbId, "Resolved");
+        int countAll        = issueDAO.countByUserId(userDbId, null, keywordFilter);
+        int countOpen       = issueDAO.countByUserId(userDbId, "Open", keywordFilter);
+        int countInProgress = issueDAO.countByUserId(userDbId, "In Progress", keywordFilter);
+        int countResolved   = issueDAO.countByUserId(userDbId, "Resolved", keywordFilter);
 
         int totalPages = (int) Math.ceil((double) totalCount / PAGE_SIZE);
         if (totalPages < 1) totalPages = 1;
@@ -80,6 +81,7 @@ public class CitizenMyIssuesServlet extends HttpServlet {
         request.setAttribute("activePage",    "my-issues");
         request.setAttribute("issues",        issues);
         request.setAttribute("statusFilter",  statusFilter);
+        request.setAttribute("keywordFilter", keywordFilter);
         request.setAttribute("currentPage",   page);
         request.setAttribute("totalPages",    totalPages);
         request.setAttribute("totalCount",    totalCount);

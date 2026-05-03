@@ -7,6 +7,7 @@
 <%
   List<Issue> issues        = (List<Issue>) request.getAttribute("issues");
   String statusFilter       = (String)      request.getAttribute("statusFilter");
+  String keywordFilter      = (String)      request.getAttribute("keywordFilter");
   int currentPage           = request.getAttribute("currentPage")    != null ? (int) request.getAttribute("currentPage")    : 1;
   int totalPages            = request.getAttribute("totalPages")     != null ? (int) request.getAttribute("totalPages")     : 1;
   int totalCount            = request.getAttribute("totalCount")     != null ? (int) request.getAttribute("totalCount")     : 0;
@@ -42,11 +43,17 @@
       <% } %>
 
       <!-- Filter tabs -->
+      <form method="get" action="<%= contextPath %>/citizen/my-issues" style="display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; align-items:center;">
+        <input type="text" name="keyword" placeholder="Search title or category" value="<%= keywordFilter != null ? keywordFilter : "" %>" style="height:36px; width:min(100%, 280px); border:1px solid #e2e8f0; border-radius:6px; padding:0 10px; font-size:13px;"/>
+        <% if (statusFilter != null) { %><input type="hidden" name="status" value="<%= statusFilter %>"/><% } %>
+        <button type="submit" style="height:36px; padding:0 14px; border:none; border-radius:6px; background:#059669; color:#fff; font-size:13px; font-weight:600; cursor:pointer;">Search</button>
+      </form>
+
       <div style="display:flex; gap:6px; margin-bottom:24px; flex-wrap:wrap;">
-        <a href="<%= contextPath %>/citizen/my-issues" style="padding:7px 16px; border-radius:6px; font-size:13px; font-weight:600; text-decoration:none; <%= (statusFilter == null) ? "background:#0f172a; color:#fff; border:none;" : "border:1px solid #e2e8f0; background:#fff; color:#64748b;" %>">All (<%= countAll %>)</a>
-        <a href="<%= contextPath %>/citizen/my-issues?status=Open" style="padding:7px 16px; border-radius:6px; font-size:13px; font-weight:600; text-decoration:none; <%= "Open".equals(statusFilter) ? "background:#0f172a; color:#fff; border:none;" : "border:1px solid #e2e8f0; background:#fff; color:#64748b;" %>">Open (<%= countOpen %>)</a>
-        <a href="<%= contextPath %>/citizen/my-issues?status=In+Progress" style="padding:7px 16px; border-radius:6px; font-size:13px; font-weight:600; text-decoration:none; <%= "In Progress".equals(statusFilter) ? "background:#0f172a; color:#fff; border:none;" : "border:1px solid #e2e8f0; background:#fff; color:#64748b;" %>">In Progress (<%= countInProgress %>)</a>
-        <a href="<%= contextPath %>/citizen/my-issues?status=Resolved" style="padding:7px 16px; border-radius:6px; font-size:13px; font-weight:600; text-decoration:none; <%= "Resolved".equals(statusFilter) ? "background:#0f172a; color:#fff; border:none;" : "border:1px solid #e2e8f0; background:#fff; color:#64748b;" %>">Resolved (<%= countResolved %>)</a>
+        <a href="<%= contextPath %>/citizen/my-issues<%= keywordFilter != null ? "?keyword=" + java.net.URLEncoder.encode(keywordFilter, "UTF-8") : "" %>" style="padding:7px 16px; border-radius:6px; font-size:13px; font-weight:600; text-decoration:none; <%= (statusFilter == null) ? "background:#0f172a; color:#fff; border:none;" : "border:1px solid #e2e8f0; background:#fff; color:#64748b;" %>">All (<%= countAll %>)</a>
+        <a href="<%= contextPath %>/citizen/my-issues?status=Open<%= keywordFilter != null ? "&keyword=" + java.net.URLEncoder.encode(keywordFilter, "UTF-8") : "" %>" style="padding:7px 16px; border-radius:6px; font-size:13px; font-weight:600; text-decoration:none; <%= "Open".equals(statusFilter) ? "background:#0f172a; color:#fff; border:none;" : "border:1px solid #e2e8f0; background:#fff; color:#64748b;" %>">Open (<%= countOpen %>)</a>
+        <a href="<%= contextPath %>/citizen/my-issues?status=In+Progress<%= keywordFilter != null ? "&keyword=" + java.net.URLEncoder.encode(keywordFilter, "UTF-8") : "" %>" style="padding:7px 16px; border-radius:6px; font-size:13px; font-weight:600; text-decoration:none; <%= "In Progress".equals(statusFilter) ? "background:#0f172a; color:#fff; border:none;" : "border:1px solid #e2e8f0; background:#fff; color:#64748b;" %>">In Progress (<%= countInProgress %>)</a>
+        <a href="<%= contextPath %>/citizen/my-issues?status=Resolved<%= keywordFilter != null ? "&keyword=" + java.net.URLEncoder.encode(keywordFilter, "UTF-8") : "" %>" style="padding:7px 16px; border-radius:6px; font-size:13px; font-weight:600; text-decoration:none; <%= "Resolved".equals(statusFilter) ? "background:#0f172a; color:#fff; border:none;" : "border:1px solid #e2e8f0; background:#fff; color:#64748b;" %>">Resolved (<%= countResolved %>)</a>
       </div>
 
       <!-- Issues Table -->
@@ -60,13 +67,14 @@
               <th style="text-align:left; padding:12px 16px; font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:1px;">Priority</th>
               <th style="text-align:left; padding:12px 16px; font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:1px;">Filed</th>
               <th style="text-align:left; padding:12px 16px; font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:1px;">Upvotes</th>
+              <th style="text-align:left; padding:12px 16px; font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:1px;">Actions</th>
               <th style="text-align:right; padding:12px 20px;"></th>
             </tr>
           </thead>
           <tbody>
             <% if (issues.isEmpty()) { %>
             <tr>
-              <td colspan="7" style="padding:40px 20px; text-align:center; color:#94a3b8; font-size:14px;">
+              <td colspan="8" style="padding:40px 20px; text-align:center; color:#94a3b8; font-size:14px;">
                 You haven't reported any issues yet. <a href="<%= contextPath %>/citizen/report-issue" style="color:#059669; font-weight:600; text-decoration:none;">Report one now →</a>
               </td>
             </tr>
@@ -99,6 +107,15 @@
               </td>
               <td style="padding:14px 16px; font-size:12px; color:#94a3b8;"><%= issue.getCreatedAtShort() %></td>
               <td style="padding:14px 16px; font-size:13px; font-weight:600; color:#64748b;"><%= issue.getUpvoteCount() %></td>
+              <td style="padding:14px 16px;">
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                  <a href="<%= contextPath %>/citizen/issue-edit?id=<%= issue.getId() %>" style="display:inline-flex; align-items:center; justify-content:center; padding:6px 12px; border-radius:6px; background:#059669; color:#fff; font-size:11px; font-weight:700; text-decoration:none;">Edit</a>
+                  <form action="<%= contextPath %>/citizen/issue-delete" method="post" onsubmit="return confirm('Delete this report permanently?');" style="margin:0; display:inline-flex;">
+                    <input type="hidden" name="issueId" value="<%= issue.getId() %>"/>
+                    <button type="submit" style="padding:6px 12px; border-radius:6px; background:#fff; color:#b91c1c; border:1px solid #fecaca; font-size:11px; font-weight:700; cursor:pointer;">Delete</button>
+                  </form>
+                </div>
+              </td>
               <td style="padding:14px 20px; text-align:right;">
                 <a href="<%= contextPath %>/citizen/issue-detail?id=<%= issue.getId() %>" style="font-size:12px; color:#059669; font-weight:600; text-decoration:none;">View →</a>
               </td>
@@ -112,13 +129,13 @@
           <% if (totalPages > 1) { %>
           <div style="display:flex; gap:4px;">
             <% if (currentPage > 1) { %>
-            <a href="<%= contextPath %>/citizen/my-issues?page=<%= currentPage - 1 %><%= statusFilter != null ? "&status=" + statusFilter : "" %>" style="width:30px; height:30px; border-radius:6px; border:1px solid #e2e8f0; background:#fff; color:#64748b; font-size:12px; display:flex; align-items:center; justify-content:center; text-decoration:none;">&lsaquo;</a>
+            <a href="<%= contextPath %>/citizen/my-issues?page=<%= currentPage - 1 %><%= statusFilter != null ? "&status=" + java.net.URLEncoder.encode(statusFilter, "UTF-8") : "" %><%= keywordFilter != null ? "&keyword=" + java.net.URLEncoder.encode(keywordFilter, "UTF-8") : "" %>" style="width:30px; height:30px; border-radius:6px; border:1px solid #e2e8f0; background:#fff; color:#64748b; font-size:12px; display:flex; align-items:center; justify-content:center; text-decoration:none;">&lsaquo;</a>
             <% } %>
             <% for (int p = 1; p <= totalPages; p++) { %>
-            <a href="<%= contextPath %>/citizen/my-issues?page=<%= p %><%= statusFilter != null ? "&status=" + statusFilter : "" %>" style="width:30px; height:30px; border-radius:6px; border:<%= p == currentPage ? "none" : "1px solid #e2e8f0" %>; background:<%= p == currentPage ? "#0f172a" : "#fff" %>; color:<%= p == currentPage ? "#fff" : "#64748b" %>; font-size:12px; font-weight:<%= p == currentPage ? "700" : "400" %>; display:flex; align-items:center; justify-content:center; text-decoration:none;"><%= p %></a>
+            <a href="<%= contextPath %>/citizen/my-issues?page=<%= p %><%= statusFilter != null ? "&status=" + java.net.URLEncoder.encode(statusFilter, "UTF-8") : "" %><%= keywordFilter != null ? "&keyword=" + java.net.URLEncoder.encode(keywordFilter, "UTF-8") : "" %>" style="width:30px; height:30px; border-radius:6px; border:<%= p == currentPage ? "none" : "1px solid #e2e8f0" %>; background:<%= p == currentPage ? "#0f172a" : "#fff" %>; color:<%= p == currentPage ? "#fff" : "#64748b" %>; font-size:12px; font-weight:<%= p == currentPage ? "700" : "400" %>; display:flex; align-items:center; justify-content:center; text-decoration:none;"><%= p %></a>
             <% } %>
             <% if (currentPage < totalPages) { %>
-            <a href="<%= contextPath %>/citizen/my-issues?page=<%= currentPage + 1 %><%= statusFilter != null ? "&status=" + statusFilter : "" %>" style="width:30px; height:30px; border-radius:6px; border:1px solid #e2e8f0; background:#fff; color:#64748b; font-size:12px; display:flex; align-items:center; justify-content:center; text-decoration:none;">&rsaquo;</a>
+            <a href="<%= contextPath %>/citizen/my-issues?page=<%= currentPage + 1 %><%= statusFilter != null ? "&status=" + java.net.URLEncoder.encode(statusFilter, "UTF-8") : "" %><%= keywordFilter != null ? "&keyword=" + java.net.URLEncoder.encode(keywordFilter, "UTF-8") : "" %>" style="width:30px; height:30px; border-radius:6px; border:1px solid #e2e8f0; background:#fff; color:#64748b; font-size:12px; display:flex; align-items:center; justify-content:center; text-decoration:none;">&rsaquo;</a>
             <% } %>
           </div>
           <% } %>

@@ -41,6 +41,7 @@ public class MunicipalityIssueListServlet extends HttpServlet {
         String statusFilter   = trim(request.getParameter("status"));
         String categoryFilter = trim(request.getParameter("category"));
         String wardFilter     = trim(request.getParameter("ward"));
+        String keywordFilter  = trim(request.getParameter("keyword"));
 
         int page = 1;
         try { page = Math.max(1, Integer.parseInt(request.getParameter("page"))); }
@@ -49,18 +50,20 @@ public class MunicipalityIssueListServlet extends HttpServlet {
         // Fetch issues belonging to this municipality
         List<Issue> issues = Collections.emptyList();
         int totalCount = 0;
+        int filteredCount = 0;
         int countOpen = 0, countInProgress = 0, countResolved = 0;
 
         if (municipalityId > 0) {
             issues = issueDAO.findByMunicipalityId(
-                    municipalityId, statusFilter, categoryFilter, wardFilter, page, PAGE_SIZE);
+                    municipalityId, statusFilter, categoryFilter, wardFilter, keywordFilter, page, PAGE_SIZE);
             totalCount    = issueDAO.countByMunicipalityId(municipalityId, null);
-            countOpen       = issueDAO.countByMunicipalityId(municipalityId, "Open");
-            countInProgress = issueDAO.countByMunicipalityId(municipalityId, "In Progress");
-            countResolved   = issueDAO.countByMunicipalityId(municipalityId, "Resolved");
+            filteredCount = issueDAO.countByMunicipalityId(municipalityId, statusFilter, keywordFilter);
+            countOpen       = issueDAO.countByMunicipalityId(municipalityId, "Open", keywordFilter);
+            countInProgress = issueDAO.countByMunicipalityId(municipalityId, "In Progress", keywordFilter);
+            countResolved   = issueDAO.countByMunicipalityId(municipalityId, "Resolved", keywordFilter);
         }
 
-        int totalPages = (int) Math.ceil((double) totalCount / PAGE_SIZE);
+        int totalPages = (int) Math.ceil((double) filteredCount / PAGE_SIZE);
         if (totalPages < 1) totalPages = 1;
 
         // Success/error flash messages from manage-issue POST
@@ -74,9 +77,11 @@ public class MunicipalityIssueListServlet extends HttpServlet {
         request.setAttribute("statusFilter",    statusFilter);
         request.setAttribute("categoryFilter",  categoryFilter);
         request.setAttribute("wardFilter",      wardFilter);
+        request.setAttribute("keywordFilter",   keywordFilter);
         request.setAttribute("currentPage",     page);
         request.setAttribute("totalPages",      totalPages);
         request.setAttribute("totalCount",      totalCount);
+        request.setAttribute("filteredCount",   filteredCount);
         request.setAttribute("countOpen",       countOpen);
         request.setAttribute("countInProgress", countInProgress);
         request.setAttribute("countResolved",   countResolved);

@@ -24,6 +24,7 @@ public class AdminIssueServlet extends HttpServlet {
         String municipalityFilter = trim(request.getParameter("municipalityId"));
         String wardFilter = trim(request.getParameter("ward"));
         String statusFilter = trim(request.getParameter("status"));
+        String keywordFilter = trim(request.getParameter("keyword"));
 
         int page = 1;
         try {
@@ -31,7 +32,7 @@ public class AdminIssueServlet extends HttpServlet {
         } catch (NumberFormatException ignored) {
         }
 
-        List<Issue> issues = issueDAO.findAll(categoryFilter, municipalityFilter, wardFilter, statusFilter, page, PAGE_SIZE);
+        List<Issue> issues = issueDAO.findAll(categoryFilter, municipalityFilter, wardFilter, statusFilter, keywordFilter, page, PAGE_SIZE);
         if (issues == null) {
             issues = Collections.emptyList();
         }
@@ -41,7 +42,7 @@ public class AdminIssueServlet extends HttpServlet {
         int inProgressCount = issueDAO.countAllIssues("In Progress");
         int resolvedCount = issueDAO.countAllIssues("Resolved");
 
-        int filteredCount = issueDAO.countAllFiltered(categoryFilter, municipalityFilter, wardFilter, statusFilter);
+        int filteredCount = issueDAO.countAllFiltered(categoryFilter, municipalityFilter, wardFilter, statusFilter, keywordFilter);
         int totalPages = (int) Math.ceil((double) filteredCount / PAGE_SIZE);
         if (totalPages < 1) {
             totalPages = 1;
@@ -60,6 +61,7 @@ public class AdminIssueServlet extends HttpServlet {
         request.setAttribute("municipalityFilter", municipalityFilter);
         request.setAttribute("wardFilter", wardFilter);
         request.setAttribute("statusFilter", statusFilter);
+        request.setAttribute("keywordFilter", keywordFilter);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("totalCount", totalCount);
