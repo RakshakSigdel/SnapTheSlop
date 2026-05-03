@@ -9,7 +9,7 @@ public class DBConnection {
     private static final String DB_URL
             = "jdbc:mysql://localhost:3306/snaptheslop";
     private static final String DB_USER = "root";
-    private static final String DB_PASSWORD = "Pranu323@#";
+    private static final String DB_PASSWORD = "1234";
     private static final String DB_DRIVER = "com.mysql.cj.jdbc.Driver";
 
     public static Connection getConnection()
