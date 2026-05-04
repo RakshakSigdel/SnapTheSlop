@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <% String activePage = (String) request.getAttribute("activePage"); %>
 
-<div style="position:fixed; top:0; left:0; height:100vh; width:220px; background:#0f172a; border-right:1px solid #1e293b; display:flex; flex-direction:column; z-index:50;">
+<div class="app-sidebar" style="position:fixed; top:0; left:0; height:100vh; width:220px; background:#0f172a; border-right:1px solid #1e293b; display:flex; flex-direction:column; z-index:50;">
 
     <div style="padding:20px 20px 16px; border-bottom:1px solid #1e293b;">
         <div style="display:flex; align-items:center; gap:10px;">
