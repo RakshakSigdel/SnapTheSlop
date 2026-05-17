@@ -1,6 +1,6 @@
 package com.snaptheslop.snaptheslop.admin.controller;
 
-import com.snaptheslop.snaptheslop.admin.model.MunicipalityDTO;
+import com.snaptheslop.snaptheslop.municipality.model.Municipality;
 import com.snaptheslop.snaptheslop.admin.model.dao.AdminDAO;
 import com.snaptheslop.snaptheslop.security.PasswordUtil;
 
@@ -27,7 +27,7 @@ public class AdminManageMunicipalityServlet extends HttpServlet {
             return;
         }
 
-        MunicipalityDTO municipality = adminDAO.getMunicipalityById(municipalityId);
+        Municipality municipality = adminDAO.getMunicipalityById(municipalityId);
         if (municipality == null) {
             request.setAttribute("error", "Municipality not found in database.");
         }
@@ -47,7 +47,7 @@ public class AdminManageMunicipalityServlet extends HttpServlet {
             return;
         }
 
-        MunicipalityDTO currentMunicipality = adminDAO.getMunicipalityById(municipalityId);
+        Municipality currentMunicipality = adminDAO.getMunicipalityById(municipalityId);
         if (currentMunicipality == null) {
             request.setAttribute("error", "Municipality not found in database.");
             forwardPage(request, response, null);
@@ -64,11 +64,11 @@ public class AdminManageMunicipalityServlet extends HttpServlet {
             request.setAttribute("error", "Unsupported action.");
         }
 
-        MunicipalityDTO updatedMunicipality = adminDAO.getMunicipalityById(municipalityId);
+        Municipality updatedMunicipality = adminDAO.getMunicipalityById(municipalityId);
         forwardPage(request, response, updatedMunicipality);
     }
 
-    private void handleSaveAction(HttpServletRequest request, MunicipalityDTO currentMunicipality) {
+    private void handleSaveAction(HttpServletRequest request, Municipality currentMunicipality) {
         String municipalityName = request.getParameter("municipalityName");
         String district = request.getParameter("district");
         String province = request.getParameter("province");
@@ -96,7 +96,7 @@ public class AdminManageMunicipalityServlet extends HttpServlet {
             return;
         }
 
-        MunicipalityDTO updateRequest = new MunicipalityDTO();
+        Municipality updateRequest = new Municipality();
         updateRequest.setId(currentMunicipality.getId());
         updateRequest.setOldName(currentMunicipality.getName());
         updateRequest.setName(municipalityName.trim());
@@ -157,7 +157,7 @@ public class AdminManageMunicipalityServlet extends HttpServlet {
         }
     }
 
-    private void forwardPage(HttpServletRequest request, HttpServletResponse response, MunicipalityDTO municipality)
+    private void forwardPage(HttpServletRequest request, HttpServletResponse response, Municipality municipality)
             throws ServletException, IOException {
         request.setAttribute("activePage", "municipalities");
         request.setAttribute("municipality", municipality);

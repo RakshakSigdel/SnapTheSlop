@@ -1,6 +1,6 @@
 package com.snaptheslop.snaptheslop.admin.controller;
 
-import com.snaptheslop.snaptheslop.admin.model.MunicipalityDTO;
+import com.snaptheslop.snaptheslop.municipality.model.Municipality;
 import com.snaptheslop.snaptheslop.admin.model.dao.AdminDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -103,8 +103,8 @@ public class AdminMunicipalitiesServlet extends HttpServlet {
       return;
     }
 
-    // Create municipality DTO
-    MunicipalityDTO municipality = new MunicipalityDTO();
+    // Create municipality object
+    Municipality municipality = new Municipality();
     municipality.setName(municipalityName.trim());
     municipality.setCode(municipalityCode.trim());
     municipality.setContactNumber(municipalityPhone.trim());
