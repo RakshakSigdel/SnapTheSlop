@@ -1,4 +1,4 @@
-package com.snaptheslop.snaptheslop.citizen.controller;
+package com.snaptheslop.snaptheslop.notification.controller;
 
 import com.snaptheslop.snaptheslop.notification.model.dao.NotificationDAO;
 import com.snaptheslop.snaptheslop.user.model.User;

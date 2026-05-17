@@ -1,4 +1,4 @@
-package com.snaptheslop.snaptheslop.municipality.controller;
+package com.snaptheslop.snaptheslop.citizen.controller;
 
 import com.snaptheslop.snaptheslop.municipality.model.dao.MunicipalityDAO;
 import com.snaptheslop.snaptheslop.municipality.model.dao.WardDAO;
