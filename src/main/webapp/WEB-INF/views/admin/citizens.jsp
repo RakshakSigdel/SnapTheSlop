@@ -1,11 +1,11 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.List" %>
-<%@ page import="com.snaptheslop.snaptheslop.user.model.UserDTO" %>
+<%@ page import="com.snaptheslop.snaptheslop.user.model.User" %>
 <% request.setAttribute("activePage", "citizens"); %>
 <jsp:include page="../common/header.jsp"/>
 
 <%
-	List<UserDTO> users = (List<UserDTO>) request.getAttribute("users");
+	List<User> users = (List<User>) request.getAttribute("users");
 %>
 
 <div class="flex min-h-screen">
@@ -60,7 +60,7 @@
 						<td colspan="6" style="padding:14px 18px; font-size:13px; color:#64748b; text-align:center;">No users found.</td>
 					</tr>
 					<% } else { %>
-					<% for (UserDTO user : users) { %>
+					<% for (User user : users) { %>
 					<%
 						String status = user.getAccountStatus() != null ? user.getAccountStatus() : "Active";
 						boolean inactive = "inactive".equalsIgnoreCase(status) || "suspended".equalsIgnoreCase(status) || "disabled".equalsIgnoreCase(status);

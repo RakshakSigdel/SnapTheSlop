@@ -3,7 +3,7 @@ package com.snaptheslop.snaptheslop.issue.controller;
 import com.snaptheslop.snaptheslop.config.DBConnection;
 import com.snaptheslop.snaptheslop.issue.model.Issue;
 import com.snaptheslop.snaptheslop.issue.model.dao.IssueDAO;
-import com.snaptheslop.snaptheslop.user.model.UserDTO;
+import com.snaptheslop.snaptheslop.user.model.User;
 import com.snaptheslop.snaptheslop.util.SessionUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -34,7 +34,7 @@ public class CitizenMyIssuesServlet extends HttpServlet {
             throws ServletException, IOException {
 
         // Auth
-        UserDTO citizen = SessionUtil.getLoggedInUser(request);
+        User citizen = SessionUtil.getLoggedInUser(request);
         if (citizen == null) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;

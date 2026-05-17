@@ -1,6 +1,6 @@
 package com.snaptheslop.snaptheslop.user.controller;
 
-import com.snaptheslop.snaptheslop.user.model.UserDTO;
+import com.snaptheslop.snaptheslop.user.model.User;
 import com.snaptheslop.snaptheslop.user.model.dao.UserDAO;
 import com.snaptheslop.snaptheslop.util.ValidationUtil;
 import jakarta.servlet.ServletException;
@@ -75,7 +75,7 @@ public class RegisterServlet extends HttpServlet {
     }
 
     // Create UserDTO
-    UserDTO newUser = new UserDTO();
+    User newUser = new User();
     newUser.setUserId(
       "NS-" +
         System.currentTimeMillis() +

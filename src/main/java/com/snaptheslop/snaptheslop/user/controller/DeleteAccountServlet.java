@@ -1,6 +1,6 @@
 package com.snaptheslop.snaptheslop.user.controller;
 
-import com.snaptheslop.snaptheslop.user.model.UserDTO;
+import com.snaptheslop.snaptheslop.user.model.User;
 import com.snaptheslop.snaptheslop.user.model.dao.UserDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -23,7 +23,7 @@ public class DeleteAccountServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
 
         HttpSession session = request.getSession(false);
-        UserDTO user = (UserDTO) (session != null ? session.getAttribute("loggedInUser") : null);
+        User user = (User) (session != null ? session.getAttribute("loggedInUser") : null);
 
         if (user == null || user.getUserId() == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

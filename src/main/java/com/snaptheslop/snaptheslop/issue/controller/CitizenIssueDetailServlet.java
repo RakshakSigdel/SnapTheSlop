@@ -5,7 +5,7 @@ import com.snaptheslop.snaptheslop.comment.model.Comment;
 import com.snaptheslop.snaptheslop.comment.model.dao.CommentDAO;
 import com.snaptheslop.snaptheslop.issue.model.Issue;
 import com.snaptheslop.snaptheslop.issue.model.dao.IssueDAO;
-import com.snaptheslop.snaptheslop.user.model.UserDTO;
+import com.snaptheslop.snaptheslop.user.model.User;
 import com.snaptheslop.snaptheslop.util.SessionUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -56,7 +56,7 @@ public class CitizenIssueDetailServlet extends HttpServlet {
             return;
         }
 
-        UserDTO citizen = SessionUtil.getLoggedInUser(request);
+        User citizen = SessionUtil.getLoggedInUser(request);
         int userDbId = resolveLoggedInUserDbId(request, citizen);
         request.setAttribute("canModifyIssue", userDbId > 0 && userDbId == issue.getUserId());
 
@@ -82,7 +82,7 @@ public class CitizenIssueDetailServlet extends HttpServlet {
         request.getRequestDispatcher("/WEB-INF/views/citizen/issue-detail.jsp").forward(request, response);
     }
 
-    private int resolveLoggedInUserDbId(HttpServletRequest request, UserDTO citizen) {
+    private int resolveLoggedInUserDbId(HttpServletRequest request, User citizen) {
         int userDbId = SessionUtil.getLoggedInUserDbId(request);
         if (userDbId > 0) {
             return userDbId;

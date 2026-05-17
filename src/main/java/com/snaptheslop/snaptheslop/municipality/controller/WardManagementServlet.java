@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 import com.snaptheslop.snaptheslop.municipality.model.dao.MunicipalityDAO;
 import com.snaptheslop.snaptheslop.municipality.model.dao.WardDAO;
 import com.snaptheslop.snaptheslop.municipality.model.Ward;
-import com.snaptheslop.snaptheslop.user.model.UserDTO;
+import com.snaptheslop.snaptheslop.user.model.User;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -67,7 +67,7 @@ public class WardManagementServlet extends HttpServlet {
 
         try {
             HttpSession session = request.getSession(false);
-            UserDTO user = (UserDTO) (session != null ? session.getAttribute("loggedInUser") : null);
+            User user = (User) (session != null ? session.getAttribute("loggedInUser") : null);
 
             if (!isMunicipalHead(user)) {
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
@@ -165,7 +165,7 @@ public class WardManagementServlet extends HttpServlet {
 
         try {
             HttpSession session = request.getSession(false);
-            UserDTO user = (UserDTO) (session != null ? session.getAttribute("loggedInUser") : null);
+            User user = (User) (session != null ? session.getAttribute("loggedInUser") : null);
 
             if (!isMunicipalHead(user)) {
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
@@ -233,7 +233,7 @@ public class WardManagementServlet extends HttpServlet {
             throws ServletException, IOException, SQLException, ClassNotFoundException {
 
         HttpSession session = request.getSession(false);
-        UserDTO user = (UserDTO) (session != null ? session.getAttribute("loggedInUser") : null);
+        User user = (User) (session != null ? session.getAttribute("loggedInUser") : null);
 
         if (user == null) {
             response.sendRedirect(request.getContextPath() + "/login");
@@ -265,7 +265,7 @@ public class WardManagementServlet extends HttpServlet {
 
         try {
             HttpSession session = request.getSession(false);
-            UserDTO user = (UserDTO) (session != null ? session.getAttribute("loggedInUser") : null);
+            User user = (User) (session != null ? session.getAttribute("loggedInUser") : null);
 
             if (user == null) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -371,7 +371,7 @@ public class WardManagementServlet extends HttpServlet {
                 .replace("\t", "\\t");
     }
 
-    private int resolveMunicipalityIdFromRequestOrUser(HttpServletRequest request, UserDTO user)
+    private int resolveMunicipalityIdFromRequestOrUser(HttpServletRequest request, User user)
             throws SQLException, ClassNotFoundException {
         String municipalityIdStr = request.getParameter("municipalityId");
         if (municipalityIdStr != null && !municipalityIdStr.trim().isEmpty()) {
@@ -391,7 +391,7 @@ public class WardManagementServlet extends HttpServlet {
         return resolveMunicipalityIdFromUser(user);
     }
 
-    private int resolveMunicipalityIdFromUser(UserDTO user) throws SQLException, ClassNotFoundException {
+    private int resolveMunicipalityIdFromUser(User user) throws SQLException, ClassNotFoundException {
         if (user == null || user.getMunicipality() == null || user.getMunicipality().trim().isEmpty()) {
             return -1;
         }
@@ -400,12 +400,12 @@ public class WardManagementServlet extends HttpServlet {
         return municipalityId != null ? municipalityId : -1;
     }
 
-    private boolean isMunicipalHead(UserDTO user) {
+    private boolean isMunicipalHead(User user) {
         return user != null && user.getRole() != null
                 && "MUNICIPAL HEAD".equalsIgnoreCase(user.getRole().trim().replace('_', ' '));
     }
 
-    private boolean isCitizen(UserDTO user) {
+    private boolean isCitizen(User user) {
         if (user == null || user.getRole() == null) {
             return false;
         }
@@ -413,7 +413,7 @@ public class WardManagementServlet extends HttpServlet {
         return "REGISTERED CITIZEN".equals(role) || "CITIZEN".equals(role);
     }
 
-    private boolean isAdmin(UserDTO user) {
+    private boolean isAdmin(User user) {
         if (user == null || user.getRole() == null) {
             return false;
         }

@@ -4,7 +4,7 @@ import com.snaptheslop.snaptheslop.config.DBConnection;
 import com.snaptheslop.snaptheslop.issue.model.Issue;
 import com.snaptheslop.snaptheslop.issue.model.dao.IssueDAO;
 import com.snaptheslop.snaptheslop.municipality.model.dao.WardDAO;
-import com.snaptheslop.snaptheslop.user.model.UserDTO;
+import com.snaptheslop.snaptheslop.user.model.User;
 import com.snaptheslop.snaptheslop.util.ImageUploadUtil;
 import com.snaptheslop.snaptheslop.util.SessionUtil;
 import jakarta.servlet.ServletException;
@@ -40,7 +40,7 @@ public class CitizenIssueEditServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        UserDTO citizen = SessionUtil.getLoggedInUser(request);
+        User citizen = SessionUtil.getLoggedInUser(request);
         if (citizen == null) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
@@ -80,7 +80,7 @@ public class CitizenIssueEditServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        UserDTO citizen = SessionUtil.getLoggedInUser(request);
+        User citizen = SessionUtil.getLoggedInUser(request);
         if (citizen == null) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
@@ -182,7 +182,7 @@ public class CitizenIssueEditServlet extends HttpServlet {
         }
     }
 
-    private int resolveLoggedInUserDbId(HttpServletRequest request, UserDTO citizen) {
+    private int resolveLoggedInUserDbId(HttpServletRequest request, User citizen) {
         int userDbId = SessionUtil.getLoggedInUserDbId(request);
         if (userDbId > 0) {
             return userDbId;

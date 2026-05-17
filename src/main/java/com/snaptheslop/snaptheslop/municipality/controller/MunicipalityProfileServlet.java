@@ -1,8 +1,8 @@
-package com.snaptheslop.snaptheslop.issue.controller;
+package com.snaptheslop.snaptheslop.municipality.controller;
 
 import com.snaptheslop.snaptheslop.municipality.model.dao.MunicipalityDAO;
 import com.snaptheslop.snaptheslop.municipality.model.Municipality;
-import com.snaptheslop.snaptheslop.user.model.UserDTO;
+import com.snaptheslop.snaptheslop.user.model.User;
 import com.snaptheslop.snaptheslop.user.model.dao.UserDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -57,8 +57,8 @@ public class MunicipalityProfileServlet extends HttpServlet {
         // Determine municipality id: prefer user's municipalityId if available
         int municipalityId = -1;
         try {
-            if (userObj instanceof UserDTO) {
-                UserDTO u = (UserDTO) userObj;
+            if (userObj instanceof User) {
+                User u = (User) userObj;
                 if (u.getMunicipalityId() > 0) {
                     municipalityId = u.getMunicipalityId();
                 }
@@ -98,12 +98,12 @@ public class MunicipalityProfileServlet extends HttpServlet {
             boolean ok = municipalityDAO.updateMunicipality(municipality);
 
             // update user name if possible
-            if (userObj instanceof UserDTO) {
-                UserDTO u = (UserDTO) userObj;
+            if (userObj instanceof User) {
+                User u = (User) userObj;
                 if (headFirstName != null) u.setFirstName(headFirstName.trim());
                 if (headLastName != null) u.setLastName(headLastName.trim());
                 userDAO.updateUserProfile(u);
-                UserDTO refreshed = userDAO.findUserById(u.getUserId());
+                User refreshed = userDAO.findUserById(u.getUserId());
                 if (refreshed != null && session != null) session.setAttribute("loggedInUser", refreshed);
             } else {
                 // try to set via reflection on session 'user' object

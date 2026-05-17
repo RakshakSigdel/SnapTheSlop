@@ -1,6 +1,6 @@
 package com.snaptheslop.snaptheslop.user.controller;
 
-import com.snaptheslop.snaptheslop.user.model.UserDTO;
+import com.snaptheslop.snaptheslop.user.model.User;
 import com.snaptheslop.snaptheslop.user.model.dao.UserDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -45,7 +45,7 @@ public class LoginServlet extends HttpServlet {
     }
 
     // Authenticate user
-    UserDTO user = userDAO.authenticateUser(email.trim(), password);
+    User user = userDAO.authenticateUser(email.trim(), password);
 
     if (user != null) {
       // Create session
