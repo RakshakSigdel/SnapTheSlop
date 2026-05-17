@@ -1,7 +1,7 @@
 package com.snaptheslop.snaptheslop.municipality.controller;
 
-import com.snaptheslop.snaptheslop.municipality.MunicipalityDAO;
-import com.snaptheslop.snaptheslop.municipality.WardDAO;
+import com.snaptheslop.snaptheslop.municipality.model.dao.MunicipalityDAO;
+import com.snaptheslop.snaptheslop.municipality.model.dao.WardDAO;
 import com.snaptheslop.snaptheslop.municipality.model.Ward;
 import com.snaptheslop.snaptheslop.user.model.UserDTO;
 import jakarta.servlet.annotation.WebServlet;

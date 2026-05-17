@@ -250,7 +250,7 @@
 
             <div class="actions">
                 <a class="btn btn-primary" href="<%= request.getContextPath() %>/">
-                    <span style="margin-right: 8px;">🏠</span> Go to Home
+                    Go to Home
                 </a>
                 <a class="btn btn-secondary" href="javascript:history.back()">
                     <span style="margin-right: 8px;">←</span> Go Back

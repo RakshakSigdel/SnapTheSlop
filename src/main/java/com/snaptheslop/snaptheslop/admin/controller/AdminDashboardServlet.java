@@ -2,7 +2,7 @@ package com.snaptheslop.snaptheslop.admin.controller;
 
 import com.snaptheslop.snaptheslop.issue.model.Issue;
 import com.snaptheslop.snaptheslop.issue.model.dao.IssueDAO;
-import com.snaptheslop.snaptheslop.municipality.MunicipalityDAO;
+import com.snaptheslop.snaptheslop.municipality.model.dao.MunicipalityDAO;
 import com.snaptheslop.snaptheslop.user.model.dao.UserDAO;
 import java.io.*;
 import java.util.Collections;

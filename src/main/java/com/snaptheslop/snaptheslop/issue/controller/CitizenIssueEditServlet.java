@@ -3,7 +3,7 @@ package com.snaptheslop.snaptheslop.issue.controller;
 import com.snaptheslop.snaptheslop.config.DBConnection;
 import com.snaptheslop.snaptheslop.issue.model.Issue;
 import com.snaptheslop.snaptheslop.issue.model.dao.IssueDAO;
-import com.snaptheslop.snaptheslop.municipality.WardDAO;
+import com.snaptheslop.snaptheslop.municipality.model.dao.WardDAO;
 import com.snaptheslop.snaptheslop.user.model.UserDTO;
 import com.snaptheslop.snaptheslop.util.ImageUploadUtil;
 import com.snaptheslop.snaptheslop.util.SessionUtil;

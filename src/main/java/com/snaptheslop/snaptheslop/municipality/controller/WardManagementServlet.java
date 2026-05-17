@@ -9,8 +9,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import com.snaptheslop.snaptheslop.municipality.MunicipalityDAO;
-import com.snaptheslop.snaptheslop.municipality.WardDAO;
+import com.snaptheslop.snaptheslop.municipality.model.dao.MunicipalityDAO;
+import com.snaptheslop.snaptheslop.municipality.model.dao.WardDAO;
 import com.snaptheslop.snaptheslop.municipality.model.Ward;
 import com.snaptheslop.snaptheslop.user.model.UserDTO;
 

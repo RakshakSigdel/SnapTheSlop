@@ -1,7 +1,7 @@
 package com.snaptheslop.snaptheslop.user.model.dao;
 
 import com.snaptheslop.snaptheslop.config.DBConnection;
-import com.snaptheslop.snaptheslop.municipality.MunicipalityDAO;
+import com.snaptheslop.snaptheslop.municipality.model.dao.MunicipalityDAO;
 import com.snaptheslop.snaptheslop.user.model.UserDTO;
 import com.snaptheslop.snaptheslop.security.PasswordUtil;
 
