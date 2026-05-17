@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import com.snaptheslop.snaptheslop.user.model.UserDTO;
+import com.snaptheslop.snaptheslop.user.model.User;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -52,18 +52,18 @@ public class AuthFilter implements Filter {
         HttpSession session = req.getSession(false);
         Object sessionUser = session == null ? null : session.getAttribute(SESSION_LOGGED_IN_USER);
 
-        if (!(sessionUser instanceof UserDTO userDTO)) {
+        if (!(sessionUser instanceof User user)) {
             res.sendRedirect(contextPath + "/login");
             return;
         }
 
-        String role = normalizeRole(userDTO.getRole());
+        String role = normalizeRole(user.getRole());
         if (role == null) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN, "Unauthorized role.");
             return;
         }
 
-        if (isInactiveAccount(userDTO)) {
+        if (isInactiveAccount(user)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN, "Your account is inactive. Please contact admin.");
             return;
         }
@@ -122,12 +122,12 @@ public class AuthFilter implements Filter {
         return true;
     }
 
-    private boolean isInactiveAccount(UserDTO userDTO) {
-        if (userDTO == null || userDTO.getAccountStatus() == null) {
+    private boolean isInactiveAccount(User user) {
+        if (user == null || user.getAccountStatus() == null) {
             return false;
         }
 
-        String status = userDTO.getAccountStatus().trim().toLowerCase();
+        String status = user.getAccountStatus().trim().toLowerCase();
         return "inactive".equals(status) || "suspended".equals(status) || "disabled".equals(status);
     }
 

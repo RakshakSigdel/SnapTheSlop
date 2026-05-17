@@ -1,6 +1,6 @@
 package com.snaptheslop.snaptheslop.util;
 
-import com.snaptheslop.snaptheslop.user.model.UserDTO;
+import com.snaptheslop.snaptheslop.user.model.User;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
@@ -13,11 +13,11 @@ public class SessionUtil {
     private static final String SESSION_KEY = "loggedInUser";
 
     /** Returns the logged-in UserDTO, or null if not authenticated. */
-    public static UserDTO getLoggedInUser(HttpServletRequest request) {
+    public static User getLoggedInUser(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         if (session == null) return null;
         Object user = session.getAttribute(SESSION_KEY);
-        return (user instanceof UserDTO) ? (UserDTO) user : null;
+        return (user instanceof User) ? (User) user : null;
     }
 
     /** Returns the DB numeric id (users.id) for the logged-in user via a JOIN-safe lookup.
@@ -43,14 +43,14 @@ public class SessionUtil {
 
     /** Convenience: role check. Normalises the stored role string. */
     public static boolean isCitizen(HttpServletRequest request) {
-        UserDTO user = getLoggedInUser(request);
+        User user = getLoggedInUser(request);
         if (user == null || user.getRole() == null) return false;
         String r = user.getRole().trim().toUpperCase();
         return r.contains("CITIZEN");
     }
 
     public static boolean isMunicipalHead(HttpServletRequest request) {
-        UserDTO user = getLoggedInUser(request);
+        User user = getLoggedInUser(request);
         if (user == null || user.getRole() == null) return false;
         String r = user.getRole().trim().toUpperCase();
         return r.contains("MUNICIPAL");

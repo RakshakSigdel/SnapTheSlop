@@ -4,7 +4,7 @@ import com.snaptheslop.snaptheslop.issue.model.Issue;
 import com.snaptheslop.snaptheslop.issue.model.dao.IssueDAO;
 import com.snaptheslop.snaptheslop.comment.model.dao.CommentDAO;
 import com.snaptheslop.snaptheslop.upvote.model.dao.UpvoteDAO;
-import com.snaptheslop.snaptheslop.user.model.UserDTO;
+import com.snaptheslop.snaptheslop.user.model.User;
 import com.snaptheslop.snaptheslop.util.SessionUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -13,7 +13,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -61,7 +60,7 @@ public class MunicipalityManageIssueServlet extends HttpServlet {
         }
 
         // Verify this issue belongs to the logged-in municipality
-        UserDTO muniUser = SessionUtil.getLoggedInUser(request);
+        User muniUser = SessionUtil.getLoggedInUser(request);
         if (muniUser != null && muniUser.getMunicipalityId() > 0
                 && issue.getMunicipalityId() != muniUser.getMunicipalityId()) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN,
@@ -122,7 +121,7 @@ public class MunicipalityManageIssueServlet extends HttpServlet {
         }
 
         // Auth — ensure municipality owns this issue
-        UserDTO muniUser = SessionUtil.getLoggedInUser(request);
+        User muniUser = SessionUtil.getLoggedInUser(request);
         if (muniUser != null && muniUser.getMunicipalityId() > 0
                 && issue.getMunicipalityId() != muniUser.getMunicipalityId()) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN,

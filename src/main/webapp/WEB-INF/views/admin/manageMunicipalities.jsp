@@ -1,10 +1,10 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="com.snaptheslop.snaptheslop.admin.model.MunicipalityDTO" %>
+<%@ page import="com.snaptheslop.snaptheslop.municipality.model.Municipality" %>
 <% request.setAttribute("activePage", "municipalities"); %>
 <jsp:include page="../common/header.jsp"/>
 
 <%
-	MunicipalityDTO municipality = (MunicipalityDTO) request.getAttribute("municipality");
+	Municipality municipality = (Municipality) request.getAttribute("municipality");
 	boolean municipalityExists = municipality != null;
 	boolean adminExists = municipalityExists
 		&& municipality.getAdminEmail() != null

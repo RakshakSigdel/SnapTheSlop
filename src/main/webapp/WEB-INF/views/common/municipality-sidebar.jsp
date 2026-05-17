@@ -1,10 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="com.snaptheslop.snaptheslop.user.model.UserDTO" %>
+<%@ page import="com.snaptheslop.snaptheslop.user.model.User" %>
 <%@ page import="com.snaptheslop.snaptheslop.util.SessionUtil" %>
 <%@ page import="com.snaptheslop.snaptheslop.notification.model.dao.NotificationDAO" %>
 <% 
     String activePage = (String) request.getAttribute("activePage"); 
-    UserDTO mUser = SessionUtil.getLoggedInUser(request);
+    User mUser = SessionUtil.getLoggedInUser(request);
     int mUnreadCount = 0;
     if (mUser != null && mUser.getMunicipalityId() > 0) {
         mUnreadCount = new NotificationDAO().countUnreadForMunicipality(mUser.getMunicipalityId());

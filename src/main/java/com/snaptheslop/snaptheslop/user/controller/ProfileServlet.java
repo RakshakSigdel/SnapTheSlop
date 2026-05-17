@@ -1,8 +1,8 @@
 package com.snaptheslop.snaptheslop.user.controller;
 
-import com.snaptheslop.snaptheslop.municipality.MunicipalityDAO;
+import com.snaptheslop.snaptheslop.municipality.model.dao.MunicipalityDAO;
 import com.snaptheslop.snaptheslop.municipality.model.Municipality;
-import com.snaptheslop.snaptheslop.user.model.UserDTO;
+import com.snaptheslop.snaptheslop.user.model.User;
 import com.snaptheslop.snaptheslop.user.model.dao.UserDAO;
 
 import jakarta.servlet.ServletException;
@@ -25,7 +25,7 @@ public class ProfileServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        UserDTO profileUser = (UserDTO) request.getSession().getAttribute("loggedInUser");
+        User profileUser = (User) request.getSession().getAttribute("loggedInUser");
 
         // UI-only behavior: always show profile page with demo/fallback data.
         if (profileUser == null) {
@@ -35,7 +35,7 @@ public class ProfileServlet extends HttpServlet {
 
         // Retrieve latest user data from database only for real user ids.
         if (profileUser.getUserId() != null && profileUser.getUserId().startsWith("NS-")) {
-            UserDTO updatedUser = userDAO.findUserById(profileUser.getUserId());
+            User updatedUser = userDAO.findUserById(profileUser.getUserId());
             if (updatedUser != null) {
                 profileUser = updatedUser;
                 request.getSession().setAttribute("loggedInUser", profileUser);
@@ -52,7 +52,7 @@ public class ProfileServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        UserDTO profileUser = (UserDTO) request.getSession().getAttribute("loggedInUser");
+        User profileUser = (User) request.getSession().getAttribute("loggedInUser");
 
         if (profileUser == null) {
             response.sendRedirect(request.getContextPath() + "/login");
@@ -94,7 +94,7 @@ public class ProfileServlet extends HttpServlet {
 
         // Update in database
         if (userDAO.updateUserProfile(profileUser)) {
-            UserDTO refreshedUser = userDAO.findUserById(profileUser.getUserId());
+            User refreshedUser = userDAO.findUserById(profileUser.getUserId());
             if (refreshedUser != null) {
                 profileUser = refreshedUser;
             }
@@ -146,8 +146,8 @@ public class ProfileServlet extends HttpServlet {
         return first + last;
     }
 
-    private UserDTO createDemoUser() {
-        UserDTO user = new UserDTO();
+    private User createDemoUser() {
+        User user = new User();
         user.setUserId("NS-UI-000001");
         user.setFirstName("Ramesh");
         user.setLastName("Yadav");

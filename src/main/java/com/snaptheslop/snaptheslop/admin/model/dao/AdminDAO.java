@@ -1,6 +1,6 @@
 package com.snaptheslop.snaptheslop.admin.model.dao;
 
-import com.snaptheslop.snaptheslop.admin.model.MunicipalityDTO;
+import com.snaptheslop.snaptheslop.municipality.model.Municipality;
 import com.snaptheslop.snaptheslop.config.DBConnection;
 import com.snaptheslop.snaptheslop.security.PasswordUtil;
 import java.sql.*;
@@ -13,7 +13,7 @@ public class AdminDAO {
   /**
    * Register a new municipality and create municipal head admin account
    */
-  public boolean registerMunicipality(MunicipalityDTO municipality) {
+  public boolean registerMunicipality(Municipality municipality) {
     Connection conn = null;
     try {
       conn = DBConnection.getConnection();
@@ -135,8 +135,8 @@ public class AdminDAO {
   /**
    * Get all municipalities
    */
-  public List<MunicipalityDTO> getAllMunicipalities() {
-    List<MunicipalityDTO> municipalities = new ArrayList<>();
+  public List<Municipality> getAllMunicipalities() {
+    List<Municipality> municipalities = new ArrayList<>();
     String sql =
       "SELECT m.id, m.name, m.district, m.province, m.contact_number, m.email, m.office_address, " +
       "COUNT(DISTINCT w.id) AS ward_count, " +
@@ -154,7 +154,7 @@ public class AdminDAO {
       ResultSet rs = stmt.executeQuery(sql)
     ) {
       while (rs.next()) {
-        MunicipalityDTO municipality = new MunicipalityDTO();
+        Municipality municipality = new Municipality();
         municipality.setId(rs.getInt("id"));
         municipality.setName(rs.getString("name"));
         municipality.setDistrict(rs.getString("district"));
@@ -183,7 +183,7 @@ public class AdminDAO {
   /**
    * Get municipality by ID
    */
-  public MunicipalityDTO getMunicipalityById(int id) {
+  public Municipality getMunicipalityById(int id) {
     String sql =
       "SELECT m.id, m.name, m.district, m.province, m.contact_number, m.email, m.office_address, " +
       "COUNT(DISTINCT w.id) AS ward_count, " +
@@ -206,7 +206,7 @@ public class AdminDAO {
       ResultSet rs = pstmt.executeQuery();
 
       if (rs.next()) {
-        MunicipalityDTO municipality = new MunicipalityDTO();
+        Municipality municipality = new Municipality();
         municipality.setId(rs.getInt("id"));
         municipality.setName(rs.getString("name"));
         municipality.setOldName(rs.getString("name"));
@@ -236,7 +236,7 @@ public class AdminDAO {
     return null;
   }
 
-  public boolean updateMunicipalityAndAdmin(MunicipalityDTO municipality) {
+  public boolean updateMunicipalityAndAdmin(Municipality municipality) {
     Connection conn = null;
     try {
       conn = DBConnection.getConnection();
@@ -367,7 +367,7 @@ public class AdminDAO {
   /**
    * Get municipality by name
    */
-  public MunicipalityDTO getMunicipalityByName(String name) {
+  public Municipality getMunicipalityByName(String name) {
     String sql = "SELECT * FROM municipalities WHERE name = ?";
 
     try (
@@ -378,7 +378,7 @@ public class AdminDAO {
       ResultSet rs = pstmt.executeQuery();
 
       if (rs.next()) {
-        MunicipalityDTO municipality = new MunicipalityDTO();
+        Municipality municipality = new Municipality();
         municipality.setId(rs.getInt("id"));
         municipality.setName(rs.getString("name"));
         municipality.setDistrict(rs.getString("district"));

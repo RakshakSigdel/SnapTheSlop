@@ -1,9 +1,9 @@
-package com.snaptheslop.snaptheslop.issue.controller;
+package com.snaptheslop.snaptheslop.municipality.controller;
 
 import com.snaptheslop.snaptheslop.issue.model.Issue;
 import com.snaptheslop.snaptheslop.issue.model.dao.IssueDAO;
-import com.snaptheslop.snaptheslop.municipality.MunicipalityDAO;
-import com.snaptheslop.snaptheslop.user.model.UserDTO;
+import com.snaptheslop.snaptheslop.municipality.model.dao.MunicipalityDAO;
+import com.snaptheslop.snaptheslop.user.model.User;
 import com.snaptheslop.snaptheslop.util.SessionUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -22,7 +22,7 @@ public class MunicipalityDashboardServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        UserDTO municipalityUser = SessionUtil.getLoggedInUser(request);
+        User municipalityUser = SessionUtil.getLoggedInUser(request);
         if (municipalityUser == null) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
@@ -54,7 +54,7 @@ public class MunicipalityDashboardServlet extends HttpServlet {
                .forward(request, response);
     }
 
-    private int resolveMunicipalityId(UserDTO user, HttpSession session) {
+    private int resolveMunicipalityId(User user, HttpSession session) {
         if (user == null) {
             return -1;
         }

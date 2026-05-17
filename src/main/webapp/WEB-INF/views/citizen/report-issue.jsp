@@ -3,7 +3,7 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="com.snaptheslop.snaptheslop.issue.model.Issue" %>
-<%@ page import="com.snaptheslop.snaptheslop.user.model.UserDTO" %>
+<%@ page import="com.snaptheslop.snaptheslop.user.model.User" %>
 <jsp:include page="../common/header.jsp"/>
 
 <%
@@ -23,7 +23,7 @@
   }
 
   if (reportMunicipalityName == null) {
-    UserDTO loggedInUser = (UserDTO) session.getAttribute("loggedInUser");
+    User loggedInUser = (User) session.getAttribute("loggedInUser");
     if (loggedInUser != null) {
       reportMunicipalityName = loggedInUser.getMunicipality();
     }

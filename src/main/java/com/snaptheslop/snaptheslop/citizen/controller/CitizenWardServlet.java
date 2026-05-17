@@ -1,9 +1,9 @@
-package com.snaptheslop.snaptheslop.municipality.controller;
+package com.snaptheslop.snaptheslop.citizen.controller;
 
-import com.snaptheslop.snaptheslop.municipality.MunicipalityDAO;
-import com.snaptheslop.snaptheslop.municipality.WardDAO;
+import com.snaptheslop.snaptheslop.municipality.model.dao.MunicipalityDAO;
+import com.snaptheslop.snaptheslop.municipality.model.dao.WardDAO;
 import com.snaptheslop.snaptheslop.municipality.model.Ward;
-import com.snaptheslop.snaptheslop.user.model.UserDTO;
+import com.snaptheslop.snaptheslop.user.model.User;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,15 +31,15 @@ public class CitizenWardServlet extends HttpServlet {
 
         try {
             HttpSession session = request.getSession(false);
-            UserDTO user = null;
+            User user = null;
             if (session != null) {
                 Object currentUser = session.getAttribute("loggedInUser");
-                if (currentUser instanceof UserDTO) {
-                    user = (UserDTO) currentUser;
+                if (currentUser instanceof User) {
+                    user = (User) currentUser;
                 } else {
                     Object legacyUser = session.getAttribute("user");
-                    if (legacyUser instanceof UserDTO) {
-                        user = (UserDTO) legacyUser;
+                    if (legacyUser instanceof User) {
+                        user = (User) legacyUser;
                     }
                 }
             }
@@ -96,7 +96,7 @@ public class CitizenWardServlet extends HttpServlet {
         }
     }
 
-    private int resolveMunicipalityIdFromUser(UserDTO user) throws SQLException, ClassNotFoundException {
+    private int resolveMunicipalityIdFromUser(User user) throws SQLException, ClassNotFoundException {
         if (user == null) {
             return -1;
         }
@@ -119,7 +119,7 @@ public class CitizenWardServlet extends HttpServlet {
         return -1;
     }
 
-    private boolean isCitizen(UserDTO user) {
+    private boolean isCitizen(User user) {
         if (user == null || user.getRole() == null) {
             return false;
         }

@@ -4,10 +4,10 @@ import com.snaptheslop.snaptheslop.comment.model.Comment;
 import com.snaptheslop.snaptheslop.comment.model.dao.CommentDAO;
 import com.snaptheslop.snaptheslop.issue.model.Issue;
 import com.snaptheslop.snaptheslop.issue.model.dao.IssueDAO;
-import com.snaptheslop.snaptheslop.municipality.MunicipalityDAO;
+import com.snaptheslop.snaptheslop.municipality.model.dao.MunicipalityDAO;
 import com.snaptheslop.snaptheslop.municipality.model.Municipality;
 import com.snaptheslop.snaptheslop.upvote.model.dao.UpvoteDAO;
-import com.snaptheslop.snaptheslop.user.model.UserDTO;
+import com.snaptheslop.snaptheslop.user.model.User;
 import com.snaptheslop.snaptheslop.util.SessionUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -82,7 +82,7 @@ public class CitizenBrowseIssuesServlet extends HttpServlet {
                 : commentDAO.countByIssueIds(issueIds);
 
         Set<Integer> upvotedIssueIds = Collections.emptySet();
-        UserDTO user = SessionUtil.getLoggedInUser(request);
+        User user = SessionUtil.getLoggedInUser(request);
         if (user != null && !issueIds.isEmpty()) {
             int userDbId = SessionUtil.getLoggedInUserDbId(request);
             if (userDbId > 0) {

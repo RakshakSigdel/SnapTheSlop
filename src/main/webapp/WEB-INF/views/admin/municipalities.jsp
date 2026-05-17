@@ -1,6 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.List" %>
-<%@ page import="com.snaptheslop.snaptheslop.admin.model.MunicipalityDTO" %>
+<%@ page import="com.snaptheslop.snaptheslop.municipality.model.Municipality" %>
 <% request.setAttribute("activePage", "municipalities"); %>
 <jsp:include page="../common/header.jsp"/>
 
@@ -37,9 +37,9 @@
 						</thead>
 						<tbody>
 						<%
-							List<MunicipalityDTO> municipalities = (List<MunicipalityDTO>) request.getAttribute("municipalities");
+							List<Municipality> municipalities = (List<Municipality>) request.getAttribute("municipalities");
 							if (municipalities != null && !municipalities.isEmpty()) {
-								for (MunicipalityDTO municipality : municipalities) {
+								for (Municipality municipality : municipalities) {
 									String adminEmail = municipality.getAdminEmail() != null && !municipality.getAdminEmail().trim().isEmpty()
 										? municipality.getAdminEmail()
 										: "pending setup";
