@@ -2,7 +2,7 @@ package com.snaptheslop.snaptheslop.issue.controller;
 
 import com.snaptheslop.snaptheslop.issue.model.Issue;
 import com.snaptheslop.snaptheslop.issue.model.dao.IssueDAO;
-import com.snaptheslop.snaptheslop.user.model.UserDTO;
+import com.snaptheslop.snaptheslop.user.model.User;
 import com.snaptheslop.snaptheslop.util.SessionUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -29,7 +29,7 @@ public class MunicipalityIssueListServlet extends HttpServlet {
             throws ServletException, IOException {
 
         // Auth
-        UserDTO muniUser = SessionUtil.getLoggedInUser(request);
+        User muniUser = SessionUtil.getLoggedInUser(request);
         if (muniUser == null) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;

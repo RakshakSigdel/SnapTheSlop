@@ -2,7 +2,7 @@ package com.snaptheslop.snaptheslop.user.model.dao;
 
 import com.snaptheslop.snaptheslop.config.DBConnection;
 import com.snaptheslop.snaptheslop.municipality.model.dao.MunicipalityDAO;
-import com.snaptheslop.snaptheslop.user.model.UserDTO;
+import com.snaptheslop.snaptheslop.user.model.User;
 import com.snaptheslop.snaptheslop.security.PasswordUtil;
 
 import java.sql.*;
@@ -20,7 +20,7 @@ public class UserDAO {
     /**
      * Register a new user by saving their data to the database
      */
-    public boolean registerUser(UserDTO user, String password) {
+    public boolean registerUser(User user, String password) {
         String sql = "INSERT INTO users (firstName, lastName, email, phoneNumber, municipality, wardNo, province, password, role, accountStatus, memberSince, userId) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?)";
 
@@ -50,7 +50,7 @@ public class UserDAO {
     /**
      * Find user by email and verify password
      */
-    public UserDTO authenticateUser(String email, String password) {
+    public User authenticateUser(String email, String password) {
         String sql = "SELECT * FROM users WHERE email = ?";
 
         try (Connection conn = DBConnection.getConnection();
@@ -75,7 +75,7 @@ public class UserDAO {
     /**
      * Find user by email
      */
-    public UserDTO findUserByEmail(String email) {
+    public User findUserByEmail(String email) {
         String sql = "SELECT * FROM users WHERE email = ?";
 
         try (Connection conn = DBConnection.getConnection();
@@ -97,7 +97,7 @@ public class UserDAO {
     /**
      * Find user by userId
      */
-    public UserDTO findUserById(String userId) {
+    public User findUserById(String userId) {
         String sql = "SELECT * FROM users WHERE userId = ?";
 
         try (Connection conn = DBConnection.getConnection();
@@ -119,7 +119,7 @@ public class UserDAO {
     /**
      * Update user profile information
      */
-    public boolean updateUserProfile(UserDTO user) {
+    public boolean updateUserProfile(User user) {
         String sql = "UPDATE users SET firstName = ?, lastName = ?, phoneNumber = ?, municipality = ?, wardNo = ?, province = ? WHERE userId = ?";
 
         try (Connection conn = DBConnection.getConnection();
@@ -198,8 +198,8 @@ public class UserDAO {
     /**
      * Get all users for admin listing
      */
-    public List<UserDTO> getAllUsers() {
-        List<UserDTO> users = new ArrayList<>();
+    public List<User> getAllUsers() {
+        List<User> users = new ArrayList<>();
         String sql = "SELECT * FROM users ORDER BY createdAt DESC";
 
         try (Connection conn = DBConnection.getConnection();
@@ -219,8 +219,8 @@ public class UserDAO {
     /**
      * Map ResultSet to UserDTO
      */
-    private UserDTO mapResultSetToUserDTO(ResultSet rs) throws SQLException {
-        UserDTO user = new UserDTO();
+    private User mapResultSetToUserDTO(ResultSet rs) throws SQLException {
+        User user = new User();
         user.setUserId(rs.getString("userId"));
         user.setFirstName(rs.getString("firstName"));
         user.setLastName(rs.getString("lastName"));

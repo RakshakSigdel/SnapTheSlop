@@ -5,7 +5,7 @@ import com.snaptheslop.snaptheslop.issue.model.Issue;
 import com.snaptheslop.snaptheslop.issue.model.dao.IssueDAO;
 import com.snaptheslop.snaptheslop.municipality.model.dao.MunicipalityDAO;
 import com.snaptheslop.snaptheslop.municipality.model.Municipality;
-import com.snaptheslop.snaptheslop.user.model.UserDTO;
+import com.snaptheslop.snaptheslop.user.model.User;
 import com.snaptheslop.snaptheslop.user.model.dao.UserDAO;
 import com.snaptheslop.snaptheslop.util.ImageUploadUtil;
 import com.snaptheslop.snaptheslop.util.SessionUtil;
@@ -47,13 +47,13 @@ public class CitizenReportIssueServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        UserDTO citizen = SessionUtil.getLoggedInUser(request);
+        User citizen = SessionUtil.getLoggedInUser(request);
         if (citizen == null) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 
-        UserDTO latestUser = userDAO.findUserById(citizen.getUserId());
+        User latestUser = userDAO.findUserById(citizen.getUserId());
         if (latestUser != null) {
             citizen = latestUser;
             request.getSession().setAttribute("loggedInUser", citizen);
@@ -88,7 +88,7 @@ public class CitizenReportIssueServlet extends HttpServlet {
             throws ServletException, IOException {
 
         // 1. Auth check
-        UserDTO citizen = SessionUtil.getLoggedInUser(request);
+        User citizen = SessionUtil.getLoggedInUser(request);
         if (citizen == null) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
@@ -108,7 +108,7 @@ public class CitizenReportIssueServlet extends HttpServlet {
         if (err != null) { reloadForm(request, response, err); return; }
 
         // 4. Resolve municipality from the logged-in user's profile
-        UserDTO latestUser = userDAO.findUserById(citizen.getUserId());
+        User latestUser = userDAO.findUserById(citizen.getUserId());
         if (latestUser != null) {
             citizen = latestUser;
             request.getSession().setAttribute("loggedInUser", citizen);
@@ -225,9 +225,9 @@ public class CitizenReportIssueServlet extends HttpServlet {
         req.setAttribute("prevCategory",    req.getParameter("category"));
         req.setAttribute("prevLocation",    req.getParameter("location"));
         req.setAttribute("prevDescription", req.getParameter("description"));
-        UserDTO citizen = SessionUtil.getLoggedInUser(req);
+        User citizen = SessionUtil.getLoggedInUser(req);
         if (citizen != null) {
-            UserDTO latestUser = userDAO.findUserById(citizen.getUserId());
+            User latestUser = userDAO.findUserById(citizen.getUserId());
             if (latestUser != null) {
                 citizen = latestUser;
                 req.getSession().setAttribute("loggedInUser", citizen);
@@ -255,7 +255,7 @@ public class CitizenReportIssueServlet extends HttpServlet {
         }
     }
 
-    private int resolveMunicipalityIdFromUser(UserDTO user) {
+    private int resolveMunicipalityIdFromUser(User user) {
         if (user == null) {
             return -1;
         }

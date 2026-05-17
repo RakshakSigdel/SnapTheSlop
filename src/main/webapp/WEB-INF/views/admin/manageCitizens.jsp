@@ -1,10 +1,10 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="com.snaptheslop.snaptheslop.user.model.UserDTO" %>
+<%@ page import="com.snaptheslop.snaptheslop.user.model.User" %>
 <% request.setAttribute("activePage", "citizens"); %>
 <jsp:include page="../common/header.jsp"/>
 
 <%
-	UserDTO targetUser = (UserDTO) request.getAttribute("targetUser");
+	User targetUser = (User) request.getAttribute("targetUser");
 	String errorMsg = (String) request.getAttribute("error");
 	String successMsg = (String) request.getAttribute("success");
 	String firstName = targetUser != null && targetUser.getFirstName() != null ? targetUser.getFirstName() : "";

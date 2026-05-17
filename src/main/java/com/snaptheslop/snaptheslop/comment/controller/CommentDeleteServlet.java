@@ -3,7 +3,7 @@ package com.snaptheslop.snaptheslop.comment.controller;
 import com.snaptheslop.snaptheslop.comment.model.Comment;
 import com.snaptheslop.snaptheslop.comment.model.dao.CommentDAO;
 import com.snaptheslop.snaptheslop.config.DBConnection;
-import com.snaptheslop.snaptheslop.user.model.UserDTO;
+import com.snaptheslop.snaptheslop.user.model.User;
 import com.snaptheslop.snaptheslop.util.SessionUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -25,7 +25,7 @@ public class CommentDeleteServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        UserDTO user = SessionUtil.getLoggedInUser(request);
+        User user = SessionUtil.getLoggedInUser(request);
         if (user == null) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
@@ -58,7 +58,7 @@ public class CommentDeleteServlet extends HttpServlet {
         response.sendRedirect(returnUrl);
     }
 
-    private int resolveUserDbId(HttpServletRequest request, UserDTO user) {
+    private int resolveUserDbId(HttpServletRequest request, User user) {
         int userDbId = SessionUtil.getLoggedInUserDbId(request);
         if (userDbId > 0) {
             return userDbId;

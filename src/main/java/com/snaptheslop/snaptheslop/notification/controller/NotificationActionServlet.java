@@ -1,7 +1,7 @@
 package com.snaptheslop.snaptheslop.notification.controller;
 
 import com.snaptheslop.snaptheslop.notification.model.dao.NotificationDAO;
-import com.snaptheslop.snaptheslop.user.model.UserDTO;
+import com.snaptheslop.snaptheslop.user.model.User;
 import com.snaptheslop.snaptheslop.util.SessionUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -23,7 +23,7 @@ public class NotificationActionServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        UserDTO user = SessionUtil.getLoggedInUser(request);
+        User user = SessionUtil.getLoggedInUser(request);
         if (user == null) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
